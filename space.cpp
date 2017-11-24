@@ -1,9 +1,8 @@
 #include "space.h"
 
-Space::Space() {
-	size = 20;
+Space::Space(int size) {
+	this->size = size;
 	num = 0;
-
 
 	matrix.resize(size);
 	for (int i = 0; i < size; i++)
@@ -17,11 +16,6 @@ Space::Space() {
 		   }
 		}
 	}
-
-}
-
-Space::Space(int size) {
-
 }
 
 void Space::add(Cuboid& c) {
@@ -49,9 +43,7 @@ void Space::printMatrix() {
 	}
 }
 
-void Space::render(int selected) {
-	if (selected == -1)
-		sc.render();
+void Space::render() {
 	drawGrid(0, Color(1,1,1));
 	for (int i = 0; i < num; i++) {
 		cuboids[i].render();	
@@ -100,36 +92,25 @@ void Space::deselect(int index) {
 	sc.pos = cuboids[index].pos;
 }
 
-bool Space::move(int index, Direction d) {
-	if (index == -1) {
-		switch(d) {
-			case Left:
-				if (sc.pos.x != 0)
-					sc.pos.x--;
-				break;
-			case Right:
-				if (sc.pos.x+1 != size)
-					sc.pos.x++;
-				break;
-			case Forward:
-				if (sc.pos.y != 0)
-					sc.pos.y--;
-				break;
-			case Backward:
-				if (sc.pos.y+1 != size)
-					sc.pos.y++;
-				break;
-			case Down:
-				if (sc.pos.z != 0)
-					sc.pos.z--;
-				break;
-			case Up:
-				if (sc.pos.z+1 != size)
-					sc.pos.z++;
-				break;
+bool Space::checkSides(bool x, bool y, bool z, int lowb1, int upb1, int lowb2, int upb2, int a, float cposz) {
+	for (int j = lowb1; j <upb1; j++) {
+		for (int k = lowb2; k < upb2; k++) {
+			if (j>=0 && j<size && k>=0 && k<size) {
+				if (!x && matrix[a][j][k] != 0) return false;
+				if (!y && matrix[j][a][k] != 0) return false;
+				if (!z && matrix[j][k][a] != 0) return false;
+			}
+			if (j>=0 && j<size && k>=1 && k<size) {
+				if (!x && matrix[a][j][k] == 0 && matrix[a][j][k-1] != 0 && cposz+0.01<k+0.2) return false;
+				if (!y && matrix[j][a][k] == 0 && matrix[j][a][k-1] != 0 && cposz+0.01<k+0.2) return false;
+			}
 		}
-		return false;
 	}
+
+	return true;
+}
+
+bool Space::move(int index, Direction d) {
 
 	Cuboid& c = cuboids[index];
 	int x = c.pos.x;
@@ -149,79 +130,23 @@ bool Space::move(int index, Direction d) {
 
 	switch(d) {
 		case Left:
-			if (x == 0) {
-				return false;
-			}
-			for (int j = miny; j <maxy+ depth; j++) {
-				for (int k = minz; k < maxz+height; k++) {
-					if (j>=0 && j<size && k>=0 && k<size && matrix[x-1][j][k] != 0)
-						return false;
-					if (j>=0 && j<size && k>=1 && k<size && matrix[x-1][j][k] == 0
-							 &&  matrix[x-1][j][k-1] != 0 && c.pos.z+0.01<k+0.2)
-						return false;
-					
-				}
-			}
-			break;
+			if (x == 0) return false;
+			return checkSides(false, true, true, miny, maxy+depth, minz, maxz+height, x-1, c.pos.z);
 		case Right:
-			if (x+width == size) 
-				return false;
-			for (int j = miny; j < maxy+depth; j++) {
-				for (int k = minz; k < maxz+height; k++) {
-					if (j>=0 && j<size && k>=0 && k<size && matrix[x+width][j][k] != 0)	
-						return false;
-					if (j>=0 && j<size && k>=1 && k<size && matrix[x+width][j][k] == 0
-							 &&  matrix[x+width][j][k-1] != 0 && c.pos.z+0.01<k+0.2)
-						return false;
-				}
-			}
-			break;
+			if (x+width == size) return false;
+			return checkSides(false, true, true, miny, maxy+depth, minz, maxz+height, x+width, c.pos.z);
 		case Forward:
-			if (y == 0)
-				return false;
-			for (int i = minx; i < maxx+width; i++) {
-				for (int k = minz; k < maxz+height; k++) {
-					if (i>=0 && i<size && k>=0 && k<size &&  matrix[i][y-1][k] != 0)	
-						return false;
-					if (i>=0 && i<size && k>=1 && k<size && matrix[i][y-1][k] == 0
-							 &&  matrix[i][y-1][k-1] != 0 && c.pos.z+0.01<k+0.2)
-						return false;
-				}
-			}
-			break;
+			if (y == 0) return false;
+			return checkSides(true, false, true, minx, maxx+width, minz, maxz+height, y-1, c.pos.z);
 		case Backward:
-			if (y+depth == size)
-				return false;
-			for (int i = minx; i < maxx+width; i++) {
-				for (int k = minz; k < maxz+height; k++) {
-					if (i>=0 && i<size && k>=0 && k<size && matrix[i][y+depth][k] != 0)	
-						return false;
-					if (i>=0 && i<size && k>=1 && k<size && matrix[i][y+depth][k] == 0
-							 &&  matrix[i][y+depth][k-1] != 0 && c.pos.z+0.01<k+0.2)
-						return false;
-				}
-			}
-			break;
+			if (y+depth == size) return false;
+			return checkSides(true, false, true, minx, maxx+width, minz, maxz+height, y+depth, c.pos.z);
 		case Down:
-			if (z == 0)
-				return false;
-			for (int i = minx; i < maxx+width; i++) {
-				for (int j = miny; j < maxy+depth; j++) {
-					if (j>=0 && j<size && i>=0 && i<size && matrix[i][j][z-1] != 0)	
-						return false;
-				}
-			}
-			break;
+			if (z == 0) return false;
+			return checkSides(true, true, false, minx, maxx+width, miny, maxy+depth, z-1, c.pos.z);
 		case Up:
-			if (z+height == size)
-				return false;
-			for (int i = minx; i < maxx+width; i++) {
-				for (int j = miny; j < maxy+depth; j++) {
-					if (j>=0 && j<size && i>=0 && i<size && matrix[i][j][z+height] != 0)	
-						return false;
-				}
-			}
-			break;
+			if (z+height == size) return false;
+			return checkSides(true, true, false, minx, maxx+width, miny, maxy+depth, z+height, c.pos.z);
 	}
 
 	return true;

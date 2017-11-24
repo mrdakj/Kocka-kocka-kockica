@@ -26,6 +26,7 @@ class Space {
 	private:
 		void updateMatrix(unsigned char number, Cuboid& c);
 		SelectionCube sc;
+		bool checkSides(bool x, bool y, bool z, int lowb1, int upb1, int lowb2, int upb2, int a, float cposz);
 
 	public:
 		// number of cuboids
@@ -36,10 +37,10 @@ class Space {
 		void printMatrix();
 		std::vector<std::vector<std::vector<unsigned char>>> matrix;
 
-		Space();
+		Space() : Space(20) {};
 		Space(int size);
 		void add(Cuboid& c);
-		void render(int selected);
+		void render();
 		// move a cuboid indexed with index in direction d
 		bool move(int index, Direction d);
 		// clear a part of the matrix where selected cuboid is

@@ -100,7 +100,7 @@ void renderScene(void) {
 	glLoadIdentity();
 	gluLookAt(cameraPosition.x,cameraPosition.y,cameraPosition.z, cameraLookAt.x,cameraLookAt.y,cameraLookAt.z, 0, 1, 0);
 
-	space.render(selected);
+	space.render();
 	
 	glutSwapBuffers();
 }
