@@ -7,11 +7,12 @@
 #include "animate.h"
 #include "space.h" 
 #include "keyboard.h"
+#include "mouse.h"
+
 
 // define global variables
 int windowWidth=1200;
 int windowHeight=700;
-int selected = -1;
 float speed = 0.08;
 int xcursor=0;
 int ycursor=0;
@@ -23,11 +24,17 @@ Button bRight('d');
 Button bForward('s');
 Button bBackward('w');
 Button bSelectDeselect(32);
-Vector3f cameraLookAt(0,0,-40);
-Vector3f cameraPosition(5,5,15);
+Vector3f cameraPosition(0,3,5);
+Vector3f to(0,0,-1);
 Vector3f view, hvector, v;
 float fovy = 40;
 int nearClippingPlaneDistance=1;
+float moveFront = 0;
+float moveLeftRight = 0;
+float theta=3.1415/2;
+float phi=3.1415/2;
+float thetaStep=0;
+float phiStep=0;
 
 //--------------------------------
 
@@ -79,7 +86,7 @@ int main(int argc, char** argv) {
 	glutMouseFunc(mouse);
     glutMotionFunc(mouseMotion);
     glutPassiveMotionFunc(passiveMouse);
-	/* glutIdleFunc(myIdleFunc); */
+	glutIdleFunc(renderScene);
 
 	glutMainLoop();
 	
@@ -93,12 +100,46 @@ void setWindow() {
 }
 
 
+void getFrontPosition() {
+	cameraPosition.x += moveFront * to.x * 0.2;
+	cameraPosition.z += moveFront * to.z * 0.2;
+}
+
+void getLeftRightPosition() {
+	cameraPosition.x += moveLeftRight * to.z * 0.2;
+	cameraPosition.z += moveLeftRight * -to.x * 0.2;
+}
+
+void calculateDirection() {
+	phi += phiStep;
+	theta += thetaStep;
+
+	to.x=std::sin(theta)*std::cos(phi);
+	to.z=-std::sin(phi)*std::sin(theta);
+	to.y=std::cos(theta);
+
+	getVectors();
+}
 
 void renderScene(void) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	if (moveFront)
+		getFrontPosition();
+
+	if (moveLeftRight)
+		getLeftRightPosition();
+
+	if (phiStep) {
+		calculateDirection();
+	}
+
+	if (thetaStep) {
+		calculateDirection();
+	}
+
 	glLoadIdentity();
-	gluLookAt(cameraPosition.x,cameraPosition.y,cameraPosition.z, cameraLookAt.x,cameraLookAt.y,cameraLookAt.z, 0, 1, 0);
+	gluLookAt(cameraPosition.x,cameraPosition.y,cameraPosition.z, cameraPosition.x + to.x,cameraPosition.y + to.y,cameraPosition.z + to.z, 0, 1, 0);
 
 	space.render();
 	
@@ -125,11 +166,12 @@ void changeScene(int w, int h) {
 	glMatrixMode(GL_MODELVIEW);
 
 	getVectors();
+
 }
 
 
 void getVectors() {
-	view = cameraLookAt-cameraPosition;
+	view = to;
 	view.normalize();
 	hvector = view * Vector3f(0,1,0);
 	hvector.normalize();

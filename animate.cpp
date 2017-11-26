@@ -19,7 +19,7 @@ bool move(Direction d, Cuboid& c,float speed) {
 		if (d != Down)
 			coordinate = line;
 
-		if (space.move(selected, d)) 
+		if (space.move(space.selected, d)) 
 		{
 			coordinate += z*speed;
 			return true;
@@ -42,10 +42,10 @@ void on_timer(int value) {
 	if (value != TIMER_ID)
 	  return;
 
-	if (selected==-1 || !somethingIsPressed())
+	if (space.selected==-1 || !somethingIsPressed())
 		return;
 
-	Cuboid& selectedCuboid = space.cuboids[selected];
+	Cuboid& selectedCuboid = space.cuboids[space.selected];
 
 	if (bLeft.pressed)
 		move(Left,selectedCuboid,speed);

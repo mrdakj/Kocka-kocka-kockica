@@ -4,6 +4,9 @@ Kocka kocka kockica
 Komande:
 
 selektovanje misem
+deselektovanje misem/space
+
+pomeranje kockice:
 
 napred - s
 
@@ -16,3 +19,10 @@ desno -d
 gore - e
 
 dole - q
+
+kamera:
+
+strelice za transliranje
+
+j, k, l, i za rotaciju
+

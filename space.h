@@ -7,48 +7,61 @@
 #include <cmath>
 #include <cstring>
 
-struct SelectionCube {
-	Position pos;
-
-	void render() {
-		glPushMatrix();
-		glColor3f(0,1,0);
-		glTranslatef(0.5, 0.5, -0.5);
-		glTranslatef(pos.x, pos.z, -pos.y);
-		glutWireCube(1);
-		glPopMatrix();
-	}
-
-	SelectionCube() {}
-};
 
 class Space {
 	private:
+		// fill matrix with id=number at position determied by c
 		void updateMatrix(unsigned char number, Cuboid& c);
-		SelectionCube sc;
+
+		// help function for move function
 		bool checkSides(bool x, bool y, bool z, int lowb1, int upb1, int lowb2, int upb2, int a, float cposz);
+
+		void printMatrix();
 
 	public:
 		// number of cuboids
 		int num;
+
+		// size of matrix
 		int size;
-		void drawGrid(float h, Color c);
+
+		// index of selected cuboid in vector cuboids, -1 if nothing is selected
+		int selected;
+
 		std::vector<Cuboid> cuboids;
-		void printMatrix();
+
+		// matrix filled with cuboids ids
 		std::vector<std::vector<std::vector<unsigned char>>> matrix;
 
+		// draw a grid at y=h
+		void drawGrid(float h, Color c);
+
+		// constructors
 		Space() : Space(20) {};
 		Space(int size);
+
+		// add a cuboid to the space
 		void add(Cuboid& c);
+
+		// render all cuboids and a grid
 		void render();
+
 		// move a cuboid indexed with index in direction d
 		bool move(int index, Direction d);
+
 		// clear a part of the matrix where selected cuboid is
-		void select(int index);
+		void select();
+
 		// fill a part of the matrix where cuboid is left
-		void deselect(int index);
-		// get element of matrix where selection cube is
-		int getSelection();
+		void deselect();
+
+		// put down selected cuboid
+		void putDown();
+
+		// pick a cuboid with index=id-1
+		void pick(int id);
+
+	
 };
 
 #endif
