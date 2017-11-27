@@ -49,6 +49,10 @@ void keyboard(unsigned char key, int x, int y) {
 		thetaStep=-0.02;
 	if (key=='k')
 		thetaStep=0.02;
+	if (key=='u')
+		moveUpDown=0.02;
+	if (key=='o')
+		moveUpDown=-0.02;
 
 	if (key == bSelectDeselect.key) {
 	  if (space.selected!=-1) {
@@ -70,9 +74,6 @@ void keyboard(unsigned char key, int x, int y) {
 }
 
 void keyBoardSpecialUp( int key, int x, int y ) { 
-	buttonChangeState(key);
-	if (!somethingIsPressed())
-		animation_ongoing=0;
 	if (key == GLUT_KEY_UP) {
 		moveFront = 0;
 	
@@ -95,6 +96,8 @@ void keyBoardUp(unsigned char key, int x, int y) {
 		phiStep=0;
 	if (key == 'i' || key=='k')
 		thetaStep=0;
+	if (key == 'u' || key=='o')
+		moveUpDown=0;
 
 	buttonChangeState(key);
 	if (!somethingIsPressed())
@@ -102,7 +105,6 @@ void keyBoardUp(unsigned char key, int x, int y) {
 }
 
 void keyboardSpecial(int key, int x, int y) {
-	buttonChangeState(key);
 
 	if (key == GLUT_KEY_UP) {
 		moveFront = 0.5;

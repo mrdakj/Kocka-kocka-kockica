@@ -24,6 +24,7 @@ extern float fovy;
 extern int nearClippingPlaneDistance;
 extern float moveFront;
 extern float moveLeftRight;
+extern float moveUpDown;
 extern float theta;
 extern float phi;
 extern float thetaStep;

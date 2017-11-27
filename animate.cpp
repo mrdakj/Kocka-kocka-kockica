@@ -47,17 +47,49 @@ void on_timer(int value) {
 
 	Cuboid& selectedCuboid = space.cuboids[space.selected];
 
-	if (bLeft.pressed)
-		move(Left,selectedCuboid,speed);
+	if (bLeft.pressed) {
+		if (to.x-to.z>=0 && -to.x-to.z>=0)
+			move(Left,selectedCuboid,speed);
+		if (-to.x-to.z>=0 && -to.x+to.z>=0)
+			move(Forward,selectedCuboid,speed);
+		if (-to.x+to.z>=0 && to.x+to.z>=0)
+			move(Right,selectedCuboid,speed);
+		if (to.x+to.z>=0 && to.x-to.z>=0)
+			move(Backward,selectedCuboid,speed);
+	}
 
-	if (bRight.pressed)
-		move(Right,selectedCuboid,speed);
+	if (bRight.pressed) {
+		if (to.x-to.z>=0 && -to.x-to.z>=0)
+			move(Right,selectedCuboid,speed);
+		if (-to.x-to.z>=0 && -to.x+to.z>=0)
+			move(Backward,selectedCuboid,speed);
+		if (-to.x+to.z>=0 && to.x+to.z>=0)
+			move(Left,selectedCuboid,speed);
+		if (to.x+to.z>=0 && to.x-to.z>=0)
+			move(Forward,selectedCuboid,speed);
+	}
 
-	if (bForward.pressed)
-		move(Forward,selectedCuboid,speed);
+	if (bForward.pressed) {
+		if (to.x-to.z>=0 && -to.x-to.z>=0)
+			move(Forward,selectedCuboid,speed);
+		if (-to.x-to.z>=0 && -to.x+to.z>=0)
+			move(Right,selectedCuboid,speed);
+		if (-to.x+to.z>=0 && to.x+to.z>=0)
+			move(Backward,selectedCuboid,speed);
+		if (to.x+to.z>=0 && to.x-to.z>=0)
+			move(Left,selectedCuboid,speed);
+	}
 
-	if (bBackward.pressed)
-		move(Backward,selectedCuboid,speed);
+	if (bBackward.pressed) {
+		if (to.x-to.z>=0 && -to.x-to.z>=0)
+			move(Backward,selectedCuboid,speed);
+		if (-to.x-to.z>=0 && -to.x+to.z>=0)
+			move(Left,selectedCuboid,speed);
+		if (-to.x+to.z>=0 && to.x+to.z>=0)
+			move(Forward,selectedCuboid,speed);
+		if (to.x+to.z>=0 && to.x-to.z>=0)
+			move(Right,selectedCuboid,speed);
+	}
 
 	if (bUp.pressed)
 		move(Up,selectedCuboid,speed);

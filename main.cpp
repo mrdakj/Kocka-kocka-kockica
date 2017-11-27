@@ -31,6 +31,7 @@ float fovy = 40;
 int nearClippingPlaneDistance=1;
 float moveFront = 0;
 float moveLeftRight = 0;
+float moveUpDown=0;
 float theta=3.1415/2;
 float phi=3.1415/2;
 float thetaStep=0;
@@ -110,6 +111,11 @@ void getLeftRightPosition() {
 	cameraPosition.z += moveLeftRight * -to.x * 0.2;
 }
 
+void getUpDownPosition() {
+
+	cameraPosition.y += moveUpDown;
+}
+
 void calculateDirection() {
 	phi += phiStep;
 	theta += thetaStep;
@@ -123,6 +129,9 @@ void calculateDirection() {
 
 void renderScene(void) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	if (moveUpDown)
+		getUpDownPosition();
 
 	if (moveFront)
 		getFrontPosition();
