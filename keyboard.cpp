@@ -41,6 +41,8 @@ bool somethingIsPressed() {
 }
 
 void keyboard(unsigned char key, int x, int y) {
+	if (key==27)
+		exit(0);
 	if (key == 'j')
 		phiStep=0.02;
 	if (key == 'l')

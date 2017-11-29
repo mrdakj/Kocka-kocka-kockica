@@ -1,12 +1,31 @@
 #include  "cuboid.h"
 #include <stdio.h>
 
-Cuboid::Cuboid() {}
+Cuboid::Cuboid() {
+	/* printf("const %f\n", pos.x); */
+	obj = gluNewQuadric();
+}
 
-Cuboid::Cuboid(Position pos, Size size) : pos(pos), size(size) {}
+Cuboid::Cuboid(Position pos, Size size) : pos(pos), size(size) {
+	/* printf("const %f\n",pos.x); */
+	obj = gluNewQuadric();
+}
 
 Cuboid::Cuboid(Position pos, Size size, Color color) : Cuboid(pos, size) { 
 	this->color = color;
+}
+
+Cuboid::Cuboid(Cuboid const& other) {
+	pos=other.pos;
+	size=other.size;
+	color=other.color;
+	obj=gluNewQuadric();
+	/* printf("copy const %f\n", pos.x); */
+}
+
+Cuboid::~Cuboid(void) {
+	/* printf("dest %f\n",pos.x); */
+	gluDeleteQuadric(obj);
 }
 
 void Cuboid::renderCuboid() {
@@ -63,7 +82,6 @@ void Cuboid::renderCylinder() {
 			glTranslatef(0.5 + i, size.height, -0.5-j);
 			glRotatef(-90,1,0,0);
 			glBegin(GL_POLYGON);
-			GLUquadricObj* obj = gluNewQuadric();
 			gluCylinder(obj, 0.25, 0.25, 0.2, 30,30);
 			glPopMatrix();
 		}

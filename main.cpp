@@ -45,27 +45,20 @@ void changeScene(int w, int h);
 int animation_ongoing;
 void getVectors();
 
-
 int main(int argc, char** argv) {
 	animation_ongoing=0;
 
+
+
+	/* TODO  destructor will not be called for this because of loop */
     Cuboid cx(Position(0,5,0), Size(2,1,1), Color(0,0,1));
+    Cuboid c(Position(4,5,0), Size(2,1,2), Color(0,1,0));
+    Cuboid c3(Position(6,14,2), Size(1,1,1), Color(1,0,0));
+
 	space.add(cx);
-
-	Cuboid c3;
-	c3.pos.x = 6;
-	c3.pos.y = 14;
-	c3.pos.z = 2;
-	c3.color.r=1;
 	space.add(c3);
-
-	Cuboid c;
-	c.pos.x = 4;
-	c.pos.y = 3;
-	c.size.width=2;
-	c.size.depth=2;
-	c.color.g=1;
 	space.add(c);
+
 
 	/* init glut */
 	glutInit(&argc, argv);

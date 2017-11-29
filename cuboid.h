@@ -38,9 +38,12 @@ class Cuboid {
 		Cuboid();
 		Cuboid(Position pos, Size size);
 		Cuboid(Position pos, Size size, Color color);
+        Cuboid(Cuboid const& other); 
+		~Cuboid(void);
 		void round();
 
 	private:
+		GLUquadricObj* obj;
 		void renderCuboid();
 		void renderCylinder();
 		void render();

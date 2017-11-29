@@ -2,7 +2,8 @@
 
 Space::Space(int size) {
 	this->size = size;
-	this->selected = -1;
+	selected = -1;
+	cuboids.reserve(256);
 
 	num = 0;
 
@@ -16,6 +17,10 @@ Space::Space(int size) {
 		   }
 		}
 	}
+}
+
+Space::~Space(void) {
+	/* printf("space dest\n"); */
 }
 
 void Space::add(Cuboid& c) {
@@ -163,6 +168,17 @@ void Space::pick(int id) {
 	id--;
 	selected = id;
 
+	Cuboid& c = cuboids[selected];
+
+	if (c.pos.z+c.size.height<size) {
+		for (int i = 0; i < c.size.width; i++) {
+			for (int j = 0; j < c.size.depth; j++) {
+				if (matrix[c.pos.x+i][c.pos.y+j][c.pos.z+c.size.height] != 0)
+					return;
+			}
+		}
+	}
+
 	select();
-	cuboids[selected].pos.z += 0.2;
+	c.pos.z += 0.2;
 }

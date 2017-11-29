@@ -39,6 +39,8 @@ class Space {
 		// constructors
 		Space() : Space(20) {};
 		Space(int size);
+		~Space(void);
+
 
 		// add a cuboid to the space
 		void add(Cuboid& c);
