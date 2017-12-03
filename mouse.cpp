@@ -246,123 +246,48 @@ void mouseMotion(int x, int y) {
 	glutWarpPointer(windowWidth / 2, windowHeight / 2);
 
 
-
-	bool moveCameraTheta = false;
-	bool moveCameraPhi = false;
-
-
 	Cuboid& selectedCuboid = space.cuboids[space.selected];
 
-	int delta_x = x-windowWidth/2;
+	float delta_x = x-windowWidth/2;
+	if (delta_x>50)
+		delta_x=50;
 
-	if (delta_x>0)
-		delta_x=10;
-	if (delta_x<0)
-		delta_x=-10;
-
+	delta_x *= 0.005;
 
 	if (delta_x) {
-		float speed = abs(delta_x)*0.005;
-		if (delta_x<0) {
-			if (to.x-to.z>=0 && -to.x-to.z>=0) {
-				move(Left,selectedCuboid,speed);
-				moveCameraTheta=true;
-			}
-			if (-to.x-to.z>=0 && -to.x+to.z>=0) {
-				move(Forward,selectedCuboid,speed);
-				moveCameraTheta=true;
-			}
-			if (-to.x+to.z>=0 && to.x+to.z>=0) {
-				move(Right,selectedCuboid,speed);
-				moveCameraTheta=true;
-			}
-			if (to.x+to.z>=0 && to.x-to.z>=0) {
-				move(Backward,selectedCuboid,speed);
-				moveCameraTheta=true;
-			}
-		}
-
-		if (delta_x>0) {
-			if (to.x-to.z>=0 && -to.x-to.z>=0) {
-				move(Right,selectedCuboid,speed);
-				moveCameraTheta=true;
-			}
-			if (-to.x-to.z>=0 && -to.x+to.z>=0) {
-				move(Backward,selectedCuboid,speed);
-				moveCameraTheta=true;
-			}
-			if (-to.x+to.z>=0 && to.x+to.z>=0) {
-				move(Left,selectedCuboid,speed);
-				moveCameraTheta=true;
-			}
-			if (to.x+to.z>=0 && to.x-to.z>=0) {
-				move(Forward,selectedCuboid,speed);
-				moveCameraTheta=true;
-			}
-		}
+		float b=-to.z*delta_x;
+		float a=-to.x*delta_x;
+		if (b>0)
+			move(Right,selectedCuboid,b);
+		if (b<0)
+			move(Left,selectedCuboid,-b);
+		if (a>0)
+			move(Backward,selectedCuboid,a);
+		if (a<0)
+			move(Forward,selectedCuboid,-a);
 	}
 
 
-	int delta_y = -y+windowHeight/2;
+	float delta_y = -y+windowHeight/2;
+	if (delta_y>50)
+		delta_y=50;
 
-	if (delta_y>0)
-		delta_y=10;
-	if (delta_y<0)
-		delta_y=-10;
-
+	delta_y *= 0.005;
 
 	if (delta_y) {
-		float speed = abs(delta_y)*0.005;
-		if (delta_y<0) {
-			if (to.x-to.z>=0 && -to.x-to.z>=0) {
-				move(Forward,selectedCuboid,speed);
-				moveCameraPhi=true;
-			}
-			if (-to.x-to.z>=0 && -to.x+to.z>=0) {
-				move(Right,selectedCuboid,speed);
-				moveCameraPhi=true;
-			}
-			if (-to.x+to.z>=0 && to.x+to.z>=0) {
-				move(Backward,selectedCuboid,speed);
-				moveCameraPhi=true;
-			}
-			if (to.x+to.z>=0 && to.x-to.z>=0) {
-				move(Left,selectedCuboid,speed);
-				moveCameraPhi=true;
-			}
-		}
-
-		if (delta_y>0) {
-			if (to.x-to.z>=0 && -to.x-to.z>=0) {
-				move(Backward,selectedCuboid,speed);
-				moveCameraPhi=true;
-			}
-			if (-to.x-to.z>=0 && -to.x+to.z>=0) {
-				move(Left,selectedCuboid,speed);
-				moveCameraPhi=true;
-			}
-			if (-to.x+to.z>=0 && to.x+to.z>=0) {
-				move(Forward,selectedCuboid,speed);
-				moveCameraPhi=true;
-			}
-			if (to.x+to.z>=0 && to.x-to.z>=0) {
-				move(Right,selectedCuboid,speed);
-				moveCameraPhi=true;
-			}
-		}
+		float b=to.x*delta_y;
+		float a=-to.z*delta_y;
+		if (b>0)
+			move(Right,selectedCuboid,b);
+		if (b<0)
+			move(Left,selectedCuboid,-b);
+		if (a>0)
+			move(Backward,selectedCuboid,a);
+		if (a<0)
+			move(Forward,selectedCuboid,-a);
+		
 	}
 
-	/* if (moveCameraTheta) { */
-	/* 	thetaStep = (x - windowWidth/2) * 0.0002; */
-	/* 	phiStep=0; */
-	/* 	calculateDirection(); */
-	/* } */
-
-	/* if (moveCameraPhi) { */
-	/* 	phiStep = - (y - windowHeight/2) * 0.0002; */
-	/* 	thetaStep=0; */
-	/* 	calculateDirection(); */
-	/* } */
 
 	thetaStep = phiStep = 0;
 
