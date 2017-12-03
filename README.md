@@ -29,3 +29,4 @@ strelice, u, o za transliranje
 
 mis / j, k, l, i za rotaciju
 
+exit - esc

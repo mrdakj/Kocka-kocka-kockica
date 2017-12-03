@@ -29,7 +29,7 @@ extern float theta;
 extern float phi;
 extern float thetaStep;
 extern float phiStep;
-extern int delta_x;
-extern int delta_y;
+extern int prev_x;
+extern int prev_y;
 
 #endif

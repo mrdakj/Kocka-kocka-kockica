@@ -1,6 +1,7 @@
 #include "mouse.h"
 #include "utility.h"
 #include "globalVariables.h"
+#include "camera.h"
 
 // get a direction of mouse picking ray
 Vector3f getDirection(float fx, float fy) {
@@ -159,6 +160,45 @@ void mouseMotion(int x, int y) {}
 
 
 
+void passiveMouse(int x, int y) {
+	if (x>=windowWidth-10 || x<=10) {
+		glutWarpPointer(windowWidth/2,y);
+		prev_x=windowWidth/2;
+	}
+	if (y>=windowHeight-10 || y<=10) {
+		glutWarpPointer(x,windowHeight/2);
+		prev_y=windowHeight/2;
+	}
+
+	thetaStep = (x-prev_x)*0.002;
+	if (abs(x-prev_x)>50) {
+		glutWarpPointer(windowWidth/2,y);
+		prev_x=windowWidth/2;
+		thetaStep=0;
+	}
+
+	phiStep = -(y - prev_y) * 0.002;
+	if (abs(y-prev_y)>50)
+	{
+		glutWarpPointer(x,windowHeight/2);
+		prev_y=windowHeight/2;
+		phiStep=0;
+	}
+
+	if (thetaStep) {
+		calculateDirection();
+	}
+
+	if (phiStep) {
+		calculateDirection();
+	}
+
+	prev_x = x;
+	prev_y = y;
+
+	thetaStep = phiStep = 0;
+
+}
 /* void passiveMouse(int x, int y) { */
 /* 	y = windowHeight - y; */
 

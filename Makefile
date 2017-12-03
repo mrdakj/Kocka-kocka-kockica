@@ -1,6 +1,6 @@
 LDFLAGS = -lGL -lGLU -lglut -lm
 
-main: main.o cuboid.o space.o keyboard.o animate.o mouse.o utility.o
+main: main.o cuboid.o space.o keyboard.o animate.o mouse.o utility.o camera.o
 	g++ -o main *.o $(LDFLAGS)
 main.o: main.cpp cuboid.h globalVariables.h
 	g++ -c main.cpp $(LDFLAGS)
@@ -16,6 +16,8 @@ animate.o: animate.cpp animate.h
 	g++ -c animate.cpp $(LDFLAGS)
 utility.o: utility.cpp utility.h
 	g++ -c utility.cpp $(LDFLAGS)
+camera.o: camera.cpp camera.h
+	g++ -c camera.cpp $(LDFLAGS)
 
 clean:
 	@rm -f *.o

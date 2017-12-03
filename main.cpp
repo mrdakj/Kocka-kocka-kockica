@@ -8,6 +8,7 @@
 #include "space.h" 
 #include "keyboard.h"
 #include "mouse.h"
+#include "camera.h"
 
 
 // define global variables
@@ -36,8 +37,8 @@ float theta=0;
 float phi=0;
 float thetaStep=0;
 float phiStep=0;
-int delta_x=0;
-int delta_y=0;
+int prev_x=0;
+int prev_y=0;
 
 //--------------------------------
 
@@ -97,37 +98,6 @@ void setWindow() {
 }
 
 
-void getFrontPosition() {
-	cameraPosition.x += moveFront * to.x * 0.2;
-	cameraPosition.z += moveFront * to.z * 0.2;
-}
-
-void getLeftRightPosition() {
-	cameraPosition.x += moveLeftRight * to.z * 0.2;
-	cameraPosition.z += moveLeftRight * -to.x * 0.2;
-}
-
-void getUpDownPosition() {
-
-	cameraPosition.y += moveUpDown;
-}
-
-void calculateDirection() {
-	theta += thetaStep;
-	phi += phiStep;
-
-	if (phi >= 0.9) {
-		phi = 0.9;
-	} else if (phi <= -0.9) {
-		phi = -0.9;
-	}
-
-	to.x = std::sin(theta);
-	to.y = std::sin(phi);
-	to.z = -std::cos(theta);
-
-	getVectors();
-}
 
 double inverseProject[16]={0.0};
 
@@ -140,6 +110,7 @@ void renderScene(void) {
 		glMultMatrixd(inverseProject);
 
 		glBegin(GL_TRIANGLES);
+			glColor3f(0.6,0.4,0.8);
 			glVertex3f(-0.02, -0.02, 0);
 			glVertex3f(0.02, -0.02, 0);
 			glVertex3f(0, 0, 0);
@@ -184,8 +155,8 @@ void changeScene(int w, int h) {
 
 
 	glutWarpPointer(windowWidth/2,windowHeight/2);
-	delta_x=windowWidth/2;
-	delta_y=windowHeight/2;
+	prev_x=windowWidth/2;
+	prev_y=windowHeight/2;
 
 	float ratio = 1.0 * w / h;
 
@@ -235,66 +206,3 @@ void changeScene(int w, int h) {
 }
 
 
-void getVectors() {
-	view = to;
-	view.normalize();
-	hvector = view * Vector3f(0,1,0);
-	hvector.normalize();
-	v=hvector*view;
-	v.normalize();
-	float rad = fovy * 3.14159 / 180;
-	float vLength = tan( rad / 2 ) * nearClippingPlaneDistance;
-	float hLength = vLength * ((float)windowWidth / windowHeight);
-	v = v*vLength;
-	hvector = hvector*hLength;
-}
-
-void passiveMouse(int x, int y) {
-	if (x>=windowWidth-10 || x<=10) {
-		glutWarpPointer(windowWidth/2,y);
-		delta_x=windowWidth/2;
-	}
-	if (y>=windowHeight-10 || y<=10) {
-		glutWarpPointer(x,windowHeight/2);
-		delta_y=windowHeight/2;
-	}
-
-	y = windowHeight - y;
-
-	/* if (x-delta_x>0) */
-	/* 	thetaStep =  0.003; */
-	/* else if (x-delta_x<0) */
-	/* 	thetaStep=-0.003; */
-
-	/* if (y-delta_y>0) */
-	/* 	phiStep =0.003; */
-	/* else if (y-delta_y<0) */
-	/* 	phiStep=-0.003; */
-	thetaStep = (x-delta_x)*0.002;
-	if (abs(x-delta_x)>50) {
-		glutWarpPointer(windowWidth/2,y);
-		delta_x=windowWidth/2;
-		thetaStep=0;
-	}
-
-	phiStep = (y - delta_y) * 0.002;
-	if (abs(y-delta_y)>50)
-	{
-		glutWarpPointer(x,windowHeight/2);
-		delta_y=windowHeight/2;
-		phiStep=0;
-	}
-
-	if (thetaStep) {
-		calculateDirection();
-	}
-
-	if (phiStep) {
-		calculateDirection();
-	}
-
-	delta_x = x;
-	delta_y = y;
-
-	thetaStep = phiStep = 0;
-}
