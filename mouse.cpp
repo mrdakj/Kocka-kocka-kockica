@@ -1,5 +1,6 @@
 #include "mouse.h"
 #include "utility.h"
+#include "globalVariables.h"
 
 // get a direction of mouse picking ray
 Vector3f getDirection(float fx, float fy) {
@@ -20,6 +21,8 @@ Vector3f getDirection(float fx, float fy) {
 
 void mouse(int button, int state, int x, int y) {
 	if (button == GLUT_LEFT_BUTTON &&  state == GLUT_DOWN) { 
+		x=windowWidth/2;
+		y=windowHeight/2;
 
 		if (space.selected!=-1) {
 			space.putDown();
@@ -147,6 +150,7 @@ void mouse(int button, int state, int x, int y) {
 	if (button == GLUT_RIGHT_BUTTON &&  state == GLUT_DOWN) { 
 		space.putDown();
 		glutPostRedisplay();
+
 	}
 }
 
@@ -154,4 +158,23 @@ void mouse(int button, int state, int x, int y) {
 void mouseMotion(int x, int y) {}
 
 
-void passiveMouse(int x, int y) {}
+
+/* void passiveMouse(int x, int y) { */
+/* 	y = windowHeight - y; */
+
+/* 	thetaStep = (x - delta_x) * 0.005; */
+/* 	phiStep = (y - delta_y) * 0.005; */
+
+/* 	if (thetaStep) { */
+/* 		calculateDirection2(); */
+/* 	} */
+
+/* 	if (phiStep) { */
+/* 		calculateDirection2(); */
+/* 	} */
+
+/* 	delta_x = x; */
+/* 	delta_y = y; */
+
+/* 	theta = phi = 0; */
+/* } */

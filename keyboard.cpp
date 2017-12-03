@@ -44,13 +44,13 @@ void keyboard(unsigned char key, int x, int y) {
 	if (key==27)
 		exit(0);
 	if (key == 'j')
-		phiStep=0.02;
-	if (key == 'l')
-		phiStep=-0.02;
-	if (key == 'i')
 		thetaStep=-0.02;
-	if (key=='k')
+	if (key == 'l')
 		thetaStep=0.02;
+	if (key == 'i')
+		phiStep=0.02;
+	if (key=='k')
+		phiStep=-0.02;
 	if (key=='u')
 		moveUpDown=0.02;
 	if (key=='o')
@@ -95,9 +95,9 @@ void keyBoardSpecialUp( int key, int x, int y ) {
 
 void keyBoardUp(unsigned char key, int x, int y) {
 	if (key == 'j' || key=='l')
-		phiStep=0;
-	if (key == 'i' || key=='k')
 		thetaStep=0;
+	if (key == 'i' || key=='k')
+		phiStep=0;
 	if (key == 'u' || key=='o')
 		moveUpDown=0;
 
