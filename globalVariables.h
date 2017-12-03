@@ -29,7 +29,9 @@ extern float theta;
 extern float phi;
 extern float thetaStep;
 extern float phiStep;
-extern int prev_x;
-extern int prev_y;
+// coordinates of selected object
+extern GLdouble objX;
+extern GLdouble objY;
+extern GLdouble objZ;
 
 #endif

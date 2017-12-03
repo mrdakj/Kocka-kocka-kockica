@@ -69,10 +69,10 @@ void keyboard(unsigned char key, int x, int y) {
 
 
 	buttonChangeState(key);
-	 if (!animation_ongoing) {
-            glutTimerFunc(TIMER_INTERVAL, on_timer, TIMER_ID);
-            animation_ongoing = 1;
-     }
+	 /* if (!animation_ongoing) { */
+            /* glutTimerFunc(TIMER_INTERVAL, on_timer, TIMER_ID); */
+            /* animation_ongoing = 1; */
+     /* } */
 }
 
 void keyBoardSpecialUp( int key, int x, int y ) { 
@@ -102,8 +102,8 @@ void keyBoardUp(unsigned char key, int x, int y) {
 		moveUpDown=0;
 
 	buttonChangeState(key);
-	if (!somethingIsPressed())
-		animation_ongoing=0;
+	/* if (!somethingIsPressed()) */
+	/* 	animation_ongoing=0; */
 }
 
 void keyboardSpecial(int key, int x, int y) {

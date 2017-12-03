@@ -37,9 +37,10 @@ float theta=0;
 float phi=0;
 float thetaStep=0;
 float phiStep=0;
-int prev_x=0;
-int prev_y=0;
 
+GLdouble objX=0;
+GLdouble objY=0;
+GLdouble objZ=0;
 //--------------------------------
 
 void setWindow();
@@ -105,18 +106,19 @@ void renderScene(void) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
-	glPushMatrix();
-		glLoadIdentity();
-		glMultMatrixd(inverseProject);
 
-		glBegin(GL_TRIANGLES);
-			glColor3f(0.6,0.4,0.8);
-			glVertex3f(-0.02, -0.02, 0);
-			glVertex3f(0.02, -0.02, 0);
-			glVertex3f(0, 0, 0);
-		glEnd();
+	/* glPushMatrix(); */
+	/* 	glLoadIdentity(); */
+	/* 	glMultMatrixd(inverseProject); */
 
-	glPopMatrix();
+	/* 	glBegin(GL_TRIANGLES); */
+	/* 		glColor3f(0.6,0.4,0.8); */
+	/* 		glVertex3f(-0.02, -0.02, 0); */
+	/* 		glVertex3f(0.02, -0.02, 0); */
+	/* 		glVertex3f(0, 0, 0); */
+	/* 	glEnd(); */
+
+	/* glPopMatrix(); */
 
 
 	if (moveUpDown)
@@ -136,11 +138,62 @@ void renderScene(void) {
 		calculateDirection();
 	}
 
+	Cuboid& selectedCuboid = space.cuboids[space.selected];
+	if (bUp.pressed)
+		move(Up,selectedCuboid,speed);
+
+	if (bDown.pressed)
+		move(Down,selectedCuboid,speed);
 
 	glLoadIdentity();
 	gluLookAt(cameraPosition.x,cameraPosition.y,cameraPosition.z, cameraPosition.x + to.x,cameraPosition.y + to.y,cameraPosition.z + to.z, 0, 1, 0);
 
 	space.render();
+
+	double modelMatrix[16];
+	double projMatrix[16];
+	GLint viewport[4];
+
+	glGetDoublev(GL_MODELVIEW_MATRIX,modelMatrix);
+	glGetDoublev(GL_PROJECTION_MATRIX,projMatrix);
+	glGetIntegerv(GL_VIEWPORT,viewport); 
+
+	GLdouble winX;
+	GLdouble winY;
+	GLdouble winZ;
+
+	if (space.selected == -1) {
+		glPushMatrix();
+			glLoadIdentity();
+			glMultMatrixd(inverseProject);
+			glBegin(GL_TRIANGLES);
+				glColor3f(0.6,0.4,0.8);
+				glVertex3f(-0.02, -0.02, 0);
+				glVertex3f(0.02, -0.02, 0);
+				glVertex3f(0, 0, 0);
+			glEnd();
+		glPopMatrix();
+	} else {
+		gluProject(objX,objY,objZ,modelMatrix,projMatrix,viewport,&winX, &winY, &winZ);
+			winY = winY-windowHeight/2;
+			winX = winX - windowWidth/2;
+			winX  /= windowWidth/2;
+			winY /= windowHeight/2;
+
+		glPushMatrix();
+			glLoadIdentity();
+			glMultMatrixd(inverseProject);
+		
+
+			glBegin(GL_TRIANGLES);
+				glColor3f(0.6,0.4,0.8);
+				glVertex3f(winX-0.02, winY-0.02, 0);
+				glVertex3f(winX+0.02, winY-0.02, 0);
+				glVertex3f(winX, winY, 0);
+			glEnd();
+
+		glPopMatrix();
+	} 
 
 
 	glutSwapBuffers();
@@ -155,8 +208,6 @@ void changeScene(int w, int h) {
 
 
 	glutWarpPointer(windowWidth/2,windowHeight/2);
-	prev_x=windowWidth/2;
-	prev_y=windowHeight/2;
 
 	float ratio = 1.0 * w / h;
 

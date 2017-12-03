@@ -1,8 +1,16 @@
 #include "animate.h"
 #include <unistd.h>
+#include "globalVariables.h" 
+#include "camera.h"
 
 
 bool move(Direction d, Cuboid& c,float speed) {
+
+	bool returnVal = false;
+	float xstart = c.pos.x;
+	float ystart = c.pos.y;
+	float zstart = c.pos.z;
+
 	float& coordinate =
 		(d == Left || d == Right) ? c.pos.x : ((d == Forward || d == Backward) ? c.pos.y : c.pos.z);
 
@@ -22,21 +30,31 @@ bool move(Direction d, Cuboid& c,float speed) {
 		if (space.move(space.selected, d)) 
 		{
 			coordinate += z*speed;
-			return true;
+			returnVal =true;
 		}
 		else
 		{
 			if (d == Down)
 				coordinate = line+0.2;
-			return false;
+			returnVal=false;
 		}
 	}
 	else
 	{
 		coordinate += z*speed;
-		return true;
+		returnVal=true;
 	}
+
+	if (d==Left || d==Right)
+		objX += c.pos.x - xstart;
+	if (d==Forward || d==Backward)
+		objZ += -c.pos.y + ystart;
+	if (d==Up || d==Down)
+		objY += c.pos.z-zstart;
+
+	return returnVal;
 }
+
 
 void on_timer(int value) {
 	if (value != TIMER_ID)

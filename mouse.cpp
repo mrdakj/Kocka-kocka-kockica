@@ -2,6 +2,7 @@
 #include "utility.h"
 #include "globalVariables.h"
 #include "camera.h"
+#include "animate.h"
 
 // get a direction of mouse picking ray
 Vector3f getDirection(float fx, float fy) {
@@ -36,6 +37,10 @@ void mouse(int button, int state, int x, int y) {
 		/* find intersection of planes and ray */
 		int ids[3]={-1,-1,-1};
 		float ds[3]={999999,999999,999999};
+
+		float clickX0, clickY0, clickZ0;
+		float clickX1, clickY1, clickZ1;
+		float clickX2, clickY2, clickZ2;
 
 		for (int i = 0; i < 3; i++) {
 		  float cPos = cameraPosition.get(i);
@@ -76,6 +81,9 @@ void mouse(int button, int state, int x, int y) {
 						if (id!=0) {
 							d = (cameraPosition-Vector3f(x, yf, -zf)).normSquared();
 							if (d<ds[i]) {
+								clickX0=x;
+								clickY0=yf;
+								clickZ0=-zf;
 								ids[i]=id;
 								ds[i] = d;
 							}
@@ -86,6 +94,9 @@ void mouse(int button, int state, int x, int y) {
 					if (id!=0) {
 						d = (cameraPosition-Vector3f(x, yf, -zf)).normSquared();
 						if (d<ds[i]) {
+							clickX0=x;
+							clickY0=yf;
+							clickZ0=-zf;
 							ids[i]=id;
 							ds[i] = d;
 						}
@@ -98,6 +109,9 @@ void mouse(int button, int state, int x, int y) {
 						if (id!=0) {
 							d = (cameraPosition-Vector3f(xf, y, -zf)).normSquared();
 							if (d<ds[i]) {
+								clickX1=xf;
+								clickY1=y;
+								clickZ1=-zf;
 								ids[i]=id;
 								ds[i] = d;
 							}
@@ -108,6 +122,9 @@ void mouse(int button, int state, int x, int y) {
 					if (id!=0) {
 						d = (cameraPosition-Vector3f(xf, y, -zf)).normSquared();
 						if (d<ds[i]) {
+							clickX1=xf;
+							clickY1=y;
+							clickZ1=-zf;
 							ids[i]=id;
 							ds[i] = d;
 						}
@@ -121,6 +138,9 @@ void mouse(int button, int state, int x, int y) {
 						if (id!=0) {
 							d = (cameraPosition-Vector3f(xf, yf, -z)).normSquared();
 							if (d<ds[i]) {
+								clickX2=xf;
+								clickY2=yf;
+								clickZ2=-z;
 								ids[i]=id;
 								ds[i] = d;
 							}
@@ -131,6 +151,9 @@ void mouse(int button, int state, int x, int y) {
 					if (id!=0) {
 						d = (cameraPosition-Vector3f(xf, yf, -z)).normSquared();
 						if (d<ds[i]) {
+							clickX2=xf;
+							clickY2=yf;
+							clickZ2=-z;
 							ids[i]=id;
 							ds[i] = d;
 						}
@@ -140,8 +163,24 @@ void mouse(int button, int state, int x, int y) {
 		  }//end of for
 		}//end of for
 		
+		int indeks = getIndexOfMinimum(ds[0], ds[1], ds[2]);
+		if (indeks==0) {
+			objX = clickX0;
+			objY = clickY0+0.2;
+			objZ = clickZ0;
+		}
+		if (indeks==1) {
+			objX = clickX1;
+			objY = clickY1+0.2;
+			objZ = clickZ1;
+		}
+		if (indeks==2) {
+			objX = clickX2;
+			objY = clickY2+0.2;
+			objZ = clickZ2;
+		}
 
-		int id = ids[getIndexOfMinimum(ds[0], ds[1], ds[2])];
+		int id = ids[indeks];
 
 		space.pick(id);
 
@@ -153,37 +192,27 @@ void mouse(int button, int state, int x, int y) {
 		glutPostRedisplay();
 
 	}
+
+	if (button == GLUT_LEFT_BUTTON && state == GLUT_UP) {
+		space.putDown();
+		glutPostRedisplay();
+	}
 }
 
-
-void mouseMotion(int x, int y) {}
-
-
-
-void passiveMouse(int x, int y) {
-	if (x>=windowWidth-10 || x<=10) {
-		glutWarpPointer(windowWidth/2,y);
-		prev_x=windowWidth/2;
+void mouseLook(int x, int y) {
+    static bool warped = false;
+	
+    /* Check if glutWarpPointer was just called */
+    /* if so - exit to avoid program freeze */
+	if (warped) {
+		warped = false;
+		return;
 	}
-	if (y>=windowHeight-10 || y<=10) {
-		glutWarpPointer(x,windowHeight/2);
-		prev_y=windowHeight/2;
-	}
+	
+	glutWarpPointer(windowWidth / 2, windowHeight / 2);
 
-	thetaStep = (x-prev_x)*0.002;
-	if (abs(x-prev_x)>50) {
-		glutWarpPointer(windowWidth/2,y);
-		prev_x=windowWidth/2;
-		thetaStep=0;
-	}
-
-	phiStep = -(y - prev_y) * 0.002;
-	if (abs(y-prev_y)>50)
-	{
-		glutWarpPointer(x,windowHeight/2);
-		prev_y=windowHeight/2;
-		phiStep=0;
-	}
+	thetaStep = (x - windowWidth/2) * 0.0015;
+	phiStep = - (y - windowHeight/2) * 0.0015;
 
 	if (thetaStep) {
 		calculateDirection();
@@ -193,28 +222,155 @@ void passiveMouse(int x, int y) {
 		calculateDirection();
 	}
 
-	prev_x = x;
-	prev_y = y;
+	thetaStep = phiStep = 0;
+	
+    /* The problematic glutWarpPointer was called */
+	warped = true;
+}
+
+void mouseMotion(int x, int y) {
+	if (space.selected==-1) {
+		mouseLook(x,y);
+		return;
+	}
+
+    static bool warped = false;
+	
+    /* Check if glutWarpPointer was just called */
+    /* if so - exit to avoid program freeze */
+	if (warped) {
+		warped = false;
+		return;
+	}
+	
+	glutWarpPointer(windowWidth / 2, windowHeight / 2);
+
+
+
+	bool moveCameraTheta = false;
+	bool moveCameraPhi = false;
+
+
+	Cuboid& selectedCuboid = space.cuboids[space.selected];
+
+	int delta_x = x-windowWidth/2;
+
+	if (delta_x>0)
+		delta_x=10;
+	if (delta_x<0)
+		delta_x=-10;
+
+
+	if (delta_x) {
+		float speed = abs(delta_x)*0.005;
+		if (delta_x<0) {
+			if (to.x-to.z>=0 && -to.x-to.z>=0) {
+				move(Left,selectedCuboid,speed);
+				moveCameraTheta=true;
+			}
+			if (-to.x-to.z>=0 && -to.x+to.z>=0) {
+				move(Forward,selectedCuboid,speed);
+				moveCameraTheta=true;
+			}
+			if (-to.x+to.z>=0 && to.x+to.z>=0) {
+				move(Right,selectedCuboid,speed);
+				moveCameraTheta=true;
+			}
+			if (to.x+to.z>=0 && to.x-to.z>=0) {
+				move(Backward,selectedCuboid,speed);
+				moveCameraTheta=true;
+			}
+		}
+
+		if (delta_x>0) {
+			if (to.x-to.z>=0 && -to.x-to.z>=0) {
+				move(Right,selectedCuboid,speed);
+				moveCameraTheta=true;
+			}
+			if (-to.x-to.z>=0 && -to.x+to.z>=0) {
+				move(Backward,selectedCuboid,speed);
+				moveCameraTheta=true;
+			}
+			if (-to.x+to.z>=0 && to.x+to.z>=0) {
+				move(Left,selectedCuboid,speed);
+				moveCameraTheta=true;
+			}
+			if (to.x+to.z>=0 && to.x-to.z>=0) {
+				move(Forward,selectedCuboid,speed);
+				moveCameraTheta=true;
+			}
+		}
+	}
+
+
+	int delta_y = -y+windowHeight/2;
+
+	if (delta_y>0)
+		delta_y=10;
+	if (delta_y<0)
+		delta_y=-10;
+
+
+	if (delta_y) {
+		float speed = abs(delta_y)*0.005;
+		if (delta_y<0) {
+			if (to.x-to.z>=0 && -to.x-to.z>=0) {
+				move(Forward,selectedCuboid,speed);
+				moveCameraPhi=true;
+			}
+			if (-to.x-to.z>=0 && -to.x+to.z>=0) {
+				move(Right,selectedCuboid,speed);
+				moveCameraPhi=true;
+			}
+			if (-to.x+to.z>=0 && to.x+to.z>=0) {
+				move(Backward,selectedCuboid,speed);
+				moveCameraPhi=true;
+			}
+			if (to.x+to.z>=0 && to.x-to.z>=0) {
+				move(Left,selectedCuboid,speed);
+				moveCameraPhi=true;
+			}
+		}
+
+		if (delta_y>0) {
+			if (to.x-to.z>=0 && -to.x-to.z>=0) {
+				move(Backward,selectedCuboid,speed);
+				moveCameraPhi=true;
+			}
+			if (-to.x-to.z>=0 && -to.x+to.z>=0) {
+				move(Left,selectedCuboid,speed);
+				moveCameraPhi=true;
+			}
+			if (-to.x+to.z>=0 && to.x+to.z>=0) {
+				move(Forward,selectedCuboid,speed);
+				moveCameraPhi=true;
+			}
+			if (to.x+to.z>=0 && to.x-to.z>=0) {
+				move(Right,selectedCuboid,speed);
+				moveCameraPhi=true;
+			}
+		}
+	}
+
+	/* if (moveCameraTheta) { */
+	/* 	thetaStep = (x - windowWidth/2) * 0.0002; */
+	/* 	phiStep=0; */
+	/* 	calculateDirection(); */
+	/* } */
+
+	/* if (moveCameraPhi) { */
+	/* 	phiStep = - (y - windowHeight/2) * 0.0002; */
+	/* 	thetaStep=0; */
+	/* 	calculateDirection(); */
+	/* } */
 
 	thetaStep = phiStep = 0;
 
+    /* The problematic glutWarpPointer was called */
+	warped = true;
 }
-/* void passiveMouse(int x, int y) { */
-/* 	y = windowHeight - y; */
 
-/* 	thetaStep = (x - delta_x) * 0.005; */
-/* 	phiStep = (y - delta_y) * 0.005; */
 
-/* 	if (thetaStep) { */
-/* 		calculateDirection2(); */
-/* 	} */
-
-/* 	if (phiStep) { */
-/* 		calculateDirection2(); */
-/* 	} */
-
-/* 	delta_x = x; */
-/* 	delta_y = y; */
-
-/* 	theta = phi = 0; */
-/* } */
+void passiveMouse(int x, int y) {
+	mouseLook(x, y);
+}
