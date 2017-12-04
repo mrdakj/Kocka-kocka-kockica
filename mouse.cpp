@@ -184,6 +184,21 @@ void mouse(int button, int state, int x, int y) {
 
 		space.pick(id);
 
+		if (space.selected != -1) {
+			to.x = objX-cameraPosition.x;
+			to.z = objZ-cameraPosition.z;
+			to.y = objY-cameraPosition.y;
+
+			/* for sphere coordinates */
+			float modultheta = sqrt(to.x*to.x+to.z*to.z+to.y*to.y);
+			/* for polar coordinates */
+			/* float modultheta = sqrt(to.x*to.x+to.z*to.z); */
+
+			to.x /= modultheta;
+			to.z /= modultheta;
+			to.y /= modultheta;
+		}
+
 		glutPostRedisplay();
 	}	
 
@@ -195,6 +210,23 @@ void mouse(int button, int state, int x, int y) {
 
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_UP) {
 		space.putDown();
+
+		/* for polar coordinates */
+		phi = std::asin(to.y);
+		theta = std::acos(-to.z);
+		if (to.x<0)
+			theta *= -1;
+
+
+
+		/* for sphere coordinates */
+		phi = std::acos(-to.y);
+		theta = std::acos(to.x/(std::sin(phi)));
+		if (to.z<0)
+			theta *= -1;
+
+		getVectors();
+
 		glutPostRedisplay();
 	}
 }
@@ -254,9 +286,12 @@ void mouseMotion(int x, int y) {
 
 	delta_x *= 0.005;
 
+
+	float d = sqrt(to.x*to.x+to.z*to.z); // not necessary for polar coordinates
+
 	if (delta_x) {
-		float b=-to.z*delta_x;
-		float a=-to.x*delta_x;
+		float b=-to.z*(delta_x/d);
+		float a=-to.x*(delta_x/d);
 		if (b>0)
 			move(Right,selectedCuboid,b);
 		if (b<0)
@@ -275,8 +310,8 @@ void mouseMotion(int x, int y) {
 	delta_y *= 0.005;
 
 	if (delta_y) {
-		float b=to.x*delta_y;
-		float a=-to.z*delta_y;
+		float b=to.x*(delta_y/d);
+		float a=-to.z*(delta_y/d);
 		if (b>0)
 			move(Right,selectedCuboid,b);
 		if (b<0)
@@ -288,8 +323,19 @@ void mouseMotion(int x, int y) {
 		
 	}
 
+	to.x = objX-cameraPosition.x;
+	to.z = objZ-cameraPosition.z;
+	to.y = objY-cameraPosition.y;
 
-	thetaStep = phiStep = 0;
+	/* for sphere coordinates */
+	float modultheta = sqrt(to.x*to.x+to.z*to.z+to.y*to.y);
+	/* for polar coordinates */
+	/* float modultheta = sqrt(to.x*to.x+to.z*to.z); */
+
+	to.x /= modultheta;
+	to.z /= modultheta;
+	to.y /= modultheta;
+
 
     /* The problematic glutWarpPointer was called */
 	warped = true;

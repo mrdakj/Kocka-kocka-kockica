@@ -16,13 +16,15 @@ void getVectors() {
 
 
 void getFrontPosition() {
-	cameraPosition.x += moveFront * to.x * 0.2;
-	cameraPosition.z += moveFront * to.z * 0.2;
+	float d = sqrt(to.x*to.x+to.z*to.z); // not necessary for polar coordinates
+	cameraPosition.x += moveFront * to.x/d * 0.2;
+	cameraPosition.z += moveFront * to.z/d * 0.2;
 }
 
 void getLeftRightPosition() {
-	cameraPosition.x += moveLeftRight * to.z * 0.2;
-	cameraPosition.z += moveLeftRight * -to.x * 0.2;
+	float d = sqrt(to.x*to.x+to.z*to.z); // not necessary for polar coordinates
+	cameraPosition.x += moveLeftRight * to.z/d * 0.2;
+	cameraPosition.z += moveLeftRight * -to.x/d * 0.2;
 }
 
 void getUpDownPosition() {
@@ -31,18 +33,47 @@ void getUpDownPosition() {
 }
 
 void calculateDirection() {
+	/* theta = thetaStep; */
+	/* phi = phiStep; */
+
+	/* float toxtmp = std::cos(theta)*to.x-std::sin(theta)*to.z; */
+	/* float toztmp = std::sin(theta)*to.x+std::cos(theta)*to.z; */
+	/* to.x = toxtmp; */
+	/* to.z = toztmp; */
+
+
+	/* float toytmp = std::cos(phi)*to.y-std::sin(phi)*to.z; */
+	/* toztmp = std::sin(phi)*to.y+std::cos(phi)*to.z; */
+	/* to.y = toytmp; */
+	/* to.z = toztmp; */
+
+	
 	theta += thetaStep;
 	phi += phiStep;
 
-	if (phi >= 0.9) {
-		phi = 0.9;
-	} else if (phi <= -0.9) {
-		phi = -0.9;
+	/* if (phi >= 0.9) { */
+	/* 	phi = 0.9; */
+	/* } else if (phi <= -0.9) { */
+	/* 	phi = -0.9; */
+	/* } */
+
+	/* to.x = std::sin(theta); */
+	/* to.y = std::sin(phi); */
+	/* to.z = -std::cos(theta); */
+
+
+
+	float PI=3.141592;
+	if (phi >= PI)
+		phi = PI;
+	if (phi<0.001) {
+		phi= 0.001;
 	}
 
-	to.x = std::sin(theta);
-	to.y = std::sin(phi);
-	to.z = -std::cos(theta);
+	/*FIX calculate sin and cos only once */
+	to.x = std::sin(phi)*std::cos(theta);
+	to.z = std::sin(phi)*std::sin(theta);
+	to.y = -std::cos(phi);
 
 	getVectors();
 }

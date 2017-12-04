@@ -33,8 +33,10 @@ int nearClippingPlaneDistance=1;
 float moveFront = 0;
 float moveLeftRight = 0;
 float moveUpDown=0;
-float theta=0;
-float phi=0;
+float theta=-3.141592/2;
+float phi=3.141592/2;
+/* float theta=0; */
+/* float phi=0; */
 float thetaStep=0;
 float phiStep=0;
 
@@ -107,19 +109,6 @@ void renderScene(void) {
 
 
 
-	/* glPushMatrix(); */
-	/* 	glLoadIdentity(); */
-	/* 	glMultMatrixd(inverseProject); */
-
-	/* 	glBegin(GL_TRIANGLES); */
-	/* 		glColor3f(0.6,0.4,0.8); */
-	/* 		glVertex3f(-0.02, -0.02, 0); */
-	/* 		glVertex3f(0.02, -0.02, 0); */
-	/* 		glVertex3f(0, 0, 0); */
-	/* 	glEnd(); */
-
-	/* glPopMatrix(); */
-
 
 	if (moveUpDown)
 		getUpDownPosition();
@@ -138,12 +127,38 @@ void renderScene(void) {
 		calculateDirection();
 	}
 
-	Cuboid& selectedCuboid = space.cuboids[space.selected];
-	if (bUp.pressed)
-		move(Up,selectedCuboid,speed);
+	if (space.selected != -1) {
+		Cuboid& selectedCuboid = space.cuboids[space.selected];
+		if (bUp.pressed) {
+			if (move(Up,selectedCuboid,speed)) {
+				to.x = objX-cameraPosition.x;
+				to.z = objZ-cameraPosition.z;
+				to.y = objY-cameraPosition.y;
+				float modultheta = sqrt(to.x*to.x+to.z*to.z+to.y*to.y);
+				/* for polar coordinates */
+				/* float modultheta = sqrt(to.x*to.x+to.z*to.z); */
 
-	if (bDown.pressed)
-		move(Down,selectedCuboid,speed);
+				to.x /= modultheta;
+				to.z /= modultheta;
+				to.y /= modultheta;
+			}
+		}
+
+		if (bDown.pressed) {
+			if (move(Down,selectedCuboid,speed)) {
+				to.x = objX-cameraPosition.x;
+				to.z = objZ-cameraPosition.z;
+				to.y = objY-cameraPosition.y;
+				float modultheta = sqrt(to.x*to.x+to.z*to.z+to.y*to.y);
+				/* for polar coordinates */
+				/* float modultheta = sqrt(to.x*to.x+to.z*to.z); */
+
+				to.x /= modultheta;
+				to.z /= modultheta;
+				to.y /= modultheta;
+			}
+		}
+	}
 
 	glLoadIdentity();
 	gluLookAt(cameraPosition.x,cameraPosition.y,cameraPosition.z, cameraPosition.x + to.x,cameraPosition.y + to.y,cameraPosition.z + to.z, 0, 1, 0);
@@ -219,6 +234,7 @@ void changeScene(int w, int h) {
 	gluPerspective(fovy, ratio, nearClippingPlaneDistance, 40);
 
 	glMatrixMode(GL_MODELVIEW);
+
 
 	getVectors();
 
