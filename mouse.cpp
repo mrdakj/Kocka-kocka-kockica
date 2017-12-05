@@ -4,6 +4,9 @@
 #include "camera.h"
 #include "animate.h"
 
+/* 0.005 for mouse */
+float sensitivity = 0.01;
+
 // get a direction of mouse picking ray
 Vector3f getDirection(float fx, float fy) {
 	fx -= windowWidth / 2.0;
@@ -47,6 +50,7 @@ void mouse(int button, int state, int x, int y) {
 		  float direc = dir.get(i);
 		  for (int currentPlane = 0; currentPlane < space.size; currentPlane++) {
 
+			  /* FIX check dividing by zero */
 				float k = ((i!=2) ? (currentPlane-cPos)/direc : (-currentPlane-cPos)/direc);
 				float xf = cameraPosition.x + k*dir.x;
 				float yf = cameraPosition.y + k*dir.y;
@@ -281,47 +285,54 @@ void mouseMotion(int x, int y) {
 	Cuboid& selectedCuboid = space.cuboids[space.selected];
 
 	float delta_x = x-windowWidth/2;
-	if (delta_x>50)
-		delta_x=50;
 
-	delta_x *= 0.005;
+	delta_x *= sensitivity;
+
 
 
 	float d = sqrt(to.x*to.x+to.z*to.z); // not necessary for polar coordinates
 
+	float ax=0,bx=0,ay=0,by=0;
+
 	if (delta_x) {
-		float b=-to.z*(delta_x/d);
-		float a=-to.x*(delta_x/d);
-		if (b>0)
-			move(Right,selectedCuboid,b);
-		if (b<0)
-			move(Left,selectedCuboid,-b);
-		if (a>0)
-			move(Backward,selectedCuboid,a);
-		if (a<0)
-			move(Forward,selectedCuboid,-a);
+		bx=-to.z*(delta_x/d);
+		ax=-to.x*(delta_x/d);
 	}
 
 
 	float delta_y = -y+windowHeight/2;
-	if (delta_y>50)
-		delta_y=50;
 
-	delta_y *= 0.005;
+	delta_y *= sensitivity;
+
+
 
 	if (delta_y) {
-		float b=to.x*(delta_y/d);
-		float a=-to.z*(delta_y/d);
-		if (b>0)
-			move(Right,selectedCuboid,b);
-		if (b<0)
-			move(Left,selectedCuboid,-b);
-		if (a>0)
-			move(Backward,selectedCuboid,a);
-		if (a<0)
-			move(Forward,selectedCuboid,-a);
-		
+		by=to.x*(delta_y/d);
+		ay=-to.z*(delta_y/d);
 	}
+
+	float a = ax+ay;
+	float b = bx+by;
+
+	/* if this is > 1 collision will not work properly because we cannot skip a field */
+	if (a>0.9)
+		a = 0.9;
+	if (a<-0.9)
+		a = -0.9;
+	if (b>0.9)
+		b = 0.9;
+	if (b<-0.9)
+		b = -0.9;
+
+	if (b>0)
+		move(Right,selectedCuboid,b);
+	if (b<0)
+		move(Left,selectedCuboid,-b);
+	if (a>0)
+		move(Backward,selectedCuboid,a);
+	if (a<0)
+		move(Forward,selectedCuboid,-a);
+
 
 	to.x = objX-cameraPosition.x;
 	to.z = objZ-cameraPosition.z;

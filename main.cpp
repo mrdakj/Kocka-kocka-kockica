@@ -127,6 +127,7 @@ void renderScene(void) {
 		calculateDirection();
 	}
 
+
 	if (space.selected != -1) {
 		Cuboid& selectedCuboid = space.cuboids[space.selected];
 		if (bUp.pressed) {
@@ -181,12 +182,14 @@ void renderScene(void) {
 		glPushMatrix();
 			glLoadIdentity();
 			glMultMatrixd(inverseProject);
+			glDisable(GL_DEPTH_TEST);
 			glBegin(GL_TRIANGLES);
 				glColor3f(0.6,0.4,0.8);
 				glVertex3f(-0.02, -0.02, 0);
 				glVertex3f(0.02, -0.02, 0);
 				glVertex3f(0, 0, 0);
 			glEnd();
+			glEnable(GL_DEPTH_TEST);
 		glPopMatrix();
 	} else {
 		gluProject(objX,objY,objZ,modelMatrix,projMatrix,viewport,&winX, &winY, &winZ);
@@ -199,13 +202,14 @@ void renderScene(void) {
 			glLoadIdentity();
 			glMultMatrixd(inverseProject);
 		
-
+			glDisable(GL_DEPTH_TEST);
 			glBegin(GL_TRIANGLES);
 				glColor3f(0.6,0.4,0.8);
 				glVertex3f(winX-0.02, winY-0.02, 0);
 				glVertex3f(winX+0.02, winY-0.02, 0);
 				glVertex3f(winX, winY, 0);
 			glEnd();
+			glEnable(GL_DEPTH_TEST);
 
 		glPopMatrix();
 	} 

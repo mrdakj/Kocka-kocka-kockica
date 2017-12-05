@@ -5,6 +5,8 @@
 
 
 bool move(Direction d, Cuboid& c,float speed) {
+	if (abs(speed)>1)
+		return false;
 
 	bool returnVal = false;
 	float xstart = c.pos.x;

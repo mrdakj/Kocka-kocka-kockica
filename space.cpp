@@ -1,5 +1,7 @@
 #include "space.h"
 
+/* FIX check fields before accessing matrix because of seg fault */
+
 Space::Space(int size) {
 	this->size = size;
 	selected = -1;
@@ -73,6 +75,7 @@ void Space::drawGrid(float h, Color c) {
 }
 
 void Space::updateMatrix(unsigned char number, Cuboid& c) {
+	/* check bounds */
 	for (int x = c.pos.x; x < c.pos.x+c.size.width; x++) {
 		for (int y = c.pos.y; y < c.pos.y+c.size.depth; y++) {
 			for (int z = c.pos.z; z < c.pos.z+c.size.height; z++) {
@@ -93,12 +96,14 @@ void Space::deselect() {
 bool Space::checkSides(bool x, bool y, bool z, int lowb1, int upb1, int lowb2, int upb2, int a, float cposz) {
 	for (int i = lowb1; i < upb1; i++) {
 		for (int j = lowb2; j < upb2; j++) {
-			if (i>=0 && i<size && j>=0 && j<size) {
+			if (!(i>=0 && i<size && j>=0 && j<size && a>=0 && a<size)) 
+				return false;
+			if (i>=0 && i<size && j>=0 && j<size && a>=0 && a<size) {
 				if (!x && matrix[a][i][j] != 0) return false;
 				if (!y && matrix[i][a][j] != 0) return false;
 				if (!z && matrix[i][j][a] != 0) return false;
 			}
-			if (i>=0 && i<size && j>=1 && j<size) {
+			if (i>=0 && i<size && j>=1 && j<size && a>=0 && a<size) {
 				if (!x && matrix[a][i][j] == 0 && matrix[a][i][j-1] != 0 && cposz+0.01<j+0.2) return false;
 				if (!y && matrix[i][a][j] == 0 && matrix[i][a][j-1] != 0 && cposz+0.01<j+0.2) return false;
 			}
@@ -173,8 +178,10 @@ void Space::pick(int id) {
 	if (c.pos.z+c.size.height<size) {
 		for (int i = 0; i < c.size.width; i++) {
 			for (int j = 0; j < c.size.depth; j++) {
-				if (matrix[c.pos.x+i][c.pos.y+j][c.pos.z+c.size.height] != 0)
+				if (matrix[c.pos.x+i][c.pos.y+j][c.pos.z+c.size.height] != 0) {
+					selected = -1;
 					return;
+				}
 			}
 		}
 	}

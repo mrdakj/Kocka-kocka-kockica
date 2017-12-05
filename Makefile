@@ -1,7 +1,7 @@
-LDFLAGS = -lGL -lGLU -lglut -lm
+LDFLAGS = -lGL -lGLU -lglut -lm -g
 
 main: main.o cuboid.o space.o keyboard.o animate.o mouse.o utility.o camera.o
-	g++ -o main *.o $(LDFLAGS)
+	g++  -o main *.o $(LDFLAGS)
 main.o: main.cpp cuboid.h globalVariables.h
 	g++ -c main.cpp $(LDFLAGS)
 cuboid.o: cuboid.cpp cuboid.h
