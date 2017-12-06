@@ -2,6 +2,9 @@
 
 /* FIX check fields before accessing matrix because of seg fault */
 
+
+Space::Space() : Space(20) {}
+
 Space::Space(int size) {
 	this->size = size;
 	selected = -1;
@@ -52,6 +55,7 @@ void Space::render() {
 }
 
 void Space::drawGrid(float h, Color c) {
+	glDisable(GL_LIGHTING);
 	for (int i = 0; i < 2*size+2; i++) {
 		glPushMatrix();
 
@@ -72,6 +76,7 @@ void Space::drawGrid(float h, Color c) {
 
 		glPopMatrix();
 	}
+	glEnable(GL_LIGHTING);
 }
 
 void Space::updateMatrix(unsigned char number, Cuboid& c) {

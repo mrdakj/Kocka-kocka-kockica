@@ -37,7 +37,7 @@ class Space {
 		void drawGrid(float h, Color c);
 
 		// constructors
-		Space() : Space(20) {};
+		Space();
 		Space(int size);
 		~Space(void);
 

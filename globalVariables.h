@@ -14,7 +14,6 @@ extern Space space;
 extern float speed;
 
 extern int animation_ongoing;
-extern int xcursor,ycursor;
 extern float yplane;
 extern Button bUp, bDown, bLeft, bRight, bForward, bBackward, bSelectDeselect;
 extern Vector3f cameraPosition;

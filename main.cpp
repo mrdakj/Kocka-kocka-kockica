@@ -15,8 +15,6 @@
 int windowWidth=1200;
 int windowHeight=700;
 float speed = 0.08;
-int xcursor=0;
-int ycursor=0;
 Space space;
 Button bUp('e');
 Button bDown('q');
@@ -56,9 +54,12 @@ int main(int argc, char** argv) {
 
 
 
+	GLfloat blue[] = {0.0, 0.0, 1, 1};
+	/* GLfloat blue[] = {0.1, 0.2, 0.6, 1}; */
+	GLfloat green[] = {0.0, 1.0, 0.0, 1};
 	/* TODO  destructor will not be called for this because of loop */
-    Cuboid cx(Position(0,5,0), Size(2,1,1), Color(0,0,1));
-    Cuboid c(Position(4,5,0), Size(2,1,2), Color(0,1,0));
+    Cuboid cx(Position(0,5,0), Size(2,1,1), blue);
+    Cuboid c(Position(4,5,0), Size(2,1,2), green);
     Cuboid c3(Position(6,14,2), Size(1,1,1), Color(1,0,0));
 
 	space.add(cx);
@@ -73,6 +74,21 @@ int main(int argc, char** argv) {
 	setWindow();
 
 	glEnable(GL_DEPTH_TEST);
+
+	/* Light and material */
+	GLfloat light_ambient[]={0.1, 0.1, 0.1 ,1};
+	GLfloat light_diffuse[]={1, 1, 1, 1};
+	GLfloat light_specular[]={0.3, 0.3, 0.3, 1};
+	GLfloat linear_attenuation = 0.05;
+
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+
+	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+	glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, linear_attenuation);
+	glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 60.0);
 
 	glutSetCursor(GLUT_CURSOR_NONE);
 	/* register callbacks */
@@ -108,8 +124,6 @@ void renderScene(void) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
-
-
 	if (moveUpDown)
 		getUpDownPosition();
 
@@ -127,6 +141,10 @@ void renderScene(void) {
 		calculateDirection();
 	}
 
+	GLfloat light_position[] = {cameraPosition.x,cameraPosition.y,cameraPosition.z,1};
+	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+	GLfloat spot_direction[] = { to.x, to.y, to.z };
+	glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, spot_direction);
 
 	if (space.selected != -1) {
 		Cuboid& selectedCuboid = space.cuboids[space.selected];
@@ -183,6 +201,7 @@ void renderScene(void) {
 			glLoadIdentity();
 			glMultMatrixd(inverseProject);
 			glDisable(GL_DEPTH_TEST);
+			glDisable(GL_LIGHTING);
 			glBegin(GL_TRIANGLES);
 				glColor3f(0.6,0.4,0.8);
 				glVertex3f(-0.02, -0.02, 0);
@@ -190,6 +209,7 @@ void renderScene(void) {
 				glVertex3f(0, 0, 0);
 			glEnd();
 			glEnable(GL_DEPTH_TEST);
+			glEnable(GL_LIGHTING);
 		glPopMatrix();
 	} else {
 		gluProject(objX,objY,objZ,modelMatrix,projMatrix,viewport,&winX, &winY, &winZ);
@@ -203,6 +223,7 @@ void renderScene(void) {
 			glMultMatrixd(inverseProject);
 		
 			glDisable(GL_DEPTH_TEST);
+			glDisable(GL_LIGHTING);
 			glBegin(GL_TRIANGLES);
 				glColor3f(0.6,0.4,0.8);
 				glVertex3f(winX-0.02, winY-0.02, 0);
@@ -210,6 +231,7 @@ void renderScene(void) {
 				glVertex3f(winX, winY, 0);
 			glEnd();
 			glEnable(GL_DEPTH_TEST);
+			glEnable(GL_LIGHTING);
 
 		glPopMatrix();
 	} 

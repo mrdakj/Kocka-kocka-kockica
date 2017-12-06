@@ -35,18 +35,21 @@ class Cuboid {
 		Position pos;
 		Size size;
 		Color color;
+		GLfloat diffuse_coeffs[4];
 		Cuboid();
 		Cuboid(Position pos, Size size);
 		Cuboid(Position pos, Size size, Color color);
+		Cuboid(Position pos, Size size, GLfloat* diffuse_coeffs);
         Cuboid(Cuboid const& other); 
 		~Cuboid(void);
 		void round();
+		void render();
+		void setMaterial();
 
 	private:
 		GLUquadricObj* obj;
 		void renderCuboid();
 		void renderCylinder();
-		void render();
 		void move(Direction d);
 };
 

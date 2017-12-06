@@ -236,8 +236,6 @@ void mouse(int button, int state, int x, int y) {
 }
 
 void mouseLook(int x, int y) {
-
-
 	thetaStep = (x - windowWidth/2) * 0.0015;
 	phiStep = - (y - windowHeight/2) * 0.0015;
 
