@@ -51,10 +51,10 @@ void calculateDirection() {
 	theta += thetaStep;
 	phi += phiStep;
 
-	/* if (phi >= 0.9) { */
-	/* 	phi = 0.9; */
-	/* } else if (phi <= -0.9) { */
-	/* 	phi = -0.9; */
+	/* if (phi >= 1.8) { */
+	/* 	phi = 1.8; */
+	/* } else if (phi <= -1.8) { */
+	/* 	phi = -1.8; */
 	/* } */
 
 	/* to.x = std::sin(theta); */

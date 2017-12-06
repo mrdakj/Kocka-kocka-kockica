@@ -236,16 +236,7 @@ void mouse(int button, int state, int x, int y) {
 }
 
 void mouseLook(int x, int y) {
-    static bool warped = false;
-	
-    /* Check if glutWarpPointer was just called */
-    /* if so - exit to avoid program freeze */
-	if (warped) {
-		warped = false;
-		return;
-	}
-	
-	glutWarpPointer(windowWidth / 2, windowHeight / 2);
+
 
 	thetaStep = (x - windowWidth/2) * 0.0015;
 	phiStep = - (y - windowHeight/2) * 0.0015;
@@ -260,8 +251,8 @@ void mouseLook(int x, int y) {
 
 	thetaStep = phiStep = 0;
 	
-    /* The problematic glutWarpPointer was called */
-	warped = true;
+	if (x!=windowWidth/2 || y!=windowHeight/2)
+		glutWarpPointer(windowWidth / 2, windowHeight / 2);
 }
 
 void mouseMotion(int x, int y) {
@@ -270,17 +261,10 @@ void mouseMotion(int x, int y) {
 		return;
 	}
 
-    static bool warped = false;
 	
-    /* Check if glutWarpPointer was just called */
-    /* if so - exit to avoid program freeze */
-	if (warped) {
-		warped = false;
-		return;
-	}
-	
-	glutWarpPointer(windowWidth / 2, windowHeight / 2);
 
+	if (x == windowWidth/2 && y == windowHeight/2)
+		return;
 
 	Cuboid& selectedCuboid = space.cuboids[space.selected];
 
@@ -348,8 +332,8 @@ void mouseMotion(int x, int y) {
 	to.y /= modultheta;
 
 
-    /* The problematic glutWarpPointer was called */
-	warped = true;
+	if (x!=windowWidth/2 || y!=windowHeight/2)
+		glutWarpPointer(windowWidth / 2, windowHeight / 2);
 }
 
 

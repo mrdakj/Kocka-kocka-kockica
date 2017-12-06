@@ -7,8 +7,6 @@ Napomene:
 
 Kursor je sakriven
 
-Pomeranje kockice nije najbolje podeseno za Touchpad (preporucuje se mis)
-
 Komande:
 
 selektovanje misem
