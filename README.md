@@ -1,7 +1,9 @@
 # RG001-kocka-kocka-kockica
 Kocka kocka kockica
 
-![Alt text](images/kockice.png?raw=true "kocka kocka kockica")
+![Alt text](screenshots/kockice.png?raw=true "kocka kocka kockica")
+
+![Alt text](screenshots/9.12.2017_1.png?raw=true "kocka kocka kockica")
 
 Napomene:
 

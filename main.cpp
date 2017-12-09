@@ -10,7 +10,6 @@
 #include "mouse.h"
 #include "camera.h"
 
-
 // define global variables
 int windowWidth=1200;
 int windowHeight=700;
@@ -52,26 +51,26 @@ void getVectors();
 int main(int argc, char** argv) {
 	animation_ongoing=0;
 
-
-
-	GLfloat blue[] = {0.0, 0.0, 1, 1};
-	/* GLfloat blue[] = {0.1, 0.2, 0.6, 1}; */
-	GLfloat green[] = {0.0, 1.0, 0.0, 1};
-	/* TODO  destructor will not be called for this because of loop */
-    Cuboid cx(Position(0,5,0), Size(2,1,1), blue);
-    Cuboid c(Position(4,5,0), Size(2,1,2), green);
-    Cuboid c3(Position(6,14,2), Size(1,1,1), Color(1,0,0));
-
-	space.add(cx);
-	space.add(c3);
-	space.add(c);
-
-
 	/* init glut */
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
 
 	setWindow();
+
+
+	GLfloat blue[] = {0.0, 0.0, 1, 1};
+	GLfloat green[] = {0.0, 1.0, 0.0, 1};
+
+	/* TODO  destructor will not be called for this because of loop */
+    Cuboid c(Position(4,5,0), Size(2,1,2), green);
+    Cuboid c3(Position(6,14,2), Size(1,1,1), Color(1,0,0));
+    Cuboid cx(Position(0,5,0), Size(2,1,1), blue);
+    Cuboid c2(Position(1,0,0), Size(4,1,2), green);
+
+	space.add(cx);
+	space.add(c3);
+	space.add(c);
+	space.add(c2);
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -88,7 +87,7 @@ int main(int argc, char** argv) {
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
 	glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, linear_attenuation);
-	glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 60.0);
+	/* glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 15.0); */
 
 	glutSetCursor(GLUT_CURSOR_NONE);
 	/* register callbacks */
@@ -123,7 +122,6 @@ double inverseProject[16]={0.0};
 void renderScene(void) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
 	if (moveUpDown)
 		getUpDownPosition();
 
@@ -141,10 +139,6 @@ void renderScene(void) {
 		calculateDirection();
 	}
 
-	GLfloat light_position[] = {cameraPosition.x,cameraPosition.y,cameraPosition.z,1};
-	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-	GLfloat spot_direction[] = { to.x, to.y, to.z };
-	glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, spot_direction);
 
 	if (space.selected != -1) {
 		Cuboid& selectedCuboid = space.cuboids[space.selected];
@@ -179,7 +173,15 @@ void renderScene(void) {
 		}
 	}
 
+
 	glLoadIdentity();
+
+	/* following camera because it's before lookat*/
+	GLfloat light_position[] = {0,0,0,1};
+	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+	/* GLfloat spot_direction[]={0,0,-1}; */
+	/* glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, spot_direction); */
+
 	gluLookAt(cameraPosition.x,cameraPosition.y,cameraPosition.z, cameraPosition.x + to.x,cameraPosition.y + to.y,cameraPosition.z + to.z, 0, 1, 0);
 
 	space.render();

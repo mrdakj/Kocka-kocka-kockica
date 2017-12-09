@@ -44,7 +44,6 @@ class Cuboid {
 		~Cuboid(void);
 		void round();
 		void render();
-		void setMaterial();
 
 	private:
 		GLUquadricObj* obj;

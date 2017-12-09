@@ -1,23 +1,19 @@
 #include  "cuboid.h"
 #include <stdio.h>
+#include <vector>
+#include <stdio.h>
+#include "loadModel.h"
 
-void Cuboid::setMaterial() {
+void setMaterial() {
 	GLfloat ambient_coeffs[] = {0.3, 0.3, 0.3, 1};
 	GLfloat specular_coeffs[] = {0.8,0.8,0.8,1};
 	GLfloat shininess = 20;
 	glMaterialfv(GL_FRONT, GL_AMBIENT, ambient_coeffs);
-	glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_coeffs);
 	glMaterialfv(GL_FRONT, GL_SPECULAR, specular_coeffs);
 	glMaterialf(GL_FRONT, GL_SHININESS, shininess);
 }
 
-Cuboid::Cuboid() {
-	this->diffuse_coeffs[0] = 0.5;
-	this->diffuse_coeffs[1] = 0.5;
-	this->diffuse_coeffs[2] = 0.5;
-	this->diffuse_coeffs[3] = 1;
-	obj = gluNewQuadric();
-}
+Cuboid::Cuboid() : Cuboid(Position(0,0,0), Size(1,1,1)) {}
 
 Cuboid::Cuboid(Position pos, Size size) : pos(pos), size(size) {
 	this->diffuse_coeffs[0] = 0.8;
@@ -25,6 +21,7 @@ Cuboid::Cuboid(Position pos, Size size) : pos(pos), size(size) {
 	this->diffuse_coeffs[2] = 0.0;
 	this->diffuse_coeffs[3] = 1;
 	obj = gluNewQuadric();
+	setMaterial();
 }
 
 Cuboid::Cuboid(Position pos, Size size, Color color) : Cuboid(pos, size) { 
@@ -55,10 +52,13 @@ Cuboid::~Cuboid(void) {
 	gluDeleteQuadric(obj);
 }
 
+
+
 void Cuboid::renderCuboid() {
 	int w = size.width;
 	int h = size.height;
 	int d = size.depth;
+
 
 	glBegin(GL_QUADS);
 
@@ -122,13 +122,22 @@ void Cuboid::renderCylinder() {
 }
 
 void Cuboid::render() {
-	glColor3f(color.r, color.g, color.b);
-	setMaterial();
+	/* glColor3f(color.r, color.g, color.b); */
+
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_coeffs);
+
+	int w = size.width;
+	int h = size.height;
+	int d = size.depth;
 	
 	glPushMatrix();
-	glTranslatef(pos.x, pos.z, -pos.y);
-	renderCuboid();
-	renderCylinder();
+		glTranslatef(pos.x, pos.z, -pos.y);
+		if (w == 4 && h == 1 && d == 2) {
+			renderModel();
+		} else {
+			renderCuboid();
+			renderCylinder();
+		}
 	glPopMatrix();
 }
 
