@@ -60,7 +60,7 @@ void read_file2(char* file) {
 
 void renderModel() {
 	if (!loaded) {
-		char file[] = "lego3x2x1.obj";
+		char file[] = "lego4x2x1.obj";
 		read_file2(file);
 		loaded = true;
 	}
