@@ -54,6 +54,7 @@ void Space::render() {
 		cuboids[i].render();	
 }
 
+
 void Space::drawGrid(float h, Color c) {
 	glDisable(GL_LIGHTING);
 	for (int i = 0; i < 2*size+2; i++) {

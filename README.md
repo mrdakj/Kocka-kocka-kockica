@@ -11,17 +11,11 @@ Kursor je sakriven
 
 Komande:
 
-selektovanje misem
+selektovanje kockice - levi klik misa
 
-deselektovanje misem
+pomeranje kockice u ravni xy - levi klik misa
 
-pomeranje kockice:
-
-misem u ravni
-
-gore - e
-
-dole - q
+pomeranje kockice gore dole - levi+desni klik misa (oba se drze istovremeno, ali se prvo pritisne levo dugme) / levi klik misa + e ili q
 
 kamera:
 

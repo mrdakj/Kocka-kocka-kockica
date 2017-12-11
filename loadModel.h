@@ -2,5 +2,6 @@
 #define _MODEL_H_
 
 void renderModel();
+void renderWheel();
 
 #endif

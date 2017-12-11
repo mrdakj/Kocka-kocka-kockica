@@ -9,8 +9,16 @@
 #include "keyboard.h"
 #include "mouse.h"
 #include "camera.h"
+#include "loadModel.h"
 
 // define global variables
+int wheel_rotation_angle = 0;
+float translate_x=0.01;
+int car_x=5;
+int car_y=10;
+int car_width=9;
+int car_depth=5;
+
 int windowWidth=1200;
 int windowHeight=700;
 float speed = 0.08;
@@ -22,7 +30,7 @@ Button bRight('d');
 Button bForward('s');
 Button bBackward('w');
 Button bSelectDeselect(32);
-Vector3f cameraPosition(0,3,5);
+Vector3f cameraPosition(0,3,4);
 Vector3f to(0,0,-1);
 Vector3f view, hvector, v;
 float fovy = 40;
@@ -51,6 +59,15 @@ void getVectors();
 int main(int argc, char** argv) {
 	animation_ongoing=0;
 
+	space.matrix[car_x][car_y][0]=255;
+	space.matrix[car_x-1][car_y][0]=255;
+	space.matrix[car_x+car_width][car_y][0]=255;
+	space.matrix[car_x+car_width-1][car_y][0]=255;
+	space.matrix[car_x+car_width][car_y+car_depth][0]=255;
+	space.matrix[car_x+car_width-1][car_y+car_depth][0]=255;
+	space.matrix[car_x][car_y+car_depth][0]=255;
+	space.matrix[car_x-1][car_y+car_depth][0]=255;
+
 	/* init glut */
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
@@ -62,13 +79,13 @@ int main(int argc, char** argv) {
 	GLfloat green[] = {0.0, 1.0, 0.0, 1};
 
 	/* TODO  destructor will not be called for this because of loop */
-    Cuboid c(Position(4,5,0), Size(2,1,2), green);
-    Cuboid c3(Position(6,14,2), Size(1,1,1), Color(1,0,0));
+    Cuboid c(Position(4,5,0), Size(2,1,2), Color(1,0,0));
+    /* Cuboid c3(Position(6,14,2), Size(1,1,1), Color(1,0,0)); */
     Cuboid cx(Position(0,5,0), Size(2,1,1), blue);
-    Cuboid c2(Position(1,0,0), Size(4,1,2), green);
+    Cuboid c2(Position(5,0,0), Size(4,1,2), green);
 
 	space.add(cx);
-	space.add(c3);
+	/* space.add(c3); */
 	space.add(c);
 	space.add(c2);
 
@@ -89,6 +106,7 @@ int main(int argc, char** argv) {
 	glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, linear_attenuation);
 	/* glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 15.0); */
 
+	glClearColor(0.1,0.1,0.1,1);
 	glutSetCursor(GLUT_CURSOR_NONE);
 	/* register callbacks */
 	glutSetKeyRepeat(GLUT_KEY_REPEAT_OFF);
@@ -120,6 +138,9 @@ void setWindow() {
 double inverseProject[16]={0.0};
 
 void renderScene(void) {
+	wheel_rotation_angle+=1;
+	translate_x += 0.02;
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	if (moveUpDown)
@@ -184,7 +205,46 @@ void renderScene(void) {
 
 	gluLookAt(cameraPosition.x,cameraPosition.y,cameraPosition.z, cameraPosition.x + to.x,cameraPosition.y + to.y,cameraPosition.z + to.z, 0, 1, 0);
 
+
+	/* glTranslatef(-translate_x,0,0); */
+
 	space.render();
+
+	glDisable(GL_LIGHTING);
+	glColor3f(0.2,0.3,0.2);
+	glBegin(GL_QUADS);
+		glVertex3f(car_x,0,-car_y-1);
+		glVertex3f(car_x+car_width,0,-car_y-1);
+		glVertex3f(car_x+car_width,0,-car_y-car_depth);
+		glVertex3f(car_x,0,-car_y-car_depth);
+	glEnd();
+	glEnable(GL_LIGHTING);
+
+	glPushMatrix();
+		glTranslatef(car_x,-0.1,-0.5-car_y);
+		glRotatef(wheel_rotation_angle, 0,0,1);
+		renderWheel();
+	glPopMatrix();
+
+	glPushMatrix();
+		glTranslatef(car_x+car_width,-0.1,-0.5-car_y);
+		glRotatef(wheel_rotation_angle, 0,0,1);
+		renderWheel();
+	glPopMatrix();
+
+	glPushMatrix();
+		glTranslatef(car_x+car_width,-0.1,-0.5-car_y-car_depth);
+		glRotatef(wheel_rotation_angle, 0,0,1);
+		glRotatef(180,1,0,0);
+		renderWheel();
+	glPopMatrix();
+
+	glPushMatrix();
+		glTranslatef(car_x,-0.1,-0.5-car_y-car_depth);
+		glRotatef(wheel_rotation_angle, 0,0,1);
+		glRotatef(180,1,0,0);
+		renderWheel();
+	glPopMatrix();
 
 	double modelMatrix[16];
 	double projMatrix[16];
@@ -259,7 +319,7 @@ void changeScene(int w, int h) {
 	glMatrixMode(GL_PROJECTION);
 
 	glLoadIdentity();
-	gluPerspective(fovy, ratio, nearClippingPlaneDistance, 40);
+	gluPerspective(fovy, ratio, nearClippingPlaneDistance, 400);
 
 	glMatrixMode(GL_MODELVIEW);
 

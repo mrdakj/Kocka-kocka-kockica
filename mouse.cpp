@@ -6,6 +6,9 @@
 
 /* 0.005 for mouse */
 float sensitivity = 0.01;
+static bool right_down=false;
+static bool left_down=false;
+
 
 // get a direction of mouse picking ray
 Vector3f getDirection(float fx, float fy) {
@@ -26,6 +29,7 @@ Vector3f getDirection(float fx, float fy) {
 
 void mouse(int button, int state, int x, int y) {
 	if (button == GLUT_LEFT_BUTTON &&  state == GLUT_DOWN) { 
+		left_down=true;
 		x=windowWidth/2;
 		y=windowHeight/2;
 
@@ -82,7 +86,7 @@ void mouse(int button, int state, int x, int y) {
 				if (i==0) {
 					if (x-1>=0) {
 						id = space.matrix[x-1][z][y]; 
-						if (id!=0) {
+						if (id!=0 && id!=255) {
 							d = (cameraPosition-Vector3f(x, yf, -zf)).normSquared();
 							if (d<ds[i]) {
 								clickX0=x;
@@ -95,7 +99,7 @@ void mouse(int button, int state, int x, int y) {
 					}
 
 					id = space.matrix[x][z][y]; 
-					if (id!=0) {
+					if (id!=0 && id!=255) {
 						d = (cameraPosition-Vector3f(x, yf, -zf)).normSquared();
 						if (d<ds[i]) {
 							clickX0=x;
@@ -110,7 +114,7 @@ void mouse(int button, int state, int x, int y) {
 				if (i==1) {
 					if (y-1>=0) {
 						id = space.matrix[x][z][y-1]; 
-						if (id!=0) {
+						if (id!=0 && id!=255) {
 							d = (cameraPosition-Vector3f(xf, y, -zf)).normSquared();
 							if (d<ds[i]) {
 								clickX1=xf;
@@ -123,7 +127,7 @@ void mouse(int button, int state, int x, int y) {
 					}
 
 					id = space.matrix[x][z][y]; 
-					if (id!=0) {
+					if (id!=0 && id!=255) {
 						d = (cameraPosition-Vector3f(xf, y, -zf)).normSquared();
 						if (d<ds[i]) {
 							clickX1=xf;
@@ -139,7 +143,7 @@ void mouse(int button, int state, int x, int y) {
 
 					if (z-1>=0) {
 						id = space.matrix[x][z-1][y]; 
-						if (id!=0) {
+						if (id!=0 && id!=255) {
 							d = (cameraPosition-Vector3f(xf, yf, -z)).normSquared();
 							if (d<ds[i]) {
 								clickX2=xf;
@@ -152,7 +156,7 @@ void mouse(int button, int state, int x, int y) {
 					}
 
 					id = space.matrix[x][z][y]; 
-					if (id!=0) {
+					if (id!=0 && id!=255) {
 						d = (cameraPosition-Vector3f(xf, yf, -z)).normSquared();
 						if (d<ds[i]) {
 							clickX2=xf;
@@ -206,13 +210,9 @@ void mouse(int button, int state, int x, int y) {
 		glutPostRedisplay();
 	}	
 
-	if (button == GLUT_RIGHT_BUTTON &&  state == GLUT_DOWN) { 
-		space.putDown();
-		glutPostRedisplay();
-
-	}
 
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_UP) {
+		left_down=false;
 		space.putDown();
 
 		/* for polar coordinates */
@@ -233,6 +233,15 @@ void mouse(int button, int state, int x, int y) {
 
 		glutPostRedisplay();
 	}
+
+	if (button == GLUT_RIGHT_BUTTON &&  state == GLUT_DOWN) { 
+		right_down=true;
+	}
+
+	if (button == GLUT_RIGHT_BUTTON &&  state == GLUT_UP) { 
+		right_down=false;
+	}
+
 }
 
 void mouseLook(int x, int y) {
@@ -254,6 +263,7 @@ void mouseLook(int x, int y) {
 }
 
 void mouseMotion(int x, int y) {
+
 	if (space.selected==-1) {
 		mouseLook(x,y);
 		return;
@@ -293,27 +303,40 @@ void mouseMotion(int x, int y) {
 		ay=-to.z*(delta_y/d);
 	}
 
-	float a = ax+ay;
-	float b = bx+by;
+	if (left_down && !right_down) {
+		float a = ax+ay;
+		float b = bx+by;
 
-	/* if this is > 1 collision will not work properly because we cannot skip a field */
-	if (a>0.9)
-		a = 0.9;
-	if (a<-0.9)
-		a = -0.9;
-	if (b>0.9)
-		b = 0.9;
-	if (b<-0.9)
-		b = -0.9;
+		/* if this is > 1 collision will not work properly because we cannot skip a field */
+		if (a>0.9)
+			a = 0.9;
+		if (a<-0.9)
+			a = -0.9;
+		if (b>0.9)
+			b = 0.9;
+		if (b<-0.9)
+			b = -0.9;
 
-	if (b>0)
-		move(Right,selectedCuboid,b);
-	if (b<0)
-		move(Left,selectedCuboid,-b);
-	if (a>0)
-		move(Backward,selectedCuboid,a);
-	if (a<0)
-		move(Forward,selectedCuboid,-a);
+		if (b>0)
+			move(Right,selectedCuboid,b);
+		if (b<0)
+			move(Left,selectedCuboid,-b);
+		if (a>0)
+			move(Backward,selectedCuboid,a);
+		if (a<0)
+			move(Forward,selectedCuboid,-a);
+	}
+
+	if (left_down && right_down) {
+		if (delta_y>0.9)
+			delta_y = 0.9;
+		if (delta_y<-0.9)
+			delta_y = -0.9;
+		if (delta_y>0)
+			move(Up, selectedCuboid, delta_y);
+		else if (delta_y<0)
+			move(Down, selectedCuboid, -delta_y);
+	}
 
 
 	to.x = objX-cameraPosition.x;

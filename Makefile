@@ -22,4 +22,4 @@ loadModel.o: loadModel.cpp loadModel.h
 	g++ -c loadModel.cpp $(LDFLAGS)
 
 clean:
-	@rm -f *.o
+	@rm -f *.o main
