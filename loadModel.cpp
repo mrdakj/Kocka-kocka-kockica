@@ -117,7 +117,7 @@ void render() {
 
 void renderModel() {
 	if (!cuboid_loaded) {
-		char file[] = "lego4x2x1.obj";
+		char file[] = "legoCylinder.obj";
 		read_file2(file);
 		cuboid_loaded = true;
 
@@ -151,7 +151,7 @@ void renderWheel() {
 		glBegin(GL_TRIANGLES);
 			int counter = 0;
 			for (triangle i : wheel_triangles) {
-				if (counter == 5978) {
+				if (counter == 2885) {
 					GLfloat Ka[] = {0.10, 0.10, 0.10,1};
 					GLfloat Kd[] = {0.011954, 0.011954, 0.011954,1};
 					GLfloat Ks[] = {0.278796, 0.278796, 0.278796,1};

@@ -17,11 +17,10 @@ Cuboid::Cuboid() : Cuboid(Position(0,0,0), Size(1,1,1)) {}
 
 Cuboid::Cuboid(Position pos, Size size) : pos(pos), size(size) {
 	in_car=false;
-	this->diffuse_coeffs[0] = 0.8;
-	this->diffuse_coeffs[1] = 0.5;
-	this->diffuse_coeffs[2] = 0.0;
+	this->diffuse_coeffs[0] = 0.64;
+	this->diffuse_coeffs[1] = 0.64;
+	this->diffuse_coeffs[2] = 0.64;
 	this->diffuse_coeffs[3] = 1;
-	obj = gluNewQuadric();
 	setMaterial();
 }
 
@@ -35,26 +34,6 @@ Cuboid::Cuboid(Position pos, Size size, GLfloat* diffuse_coeffs) : Cuboid(pos, s
 	this->diffuse_coeffs[2] = diffuse_coeffs[2];
 	this->diffuse_coeffs[3] = diffuse_coeffs[3];
 }
-
-/* TODO move constructor */
-
-Cuboid::Cuboid(Cuboid const& other) {
-	this->diffuse_coeffs[0] = other.diffuse_coeffs[0];
-	this->diffuse_coeffs[1] = other.diffuse_coeffs[1];
-	this->diffuse_coeffs[2] = other.diffuse_coeffs[2];
-	this->diffuse_coeffs[3] = other.diffuse_coeffs[3];
-	pos=other.pos;
-	size=other.size;
-	color=other.color;
-	obj=gluNewQuadric();
-	in_car=false;
-}
-
-Cuboid::~Cuboid(void) {
-	gluDeleteQuadric(obj);
-}
-
-
 
 void Cuboid::renderCuboid() {
 	int w = size.width;
@@ -110,36 +89,23 @@ void Cuboid::renderCuboid() {
 }
 
 void Cuboid::renderCylinder() {
-	glColor3f(0,1,1);
 	for (int i = 0; i < size.width; i++) {
 		for (int j = 0; j < size.depth; j++) {
 			glPushMatrix();
-			glTranslatef(0.5 + i, size.height, -0.5-j);
-			glRotatef(-90,1,0,0);
-			/* glBegin(GL_POLYGON); */
-			gluCylinder(obj, 0.25, 0.25, 0.2, 30,30);
+			glTranslatef(0.5 + i, size.height+0.1, -0.5-j);
+			renderModel();
 			glPopMatrix();
 		}
 	}
 }
 
 void Cuboid::render() {
-	/* glColor3f(color.r, color.g, color.b); */
-
 	glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse_coeffs);
 
-	int w = size.width;
-	int h = size.height;
-	int d = size.depth;
-	
 	glPushMatrix();
 		glTranslatef(pos.x, pos.z, -pos.y);
-		if (w == 4 && h == 1 && d == 2) {
-			renderModel();
-		} else {
-			renderCuboid();
-			renderCylinder();
-		}
+		renderCuboid();
+		renderCylinder();
 	glPopMatrix();
 }
 

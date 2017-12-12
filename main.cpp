@@ -16,8 +16,8 @@ int wheel_rotation_angle = 0;
 float translate_x=0.01;
 int car_x=5;
 int car_y=10;
-int car_width=9;
-int car_depth=5;
+int car_width=12;
+int car_depth=8;
 bool go = false;
 int windowWidth=1200;
 int windowHeight=700;
@@ -115,20 +115,14 @@ void renderCylinder() {
 	float h = 0.2;
 	int d = car_depth-1;
 	
-	GLUquadricObj* obj = gluNewQuadric();
-
 	for (int i = 0; i < w; i++) {
 		for (int j = 0; j < d; j++) {
 			glPushMatrix();
-			glTranslatef(0.5 + i, h, -0.5-j);
-			glRotatef(-90,1,0,0);
-			/* glBegin(GL_POLYGON); */
-			gluCylinder(obj, 0.25, 0.25, 0.2, 30,30);
+			glTranslatef(0.5 + i, h+0.1, -0.5-j);
+			renderModel();
 			glPopMatrix();
 		}
 	}
-
-	gluDeleteQuadric(obj);
 }
 
 void renderGround() {
@@ -166,13 +160,14 @@ int main(int argc, char** argv) {
 
 
 	GLfloat blue[] = {0.0, 0.0, 1, 1};
-	GLfloat green[] = {0.0, 1.0, 0.0, 1};
+	/* GLfloat green[] = {0.0, 1.0, 0.0, 1}; */
+	GLfloat red[] = {1, 0.24, 0.14, 1};
 
 	/* TODO  destructor will not be called for this because of loop */
     Cuboid c(Position(4,5,0), Size(2,1,2), Color(1,0,0));
     /* Cuboid c3(Position(6,14,2), Size(1,1,1), Color(1,0,0)); */
     Cuboid cx(Position(0,5,0), Size(2,1,1), blue);
-    Cuboid c2(Position(5,0,0), Size(4,1,2), green);
+    Cuboid c2(Position(5,0,0), Size(4,1,2), red);
 
 	space.add(cx);
 	/* space.add(c3); */
@@ -185,7 +180,7 @@ int main(int argc, char** argv) {
 	GLfloat light_ambient[]={0.1, 0.1, 0.1 ,1};
 	GLfloat light_diffuse[]={1, 1, 1, 1};
 	GLfloat light_specular[]={0.3, 0.3, 0.3, 1};
-	GLfloat linear_attenuation = 0.05;
+	GLfloat linear_attenuation = 0.005;
 
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
@@ -197,7 +192,7 @@ int main(int argc, char** argv) {
 	/* glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 15.0); */
 
 
-	glClearColor(0.1,0.1,0.1,1);
+	glClearColor(0.16,0.16,0.16,1);
 	glutSetCursor(GLUT_CURSOR_NONE);
 	/* register callbacks */
 	glutSetKeyRepeat(GLUT_KEY_REPEAT_OFF);
@@ -294,6 +289,7 @@ void renderScene(void) {
 
 	gluLookAt(cameraPosition.x,cameraPosition.y,cameraPosition.z, cameraPosition.x + to.x,cameraPosition.y + to.y,cameraPosition.z + to.z, 0, 1, 0);
 
+
 	glTranslatef(-translate_x,0,0);
 
 	if (go) {
@@ -324,26 +320,26 @@ void renderScene(void) {
 	glPopMatrix();
 
 	glPushMatrix();
-		glTranslatef(car_x,-0.1,-0.5-car_y);
+		glTranslatef(car_x,0,-0.5-car_y);
 		glRotatef(wheel_rotation_angle, 0,0,1);
 		renderWheel();
 	glPopMatrix();
 
 	glPushMatrix();
-		glTranslatef(car_x+car_width,-0.1,-0.5-car_y);
+		glTranslatef(car_x+car_width,0,-0.5-car_y);
 		glRotatef(wheel_rotation_angle, 0,0,1);
 		renderWheel();
 	glPopMatrix();
 
 	glPushMatrix();
-		glTranslatef(car_x+car_width,-0.1,-0.5-car_y-car_depth);
+		glTranslatef(car_x+car_width,0,-0.5-car_y-car_depth);
 		glRotatef(wheel_rotation_angle, 0,0,1);
 		glRotatef(180,1,0,0);
 		renderWheel();
 	glPopMatrix();
 
 	glPushMatrix();
-		glTranslatef(car_x,-0.1,-0.5-car_y-car_depth);
+		glTranslatef(car_x,0,-0.5-car_y-car_depth);
 		glRotatef(wheel_rotation_angle, 0,0,1);
 		glRotatef(180,1,0,0);
 		renderWheel();
