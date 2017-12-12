@@ -18,7 +18,7 @@ int car_x=5;
 int car_y=10;
 int car_width=9;
 int car_depth=5;
-
+bool go = false;
 int windowWidth=1200;
 int windowHeight=700;
 float speed = 0.08;
@@ -55,6 +55,96 @@ void renderScene(void);
 void changeScene(int w, int h);
 int animation_ongoing;
 void getVectors();
+
+
+
+void renderGr() {
+	int w = car_width;
+	float h = 0.2;
+	int d = car_depth-1;
+
+	glBegin(GL_QUADS);
+
+    //Front
+	glNormal3f(0,0,1);
+    glVertex3f(0, 0, 0);
+    glVertex3f(w, 0, 0);
+    glVertex3f(w, h, 0);
+    glVertex3f(0, h, 0);
+
+    //Right
+	glNormal3f(1,0,0);
+    glVertex3f(w, 0, 0);
+    glVertex3f(w, 0, -d);
+    glVertex3f(w, h, -d);
+    glVertex3f(w, h, 0);
+
+    //Back
+	glNormal3f(0,0,-1);
+    glVertex3f(w, 0, -d);
+    glVertex3f(w, h, -d);
+    glVertex3f(0, h, -d);
+    glVertex3f(0, 0, -d);
+
+    //Left
+	glNormal3f(-1,0,0);
+    glVertex3f(0, 0, -d);
+    glVertex3f(0, h, -d);
+    glVertex3f(0, h, 0);
+    glVertex3f(0, 0, 0);
+
+	//Top
+	glNormal3f(0,1,0);
+    glVertex3f(0, h, 0);
+    glVertex3f(w, h, 0);
+    glVertex3f(w, h, -d);
+    glVertex3f(0, h, -d);
+
+	//Bottom
+	glNormal3f(0,-1,0);
+    glVertex3f(0, 0, 0);
+    glVertex3f(w, 0, 0);
+    glVertex3f(w, 0, -d);
+    glVertex3f(0, 0, -d);
+
+    glEnd();
+}
+
+void renderCylinder() {
+	int w = car_width;
+	float h = 0.2;
+	int d = car_depth-1;
+	
+	GLUquadricObj* obj = gluNewQuadric();
+
+	for (int i = 0; i < w; i++) {
+		for (int j = 0; j < d; j++) {
+			glPushMatrix();
+			glTranslatef(0.5 + i, h, -0.5-j);
+			glRotatef(-90,1,0,0);
+			/* glBegin(GL_POLYGON); */
+			gluCylinder(obj, 0.25, 0.25, 0.2, 30,30);
+			glPopMatrix();
+		}
+	}
+
+	gluDeleteQuadric(obj);
+}
+
+void renderGround() {
+	GLfloat ambient_coeffs[] = {0.3, 0.3, 0.3, 1};
+	GLfloat specular_coeffs[] = {0.8,0.8,0.8,1};
+	GLfloat green[] = {0.0, 1.0, 0.0, 1};
+	GLfloat shininess = 20;
+	glMaterialfv(GL_FRONT, GL_AMBIENT, ambient_coeffs);
+	glMaterialfv(GL_FRONT, GL_SPECULAR, specular_coeffs);
+	glMaterialf(GL_FRONT, GL_SHININESS, shininess);
+	glMaterialfv(GL_FRONT, GL_DIFFUSE, green);
+	glPushMatrix();
+		renderGr();
+		renderCylinder();
+	glPopMatrix();
+}
 
 int main(int argc, char** argv) {
 	animation_ongoing=0;
@@ -106,6 +196,7 @@ int main(int argc, char** argv) {
 	glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, linear_attenuation);
 	/* glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 15.0); */
 
+
 	glClearColor(0.1,0.1,0.1,1);
 	glutSetCursor(GLUT_CURSOR_NONE);
 	/* register callbacks */
@@ -138,8 +229,6 @@ void setWindow() {
 double inverseProject[16]={0.0};
 
 void renderScene(void) {
-	wheel_rotation_angle+=1;
-	translate_x += 0.02;
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -205,20 +294,34 @@ void renderScene(void) {
 
 	gluLookAt(cameraPosition.x,cameraPosition.y,cameraPosition.z, cameraPosition.x + to.x,cameraPosition.y + to.y,cameraPosition.z + to.z, 0, 1, 0);
 
+	glTranslatef(-translate_x,0,0);
 
-	/* glTranslatef(-translate_x,0,0); */
+	if (go) {
+		wheel_rotation_angle+=1;
+		translate_x += 0.02;
+		space.renderCar(car_x,car_y,car_width,car_depth);
+	}
+	else {
+		wheel_rotation_angle=0;
+		translate_x = 0;
+		space.render();
+	}
 
-	space.render();
 
-	glDisable(GL_LIGHTING);
-	glColor3f(0.2,0.3,0.2);
-	glBegin(GL_QUADS);
-		glVertex3f(car_x,0,-car_y-1);
-		glVertex3f(car_x+car_width,0,-car_y-1);
-		glVertex3f(car_x+car_width,0,-car_y-car_depth);
-		glVertex3f(car_x,0,-car_y-car_depth);
-	glEnd();
-	glEnable(GL_LIGHTING);
+	/* glDisable(GL_LIGHTING); */
+	/* glColor3f(0.2,0.3,0.2); */
+	/* glBegin(GL_QUADS); */
+	/* 	glVertex3f(car_x,0,-car_y-1); */
+	/* 	glVertex3f(car_x+car_width,0,-car_y-1); */
+	/* 	glVertex3f(car_x+car_width,0,-car_y-car_depth); */
+	/* 	glVertex3f(car_x,0,-car_y-car_depth); */
+	/* glEnd(); */
+	/* glEnable(GL_LIGHTING); */
+
+	glPushMatrix();
+		glTranslatef(car_x,-0.2,-1-car_y);
+		renderGround();
+	glPopMatrix();
 
 	glPushMatrix();
 		glTranslatef(car_x,-0.1,-0.5-car_y);

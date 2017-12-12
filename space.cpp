@@ -54,6 +54,48 @@ void Space::render() {
 		cuboids[i].render();	
 }
 
+void Space::check_above(Cuboid& c) {
+	int h = c.pos.z + c.size.height;
+	if (h>=size)
+		return;
+	for (int i = c.pos.x; i < c.pos.x+c.size.width; i++) {
+		for (int j = c.pos.y; j < c.pos.y+c.size.depth; j++) {
+			int id = matrix[i][j][h];
+			if (id != 0 && id != 255) {
+				if (cuboids[id-1].in_car == false) {
+					check_above(cuboids[id-1]);
+				}
+				cuboids[id-1].in_car = true;
+			}
+		}
+	}
+}
+
+void Space::renderCar(int car_x, int car_y, int car_width, int car_depth) {
+
+	/* FIX do this only once */
+
+	for (Cuboid& c : cuboids) {
+		c.in_car=false;
+	}
+
+	for (int i = car_x; i < car_x+car_width; i++) {
+		for (int j = car_y+1; j < car_y+car_depth; j++) {
+			int id = matrix[i][j][0];
+			if (id != 0 && id != 255) {
+				if (cuboids[id-1].in_car == false) {
+					check_above(cuboids[id-1]);
+				}
+				cuboids[id-1].in_car = true;
+			}
+		}
+	}
+
+	for (Cuboid& c : cuboids) {
+		if (c.in_car)
+			c.render();
+	}
+}
 
 void Space::drawGrid(float h, Color c) {
 	glDisable(GL_LIGHTING);

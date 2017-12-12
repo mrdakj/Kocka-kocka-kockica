@@ -55,6 +55,10 @@ void keyboard(unsigned char key, int x, int y) {
 		moveUpDown=0.02;
 	if (key=='o')
 		moveUpDown=-0.02;
+	if (key=='g')
+		go = true;
+	if (key=='s')
+		go = false;
 
 	if (key == bSelectDeselect.key) {
 	  if (space.selected!=-1) {

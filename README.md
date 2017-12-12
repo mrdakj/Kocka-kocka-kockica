@@ -23,4 +23,8 @@ strelice, u, o za transliranje
 
 mis / j, k, l, i za rotaciju
 
+pokretanje auta - g
+
+zaustavljanje auta - s
+
 exit - esc

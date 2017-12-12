@@ -36,5 +36,6 @@ extern int car_x;
 extern int car_y;
 extern int car_width;
 extern int car_depth;
+extern bool go;
 
 #endif

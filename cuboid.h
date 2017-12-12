@@ -50,6 +50,7 @@ class Cuboid {
 		void renderCuboid();
 		void renderCylinder();
 		void move(Direction d);
+		bool in_car;
 };
 
 #endif

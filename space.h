@@ -17,6 +17,7 @@ class Space {
 		bool checkSides(bool x, bool y, bool z, int lowb1, int upb1, int lowb2, int upb2, int a, float cposz);
 
 		void printMatrix();
+		void check_above(Cuboid& c);
 
 	public:
 		// number of cuboids
@@ -47,6 +48,7 @@ class Space {
 
 		// render all cuboids and a grid
 		void render();
+		void renderCar(int car_x, int car_y, int car_width, int car_depth);
 
 		// move a cuboid indexed with index in direction d
 		bool move(int index, Direction d);

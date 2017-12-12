@@ -16,6 +16,7 @@ void setMaterial() {
 Cuboid::Cuboid() : Cuboid(Position(0,0,0), Size(1,1,1)) {}
 
 Cuboid::Cuboid(Position pos, Size size) : pos(pos), size(size) {
+	in_car=false;
 	this->diffuse_coeffs[0] = 0.8;
 	this->diffuse_coeffs[1] = 0.5;
 	this->diffuse_coeffs[2] = 0.0;
@@ -46,6 +47,7 @@ Cuboid::Cuboid(Cuboid const& other) {
 	size=other.size;
 	color=other.color;
 	obj=gluNewQuadric();
+	in_car=false;
 }
 
 Cuboid::~Cuboid(void) {
