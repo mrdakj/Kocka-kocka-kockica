@@ -1,14 +1,12 @@
 #include "space.h"
-
-/* FIX check fields before accessing matrix because of seg fault */
-
+#include <GL/glut.h>
 
 Space::Space() : Space(20) {}
 
 Space::Space(int size) {
 	this->size = size;
-	selected = -1;
-	cuboids.reserve(256);
+	selected_brick = -1;
+	bricks.reserve(255);
 
 	num = 0;
 
@@ -18,24 +16,45 @@ Space::Space(int size) {
 		for (int j = 0; j < size; j++) {
 		   matrix[i][j].resize(size);
 		   for (int k = 0; k < size; k++) {
-		   		matrix[i][j][k] = 0;
+			   set_matrix_field(i,j,k,0);
 		   }
 		}
 	}
+
+
+	set_matrix_field(car.position_x, car.position_y, 0, CAR);
+	set_matrix_field(car.position_x-1, car.position_y, 0, CAR);
+	set_matrix_field(car.position_x+car.width, car.position_y, 0, CAR);
+	set_matrix_field(car.position_x+car.width-1, car.position_y, 0, CAR);
+	set_matrix_field(car.position_x+car.width, car.position_y+car.depth, 0, CAR);
+	set_matrix_field(car.position_x+car.width-1, car.position_y+car.depth, 0, CAR);
+	set_matrix_field(car.position_x, car.position_y+car.depth, 0, CAR);
+	set_matrix_field(car.position_x-1, car.position_y+car.depth, 0, CAR);
+
 }
 
-Space::~Space(void) {
-	/* printf("space dest\n"); */
-}
 
-void Space::add(Cuboid& c) {
+void Space::add(Brick& c) {
 	num++;
-	cuboids.push_back(c);
-	updateMatrix(cuboids.size(), c);
+	bricks.push_back(c);
+	update_matrix(bricks.size(), c);
 }
 
 
-void Space::printMatrix() {
+bool Space::set_matrix_field(int i, int j, int k, unsigned char value) {
+	if (i<0 || i>=size || j<0 || j>=size || k<0 || k>=size) return false;
+
+	matrix[i][j][k] = value;
+	return true;
+}
+
+int Space::get_matrix_field(int i, int j, int k) {
+	if (i<0 || i>=size || j<0 || j>=size || k<0 || k>=size) return -1;
+
+	return matrix[i][j][k];
+}
+
+void Space::print_matrix() {
 	for (int z = size-1; z >= 0; z--) {
 		printf("------------------------------------ z=%d\n", z);
 		for (int x = 0; x < size; x++) {
@@ -48,56 +67,62 @@ void Space::printMatrix() {
 }
 
 void Space::render() {
-	drawGrid(0, Color(1,1,1));
+
+	car.draw_base();
+	
+
+	draw_grid(Color(1,1,1));
 
 	for (int i = 0; i < num; i++)
-		cuboids[i].render();	
+		bricks[i].draw_brick();	
 }
 
-void Space::check_above(Cuboid& c) {
+void Space::check_above(Brick& c) {
 	int h = c.pos.z + c.size.height;
 	if (h>=size)
 		return;
 	for (int i = c.pos.x; i < c.pos.x+c.size.width; i++) {
 		for (int j = c.pos.y; j < c.pos.y+c.size.depth; j++) {
-			int id = matrix[i][j][h];
-			if (id != 0 && id != 255) {
-				if (cuboids[id-1].in_car == false) {
-					check_above(cuboids[id-1]);
+			int id = get_matrix_field(i,j,h);
+			if (id != -1 && id != 0 && id != CAR) {
+				if (bricks[id-1].in_car == false) {
+					check_above(bricks[id-1]);
 				}
-				cuboids[id-1].in_car = true;
+				bricks[id-1].in_car = true;
 			}
 		}
 	}
 }
 
-void Space::renderCar(int car_x, int car_y, int car_width, int car_depth) {
+void Space::draw_car() {
+
+	car.draw_base();
 
 	/* FIX do this only once */
 
-	for (Cuboid& c : cuboids) {
+	for (Brick& c : bricks) {
 		c.in_car=false;
 	}
 
-	for (int i = car_x; i < car_x+car_width; i++) {
-		for (int j = car_y+1; j < car_y+car_depth; j++) {
-			int id = matrix[i][j][0];
-			if (id != 0 && id != 255) {
-				if (cuboids[id-1].in_car == false) {
-					check_above(cuboids[id-1]);
+	for (int i = car.position_x; i < car.position_x+car.width; i++) {
+		for (int j = car.position_y+1; j < car.position_y+car.depth; j++) {
+			int id = get_matrix_field(i,j,0);
+			if (id != -1 && id != 0 && id != 255) {
+				if (bricks[id-1].in_car == false) {
+					check_above(bricks[id-1]);
 				}
-				cuboids[id-1].in_car = true;
+				bricks[id-1].in_car = true;
 			}
 		}
 	}
 
-	for (Cuboid& c : cuboids) {
+	for (Brick& c : bricks) {
 		if (c.in_car)
-			c.render();
+			c.draw_brick();
 	}
 }
 
-void Space::drawGrid(float h, Color c) {
+void Space::draw_grid(Color c) const {
 	glDisable(GL_LIGHTING);
 	for (int i = 0; i < 2*size+2; i++) {
 		glPushMatrix();
@@ -113,8 +138,8 @@ void Space::drawGrid(float h, Color c) {
 		glBegin(GL_LINES);
 			glColor3f(c.r, c.g, c.b);
 			glLineWidth(1);
-			glVertex3f(0, h, 0);
-			glVertex3f(size, h, 0);
+			glVertex3f(0, 0, 0);
+			glVertex3f(size, 0, 0);
 		glEnd();
 
 		glPopMatrix();
@@ -122,39 +147,35 @@ void Space::drawGrid(float h, Color c) {
 	glEnable(GL_LIGHTING);
 }
 
-void Space::updateMatrix(unsigned char number, Cuboid& c) {
-	/* check bounds */
+void Space::update_matrix(unsigned char number, Brick& c) {
 	for (int x = c.pos.x; x < c.pos.x+c.size.width; x++) {
 		for (int y = c.pos.y; y < c.pos.y+c.size.depth; y++) {
 			for (int z = c.pos.z; z < c.pos.z+c.size.height; z++) {
-				matrix[x][y][z] = number;	
+				set_matrix_field(x, y, z, number);
 			}
 		}
 	}
 }
 
 void Space::select() {
-	updateMatrix(0 , cuboids[selected]);
+	update_matrix(0 , bricks[selected_brick]);
 }
 
 void Space::deselect() {
-	updateMatrix(selected+1 , cuboids[selected]);
+	update_matrix(selected_brick+1 , bricks[selected_brick]);
 }
 
-bool Space::checkSides(bool x, bool y, bool z, int lowb1, int upb1, int lowb2, int upb2, int a, float cposz) {
+bool Space::check_sides(bool x, bool y, bool z, int lowb1, int upb1, int lowb2, int upb2, int a, float cposz) {
 	for (int i = lowb1; i < upb1; i++) {
 		for (int j = lowb2; j < upb2; j++) {
-			if (!(i>=0 && i<size && j>=0 && j<size && a>=0 && a<size)) 
-				return false;
-			if (i>=0 && i<size && j>=0 && j<size && a>=0 && a<size) {
-				if (!x && matrix[a][i][j] != 0) return false;
-				if (!y && matrix[i][a][j] != 0) return false;
-				if (!z && matrix[i][j][a] != 0) return false;
-			}
-			if (i>=0 && i<size && j>=1 && j<size && a>=0 && a<size) {
-				if (!x && matrix[a][i][j] == 0 && matrix[a][i][j-1] != 0 && cposz+0.01<j+0.2) return false;
-				if (!y && matrix[i][a][j] == 0 && matrix[i][a][j-1] != 0 && cposz+0.01<j+0.2) return false;
-			}
+				if (!x && get_matrix_field(a,i,j) != 0) return false;
+				if (!y && get_matrix_field(i,a,j) != 0) return false;
+				if (!z && get_matrix_field(i,j,a) != 0) return false;
+
+				if (j>=1) {
+					if (!x && get_matrix_field(a,i,j-1) != 0 && cposz+0.01<j+0.2) return false;
+					if (!y && get_matrix_field(i,a,j-1) != 0 && cposz+0.01<j+0.2) return false;
+				}
 		}
 	}
 
@@ -163,7 +184,7 @@ bool Space::checkSides(bool x, bool y, bool z, int lowb1, int upb1, int lowb2, i
 
 bool Space::move(int index, Direction d) {
 
-	Cuboid& c = cuboids[index];
+	Brick& c = bricks[index];
 	int x = c.pos.x;
 	int y = c.pos.y;
 	int z = c.pos.z;
@@ -182,36 +203,36 @@ bool Space::move(int index, Direction d) {
 	switch(d) {
 		case Left:
 			if (x == 0) return false;
-			return checkSides(false, true, true, miny, maxy+depth, minz, maxz+height, x-1, c.pos.z);
+			return check_sides(false, true, true, miny, maxy+depth, minz, maxz+height, x-1, c.pos.z);
 		case Right:
 			if (x+width == size) return false;
-			return checkSides(false, true, true, miny, maxy+depth, minz, maxz+height, x+width, c.pos.z);
+			return check_sides(false, true, true, miny, maxy+depth, minz, maxz+height, x+width, c.pos.z);
 		case Forward:
 			if (y == 0) return false;
-			return checkSides(true, false, true, minx, maxx+width, minz, maxz+height, y-1, c.pos.z);
+			return check_sides(true, false, true, minx, maxx+width, minz, maxz+height, y-1, c.pos.z);
 		case Backward:
 			if (y+depth == size) return false;
-			return checkSides(true, false, true, minx, maxx+width, minz, maxz+height, y+depth, c.pos.z);
+			return check_sides(true, false, true, minx, maxx+width, minz, maxz+height, y+depth, c.pos.z);
 		case Down:
 			if (z == 0) return false;
-			return checkSides(true, true, false, minx, maxx+width, miny, maxy+depth, z-1, c.pos.z);
+			return check_sides(true, true, false, minx, maxx+width, miny, maxy+depth, z-1, c.pos.z);
 		case Up:
 			if (z+height == size) return false;
-			return checkSides(true, true, false, minx, maxx+width, miny, maxy+depth, z+height, c.pos.z);
+			return check_sides(true, true, false, minx, maxx+width, miny, maxy+depth, z+height, c.pos.z);
 	}
 
 	return true;
 }
 
 
-void Space::putDown() {
-	if (selected == -1)
+void Space::put_down() {
+	if (selected_brick == -1)
 		return;
 
-	cuboids[selected].pos.z -= 0.2;
-	cuboids[selected].round();
+	bricks[selected_brick].pos.z -= 0.2;
+	bricks[selected_brick].round();
 	deselect();
-	selected = -1;
+	selected_brick = -1;
 }
 
 void Space::pick(int id) {
@@ -219,15 +240,15 @@ void Space::pick(int id) {
 		return;
 
 	id--;
-	selected = id;
+	selected_brick = id;
 
-	Cuboid& c = cuboids[selected];
+	Brick& c = bricks[selected_brick];
 
 	if (c.pos.z+c.size.height<size) {
 		for (int i = 0; i < c.size.width; i++) {
 			for (int j = 0; j < c.size.depth; j++) {
-				if (matrix[c.pos.x+i][c.pos.y+j][c.pos.z+c.size.height] != 0) {
-					selected = -1;
+				if (get_matrix_field(c.pos.x+i, c.pos.y+j, c.pos.z+c.size.height) != 0) {
+					selected_brick = -1;
 					return;
 				}
 			}

@@ -3,7 +3,7 @@
 #include <cstdlib>
 #include <GL/glut.h>
 
-static bool cuboid_loaded = false;
+static bool brick_loaded = false;
 static bool wheel_loaded = false;
 
 struct vert {
@@ -116,10 +116,10 @@ void render() {
 }
 
 void renderModel() {
-	if (!cuboid_loaded) {
+	if (!brick_loaded) {
 		char file[] = "legoCylinder.obj";
 		read_file2(file);
-		cuboid_loaded = true;
+		brick_loaded = true;
 
 		legoList = glGenLists(1);
 		glNewList(legoList, GL_COMPILE);

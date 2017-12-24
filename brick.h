@@ -1,9 +1,7 @@
-#ifndef _CUBOID_H_
-#define _CUBOID_H_
+#ifndef _BRICK_H_
+#define _BRICK_H_
 
-#include <GL/glut.h>
-#include <cmath>
-
+/* FIX move this enum somewhere else */
 enum Direction {
 	Up, Down,
 	Left, Right,
@@ -28,26 +26,35 @@ struct Size {
 	Size(int width, int height, int depth) :  width(width), height(height), depth(depth) {}
 };
 
-class Cuboid {
+class Brick {
 	friend class Space;
 
 	public:
+		/* attributes */
 		Position pos;
 		Size size;
 		Color color;
-		GLfloat diffuse_coeffs[4];
-		Cuboid();
-		Cuboid(Position pos, Size size);
-		Cuboid(Position pos, Size size, Color color);
-		Cuboid(Position pos, Size size, GLfloat* diffuse_coeffs);
+
+		/* constructors */
+		Brick();
+		Brick(Position pos, Size size);
+		Brick(Position pos, Size size, Color color);
+
+		/* FIX this should be private */
+		/* place a brick at the nearest matrix field */
 		void round();
-		void render();
+
+		/* draw a brick of a given size at a given position */
+		void draw_brick() const;
 
 	private:
-		void renderCuboid();
-		void renderCylinder();
-		void move(Direction d);
 		bool in_car;
+
+		/* draw a cuboid of a given size with left corner at (0, 0, 0) */
+		void draw_cuboid() const;
+
+		/* draw depth times width cylinders */
+		void draw_cylinder() const;
 };
 
 #endif

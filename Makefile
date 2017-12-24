@@ -1,11 +1,11 @@
 LDFLAGS = -lGL -lGLU -lglut -lm -g
 
-main: main.o cuboid.o space.o keyboard.o animate.o mouse.o utility.o camera.o loadModel.o
+main: main.o brick.o space.o keyboard.o animate.o mouse.o utility.o camera.o loadModel.o car.o
 	g++  -o main *.o $(LDFLAGS)
-main.o: main.cpp cuboid.h globalVariables.h
+main.o: main.cpp brick.h globalVariables.h
 	g++ -c main.cpp $(LDFLAGS)
-cuboid.o: cuboid.cpp cuboid.h
-	g++ -c cuboid.cpp $(LDFLAGS)
+brick.o: brick.cpp brick.h
+	g++ -c brick.cpp $(LDFLAGS)
 space.o: space.cpp space.h
 	g++ -c space.cpp $(LDFLAGS)
 keyboard.o: keyboard.cpp keyboard.h globalVariables.h
@@ -20,6 +20,8 @@ camera.o: camera.cpp camera.h
 	g++ -c camera.cpp $(LDFLAGS)
 loadModel.o: loadModel.cpp loadModel.h
 	g++ -c loadModel.cpp $(LDFLAGS)
+car.o: car.cpp car.h
+	g++ -c car.cpp $(LDFLAGS)
 
 clean:
 	@rm -f *.o main

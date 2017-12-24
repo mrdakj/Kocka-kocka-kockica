@@ -33,8 +33,8 @@ void mouse(int button, int state, int x, int y) {
 		x=windowWidth/2;
 		y=windowHeight/2;
 
-		if (space.selected!=-1) {
-			space.putDown();
+		if (space.selected_brick!=-1) {
+			space.put_down();
 			glutPostRedisplay();	
 		}
 
@@ -192,7 +192,7 @@ void mouse(int button, int state, int x, int y) {
 
 		space.pick(id);
 
-		if (space.selected != -1) {
+		if (space.selected_brick != -1) {
 			to.x = objX-cameraPosition.x;
 			to.z = objZ-cameraPosition.z;
 			to.y = objY-cameraPosition.y;
@@ -213,7 +213,7 @@ void mouse(int button, int state, int x, int y) {
 
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_UP) {
 		left_down=false;
-		space.putDown();
+		space.put_down();
 
 		/* for polar coordinates */
 		phi = std::asin(to.y);
@@ -264,7 +264,7 @@ void mouseLook(int x, int y) {
 
 void mouseMotion(int x, int y) {
 
-	if (space.selected==-1) {
+	if (space.selected_brick==-1) {
 		mouseLook(x,y);
 		return;
 	}
@@ -274,7 +274,7 @@ void mouseMotion(int x, int y) {
 	if (x == windowWidth/2 && y == windowHeight/2)
 		return;
 
-	Cuboid& selectedCuboid = space.cuboids[space.selected];
+	Brick& selected_brickBrick = space.bricks[space.selected_brick];
 
 	float delta_x = x-windowWidth/2;
 
@@ -318,13 +318,13 @@ void mouseMotion(int x, int y) {
 			b = -0.9;
 
 		if (b>0)
-			move(Right,selectedCuboid,b);
+			move(Right,selected_brickBrick,b);
 		if (b<0)
-			move(Left,selectedCuboid,-b);
+			move(Left,selected_brickBrick,-b);
 		if (a>0)
-			move(Backward,selectedCuboid,a);
+			move(Backward,selected_brickBrick,a);
 		if (a<0)
-			move(Forward,selectedCuboid,-a);
+			move(Forward,selected_brickBrick,-a);
 	}
 
 	if (left_down && right_down) {
@@ -333,9 +333,9 @@ void mouseMotion(int x, int y) {
 		if (delta_y<-0.9)
 			delta_y = -0.9;
 		if (delta_y>0)
-			move(Up, selectedCuboid, delta_y);
+			move(Up, selected_brickBrick, delta_y);
 		else if (delta_y<0)
-			move(Down, selectedCuboid, -delta_y);
+			move(Down, selected_brickBrick, -delta_y);
 	}
 
 

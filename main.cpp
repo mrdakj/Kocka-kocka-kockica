@@ -12,12 +12,7 @@
 #include "loadModel.h"
 
 // define global variables
-int wheel_rotation_angle = 0;
 float translate_x=0.01;
-int car_x=5;
-int car_y=10;
-int car_width=12;
-int car_depth=8;
 bool go = false;
 int windowWidth=1200;
 int windowHeight=700;
@@ -40,8 +35,6 @@ float moveLeftRight = 0;
 float moveUpDown=0;
 float theta=-3.141592/2;
 float phi=3.141592/2;
-/* float theta=0; */
-/* float phi=0; */
 float thetaStep=0;
 float phiStep=0;
 
@@ -58,99 +51,8 @@ void getVectors();
 
 
 
-void renderGr() {
-	int w = car_width;
-	float h = 0.2;
-	int d = car_depth-1;
-
-	glBegin(GL_QUADS);
-
-    //Front
-	glNormal3f(0,0,1);
-    glVertex3f(0, 0, 0);
-    glVertex3f(w, 0, 0);
-    glVertex3f(w, h, 0);
-    glVertex3f(0, h, 0);
-
-    //Right
-	glNormal3f(1,0,0);
-    glVertex3f(w, 0, 0);
-    glVertex3f(w, 0, -d);
-    glVertex3f(w, h, -d);
-    glVertex3f(w, h, 0);
-
-    //Back
-	glNormal3f(0,0,-1);
-    glVertex3f(w, 0, -d);
-    glVertex3f(w, h, -d);
-    glVertex3f(0, h, -d);
-    glVertex3f(0, 0, -d);
-
-    //Left
-	glNormal3f(-1,0,0);
-    glVertex3f(0, 0, -d);
-    glVertex3f(0, h, -d);
-    glVertex3f(0, h, 0);
-    glVertex3f(0, 0, 0);
-
-	//Top
-	glNormal3f(0,1,0);
-    glVertex3f(0, h, 0);
-    glVertex3f(w, h, 0);
-    glVertex3f(w, h, -d);
-    glVertex3f(0, h, -d);
-
-	//Bottom
-	glNormal3f(0,-1,0);
-    glVertex3f(0, 0, 0);
-    glVertex3f(w, 0, 0);
-    glVertex3f(w, 0, -d);
-    glVertex3f(0, 0, -d);
-
-    glEnd();
-}
-
-void renderCylinder() {
-	int w = car_width;
-	float h = 0.2;
-	int d = car_depth-1;
-	
-	for (int i = 0; i < w; i++) {
-		for (int j = 0; j < d; j++) {
-			glPushMatrix();
-			glTranslatef(0.5 + i, h+0.1, -0.5-j);
-			renderModel();
-			glPopMatrix();
-		}
-	}
-}
-
-void renderGround() {
-	GLfloat ambient_coeffs[] = {0.3, 0.3, 0.3, 1};
-	GLfloat specular_coeffs[] = {0.8,0.8,0.8,1};
-	GLfloat green[] = {0.0, 1.0, 0.0, 1};
-	GLfloat shininess = 20;
-	glMaterialfv(GL_FRONT, GL_AMBIENT, ambient_coeffs);
-	glMaterialfv(GL_FRONT, GL_SPECULAR, specular_coeffs);
-	glMaterialf(GL_FRONT, GL_SHININESS, shininess);
-	glMaterialfv(GL_FRONT, GL_DIFFUSE, green);
-	glPushMatrix();
-		renderGr();
-		renderCylinder();
-	glPopMatrix();
-}
-
 int main(int argc, char** argv) {
 	animation_ongoing=0;
-
-	space.matrix[car_x][car_y][0]=255;
-	space.matrix[car_x-1][car_y][0]=255;
-	space.matrix[car_x+car_width][car_y][0]=255;
-	space.matrix[car_x+car_width-1][car_y][0]=255;
-	space.matrix[car_x+car_width][car_y+car_depth][0]=255;
-	space.matrix[car_x+car_width-1][car_y+car_depth][0]=255;
-	space.matrix[car_x][car_y+car_depth][0]=255;
-	space.matrix[car_x-1][car_y+car_depth][0]=255;
 
 	/* init glut */
 	glutInit(&argc, argv);
@@ -160,17 +62,17 @@ int main(int argc, char** argv) {
 
 
 	GLfloat blue[] = {0.0, 0.0, 1, 1};
-	/* GLfloat green[] = {0.0, 1.0, 0.0, 1}; */
+	GLfloat green[] = {0.0, 1.0, 0.0, 1};
 	GLfloat red[] = {1, 0.24, 0.14, 1};
 
 	/* TODO  destructor will not be called for this because of loop */
-    Cuboid c(Position(4,5,0), Size(2,1,2), Color(1,0,0));
-    /* Cuboid c3(Position(6,14,2), Size(1,1,1), Color(1,0,0)); */
-    Cuboid cx(Position(0,5,0), Size(2,1,1), blue);
-    Cuboid c2(Position(5,0,0), Size(4,1,2), red);
+    Brick c(Position(4,5,0), Size(2,1,2), Color(1,0,0));
+    Brick c3(Position(0,0,0), Size(1,2,1), Color(0,1,0));
+    Brick cx(Position(0,5,0), Size(2,1,1), Color(0,0,1));
+    Brick c2(Position(5,0,0), Size(4,1,2), Color(1,0,0));
 
 	space.add(cx);
-	/* space.add(c3); */
+	space.add(c3);
 	space.add(c);
 	space.add(c2);
 
@@ -184,6 +86,8 @@ int main(int argc, char** argv) {
 
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
+	/* glEnable(GL_COLOR_MATERIAL); */
+	/* glEnable(GL_NORMALIZE); */
 
 	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
@@ -245,10 +149,10 @@ void renderScene(void) {
 	}
 
 
-	if (space.selected != -1) {
-		Cuboid& selectedCuboid = space.cuboids[space.selected];
+	if (space.selected_brick != -1) {
+		Brick& selected_brickBrick = space.bricks[space.selected_brick];
 		if (bUp.pressed) {
-			if (move(Up,selectedCuboid,speed)) {
+			if (move(Up,selected_brickBrick,speed)) {
 				to.x = objX-cameraPosition.x;
 				to.z = objZ-cameraPosition.z;
 				to.y = objY-cameraPosition.y;
@@ -263,7 +167,7 @@ void renderScene(void) {
 		}
 
 		if (bDown.pressed) {
-			if (move(Down,selectedCuboid,speed)) {
+			if (move(Down,selected_brickBrick,speed)) {
 				to.x = objX-cameraPosition.x;
 				to.z = objZ-cameraPosition.z;
 				to.y = objY-cameraPosition.y;
@@ -293,57 +197,17 @@ void renderScene(void) {
 	glTranslatef(-translate_x,0,0);
 
 	if (go) {
-		wheel_rotation_angle+=1;
+		space.car.wheel_rotation_angle+=1;
 		translate_x += 0.02;
-		space.renderCar(car_x,car_y,car_width,car_depth);
+		space.draw_car();
 	}
 	else {
-		wheel_rotation_angle=0;
+		space.car.wheel_rotation_angle=0;
 		translate_x = 0;
 		space.render();
 	}
 
 
-	/* glDisable(GL_LIGHTING); */
-	/* glColor3f(0.2,0.3,0.2); */
-	/* glBegin(GL_QUADS); */
-	/* 	glVertex3f(car_x,0,-car_y-1); */
-	/* 	glVertex3f(car_x+car_width,0,-car_y-1); */
-	/* 	glVertex3f(car_x+car_width,0,-car_y-car_depth); */
-	/* 	glVertex3f(car_x,0,-car_y-car_depth); */
-	/* glEnd(); */
-	/* glEnable(GL_LIGHTING); */
-
-	glPushMatrix();
-		glTranslatef(car_x,-0.2,-1-car_y);
-		renderGround();
-	glPopMatrix();
-
-	glPushMatrix();
-		glTranslatef(car_x,0,-0.5-car_y);
-		glRotatef(wheel_rotation_angle, 0,0,1);
-		renderWheel();
-	glPopMatrix();
-
-	glPushMatrix();
-		glTranslatef(car_x+car_width,0,-0.5-car_y);
-		glRotatef(wheel_rotation_angle, 0,0,1);
-		renderWheel();
-	glPopMatrix();
-
-	glPushMatrix();
-		glTranslatef(car_x+car_width,0,-0.5-car_y-car_depth);
-		glRotatef(wheel_rotation_angle, 0,0,1);
-		glRotatef(180,1,0,0);
-		renderWheel();
-	glPopMatrix();
-
-	glPushMatrix();
-		glTranslatef(car_x,0,-0.5-car_y-car_depth);
-		glRotatef(wheel_rotation_angle, 0,0,1);
-		glRotatef(180,1,0,0);
-		renderWheel();
-	glPopMatrix();
 
 	double modelMatrix[16];
 	double projMatrix[16];
@@ -357,7 +221,7 @@ void renderScene(void) {
 	GLdouble winY;
 	GLdouble winZ;
 
-	if (space.selected == -1) {
+	if (space.selected_brick == -1) {
 		glPushMatrix();
 			glLoadIdentity();
 			glMultMatrixd(inverseProject);
@@ -396,7 +260,6 @@ void renderScene(void) {
 
 		glPopMatrix();
 	} 
-
 
 	glutSwapBuffers();
 }

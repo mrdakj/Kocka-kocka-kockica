@@ -1,7 +1,12 @@
-#ifndef _CUBODIS_H_
-#define _CUBODIS_H_
+#ifndef _SPACE_H_
+#define _SPACE_H_
 
-#include "cuboid.h"
+
+/* car ID */
+#define CAR 255
+
+#include "brick.h"
+#include "car.h"
 #include <vector>
 #include <cstdio>
 #include <cmath>
@@ -10,59 +15,66 @@
 
 class Space {
 	private:
-		// fill matrix with id=number at position determied by c
-		void updateMatrix(unsigned char number, Cuboid& c);
+		/* returns false if some index is out of range, otherwise sets field (i,j,k) to value and returns true */
+		bool set_matrix_field(int i, int j, int k, unsigned char value);
 
-		// help function for move function
-		bool checkSides(bool x, bool y, bool z, int lowb1, int upb1, int lowb2, int upb2, int a, float cposz);
+		/* returns -1 if some index is out of range, otherwise gets field (i,j,k) */
+		int get_matrix_field(int i, int j, int k);
 
-		void printMatrix();
-		void check_above(Cuboid& c);
+		/* fill matrix with id=number (ranges from 1 to 255) at position determied by c */
+		void update_matrix(unsigned char number, Brick& c);
+
+		/* help function for move function */
+		bool check_sides(bool x, bool y, bool z, int lowb1, int upb1, int lowb2, int upb2, int a, float cposz);
+
+		void print_matrix();
+		void check_above(Brick& c);
 
 	public:
-		// number of cuboids
+		Car car;
+		/* number of bricks */
 		int num;
 
-		// size of matrix
+		/* size of matrix */
 		int size;
 
-		// index of selected cuboid in vector cuboids, -1 if nothing is selected
-		int selected;
+		/* index of selected brick brick in vector bricks, -1 if nothing is selected */
+		int selected_brick;
 
-		std::vector<Cuboid> cuboids;
+		/* index of brick with id is id-1 */
+		std::vector<Brick> bricks;
 
-		// matrix filled with cuboids ids
+		/* matrix filled with bricks' ids */
 		std::vector<std::vector<std::vector<unsigned char>>> matrix;
 
-		// draw a grid at y=h
-		void drawGrid(float h, Color c);
+		/* draw a grid */
+		void draw_grid(Color c) const;
 
-		// constructors
+		/* constructors */
 		Space();
 		Space(int size);
-		~Space(void);
 
 
-		// add a cuboid to the space
-		void add(Cuboid& c);
+		/* add a brick to the space */
+		void add(Brick& c);
 
-		// render all cuboids and a grid
+		/* render all bricks and a grid */
 		void render();
-		void renderCar(int car_x, int car_y, int car_width, int car_depth);
+		void draw_car();
 
-		// move a cuboid indexed with index in direction d
+		/* move a brick indexed with index in direction d */
 		bool move(int index, Direction d);
 
-		// clear a part of the matrix where selected cuboid is
+		/* clear a part of the matrix where selected_brick brick is */
 		void select();
 
-		// fill a part of the matrix where cuboid is left
+		/* fill a part of the matrix where brick is left */
 		void deselect();
 
-		// put down selected cuboid
-		void putDown();
+		/* put down selected_brick brick */
+		void put_down();
 
-		// pick a cuboid with index=id-1
+		/* pick a brick with index=id-1 */
 		void pick(int id);
 
 	

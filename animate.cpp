@@ -4,7 +4,7 @@
 #include "camera.h"
 
 
-bool move(Direction d, Cuboid& c,float speed) {
+bool move(Direction d, Brick& c,float speed) {
 	if (abs(speed)>1)
 		return false;
 
@@ -21,7 +21,7 @@ bool move(Direction d, Cuboid& c,float speed) {
 	int line = (z == 1) ? ceil(coordinate) : floor(coordinate);
 
 
-	float limit = 1.2 * speed; // 1.2>1 so we are sure the cuboid cannot go inside
+	float limit = 1.2 * speed; // 1.2>1 so we are sure the brick cannot go inside
 	if (d == Down)
 		limit += 0.2;
 
@@ -29,7 +29,7 @@ bool move(Direction d, Cuboid& c,float speed) {
 		if (d != Down)
 			coordinate = line;
 
-		if (space.move(space.selected, d)) 
+		if (space.move(space.selected_brick, d)) 
 		{
 			coordinate += z*speed;
 			returnVal =true;
@@ -62,60 +62,60 @@ void on_timer(int value) {
 	if (value != TIMER_ID)
 	  return;
 
-	if (space.selected==-1 || !somethingIsPressed())
+	if (space.selected_brick==-1 || !somethingIsPressed())
 		return;
 
-	Cuboid& selectedCuboid = space.cuboids[space.selected];
+	Brick& selected_brickBrick = space.bricks[space.selected_brick];
 
 	if (bLeft.pressed) {
 		if (to.x-to.z>=0 && -to.x-to.z>=0)
-			move(Left,selectedCuboid,speed);
+			move(Left,selected_brickBrick,speed);
 		if (-to.x-to.z>=0 && -to.x+to.z>=0)
-			move(Forward,selectedCuboid,speed);
+			move(Forward,selected_brickBrick,speed);
 		if (-to.x+to.z>=0 && to.x+to.z>=0)
-			move(Right,selectedCuboid,speed);
+			move(Right,selected_brickBrick,speed);
 		if (to.x+to.z>=0 && to.x-to.z>=0)
-			move(Backward,selectedCuboid,speed);
+			move(Backward,selected_brickBrick,speed);
 	}
 
 	if (bRight.pressed) {
 		if (to.x-to.z>=0 && -to.x-to.z>=0)
-			move(Right,selectedCuboid,speed);
+			move(Right,selected_brickBrick,speed);
 		if (-to.x-to.z>=0 && -to.x+to.z>=0)
-			move(Backward,selectedCuboid,speed);
+			move(Backward,selected_brickBrick,speed);
 		if (-to.x+to.z>=0 && to.x+to.z>=0)
-			move(Left,selectedCuboid,speed);
+			move(Left,selected_brickBrick,speed);
 		if (to.x+to.z>=0 && to.x-to.z>=0)
-			move(Forward,selectedCuboid,speed);
+			move(Forward,selected_brickBrick,speed);
 	}
 
 	if (bForward.pressed) {
 		if (to.x-to.z>=0 && -to.x-to.z>=0)
-			move(Forward,selectedCuboid,speed);
+			move(Forward,selected_brickBrick,speed);
 		if (-to.x-to.z>=0 && -to.x+to.z>=0)
-			move(Right,selectedCuboid,speed);
+			move(Right,selected_brickBrick,speed);
 		if (-to.x+to.z>=0 && to.x+to.z>=0)
-			move(Backward,selectedCuboid,speed);
+			move(Backward,selected_brickBrick,speed);
 		if (to.x+to.z>=0 && to.x-to.z>=0)
-			move(Left,selectedCuboid,speed);
+			move(Left,selected_brickBrick,speed);
 	}
 
 	if (bBackward.pressed) {
 		if (to.x-to.z>=0 && -to.x-to.z>=0)
-			move(Backward,selectedCuboid,speed);
+			move(Backward,selected_brickBrick,speed);
 		if (-to.x-to.z>=0 && -to.x+to.z>=0)
-			move(Left,selectedCuboid,speed);
+			move(Left,selected_brickBrick,speed);
 		if (-to.x+to.z>=0 && to.x+to.z>=0)
-			move(Forward,selectedCuboid,speed);
+			move(Forward,selected_brickBrick,speed);
 		if (to.x+to.z>=0 && to.x-to.z>=0)
-			move(Right,selectedCuboid,speed);
+			move(Right,selected_brickBrick,speed);
 	}
 
 	if (bUp.pressed)
-		move(Up,selectedCuboid,speed);
+		move(Up,selected_brickBrick,speed);
 
 	if (bDown.pressed)
-		move(Down,selectedCuboid,speed);
+		move(Down,selected_brickBrick,speed);
 
 
 	glutPostRedisplay();

@@ -61,11 +61,11 @@ void keyboard(unsigned char key, int x, int y) {
 		go = false;
 
 	if (key == bSelectDeselect.key) {
-	  if (space.selected!=-1) {
-		space.cuboids[space.selected].pos.z -= 0.2;
-		space.cuboids[space.selected].round();
+	  if (space.selected_brick!=-1) {
+		space.bricks[space.selected_brick].pos.z -= 0.2;
+		space.bricks[space.selected_brick].round();
 		space.deselect();
-		space.selected = -1;
+		space.selected_brick = -1;
 		glutPostRedisplay();
 	  }
 	}
