@@ -2,6 +2,13 @@
 #include "globalVariables.h"
 
 bool camera_timer_active = false;
+float theta=-3.141592/2;
+float phi=3.141592/2;
+float theta_step=0;
+float phi_step=0;
+float move_forward = 0;
+float move_left = 0;
+float move_up=0;
 
 extern Button bt_camera_rotation_up, bt_camera_rotation_down, bt_camera_rotation_left, bt_camera_rotation_right,
 	   bt_camera_translate_up, bt_camera_translate_down, bt_camera_translate_left, bt_camera_translate_right,
@@ -14,9 +21,11 @@ void get_vectors() {
 	hvector.normalize();
 	v=hvector*view;
 	v.normalize();
+	int nearClippingPlaneDistance = 1;
+	int fovy = 40;
 	float rad = fovy * 3.14159 / 180;
 	float vLength = tan( rad / 2 ) * nearClippingPlaneDistance;
-	float hLength = vLength * ((float)windowWidth / windowHeight);
+	float hLength = vLength * ((float)window_width / window_height);
 	v = v*vLength;
 	hvector = hvector*hLength;
 }
@@ -24,24 +33,24 @@ void get_vectors() {
 
 void calculate_camera_forward_position() {
 	float d = sqrt(to.x*to.x+to.z*to.z);
-	cameraPosition.x += move_forward * to.x/d * 0.2;
-	cameraPosition.z += move_forward * to.z/d * 0.2;
+	camera_position.x += move_forward * to.x/d * 0.2;
+	camera_position.z += move_forward * to.z/d * 0.2;
 }
 
 void calculate_camera_left_position() {
 	float d = sqrt(to.x*to.x+to.z*to.z); 
-	cameraPosition.x += move_left * to.z/d * 0.2;
-	cameraPosition.z += move_left * -to.x/d * 0.2;
+	camera_position.x += move_left * to.z/d * 0.2;
+	camera_position.z += move_left * -to.x/d * 0.2;
 }
 
 void calculate_camera_up_position() {
-	cameraPosition.y += move_up;
+	camera_position.y += move_up;
 }
 
 void calculate_camera_look() {
 
 	theta += theta_step;
-	phi += phiStep;
+	phi += phi_step;
 
 
 
@@ -78,13 +87,13 @@ void camera_on_timer(int value) {
 		theta_step = 0;
 
 	if (bt_camera_rotation_up.pressed)
-		phiStep=0.02;
+		phi_step=0.02;
 
 	if (bt_camera_rotation_down.pressed)
-		phiStep=-0.02;
+		phi_step=-0.02;
 
 	if (!bt_camera_rotation_up.pressed && !bt_camera_rotation_down.pressed)
-		phiStep = 0;
+		phi_step = 0;
 
 	/* translation */
 	if (bt_camera_translate_up.pressed)
@@ -107,11 +116,11 @@ void camera_on_timer(int value) {
 	if (!bt_camera_translate_left.pressed && !bt_camera_translate_right.pressed)
 		move_left = 0;
 
-	if (!theta_step && !phiStep && !move_up && !move_forward && !move_left)
+	if (!theta_step && !phi_step && !move_up && !move_forward && !move_left)
 		camera_timer_active = false;
 
 
-	if (theta_step != 0 || phiStep != 0)
+	if (theta_step != 0 || phi_step != 0)
 		calculate_camera_look();
 
 	if (move_up)
@@ -126,5 +135,5 @@ void camera_on_timer(int value) {
 	/* glutPostRedisplay(); */
 
 	if (camera_timer_active)
-		glutTimerFunc(10, camera_on_timer, CAMERA_TIMER_ID);
+		glutTimerFunc(TIMER_INTERVAL, camera_on_timer, CAMERA_TIMER_ID);
 }

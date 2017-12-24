@@ -62,10 +62,12 @@ class Space {
 		void add(Brick& c);
 
 		/* render all bricks and a grid */
-		void render() const;
+		void render_space() const;
 
 		/* draw car base and all bricks in it */
 		void draw_car();
+
+		void render();
 
 		/* move a brick indexed with index in direction d */
 		bool move(int index, Direction d) const;

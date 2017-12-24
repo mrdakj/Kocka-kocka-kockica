@@ -10,118 +10,98 @@
 #include "mouse.h"
 #include "camera.h"
 #include "loadModel.h"
+#include "utility.h"
 
 extern Button bt_brick_up, bt_brick_down;
 // define global variables
-float translate_x=0.01;
-bool go = false;
-int windowWidth=1200;
-int windowHeight=700;
+int window_width=1200;
+int window_height=700;
 float speed = 0.08;
 Space space;
-Vector3f cameraPosition(0,3,4);
+Vector3f camera_position(0,3,4);
 Vector3f to(0,0,-1);
 Vector3f view, hvector, v;
-float fovy = 40;
-int nearClippingPlaneDistance=1;
-float move_forward = 0;
-float move_left = 0;
-float move_up=0;
-float theta=-3.141592/2;
-float phi=3.141592/2;
-float theta_step=0;
-float phiStep=0;
 
 GLdouble objX=0;
 GLdouble objY=0;
 GLdouble objZ=0;
 //--------------------------------
 
-void setWindow();
-void renderScene(void);
-void changeScene(int w, int h);
-int animation_ongoing;
+void set_window();
+void on_display(void);
+void on_reshape(int w, int h);
 void get_vectors();
+void set_light();
+void draw_cursor(const ut_Point& A, const ut_Point& B, const ut_Point& C);
 
+/* crate bricks and add them to the space */
+void create_bricks();
 
 
 int main(int argc, char** argv) {
-	animation_ongoing=0;
 
 	/* init glut */
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
 
-	setWindow();
+	set_window();
 
-
-	GLfloat blue[] = {0.0, 0.0, 1, 1};
-	GLfloat green[] = {0.0, 1.0, 0.0, 1};
-	GLfloat red[] = {1, 0.24, 0.14, 1};
-
-	/* TODO  destructor will not be called for this because of loop */
-    Brick c(Position(4,5,0), Size(2,1,2), Color(1,0,0));
-    Brick c3(Position(0,0,0), Size(1,2,1), Color(0,1,0));
-    Brick cx(Position(0,5,0), Size(2,1,1), Color(0,0,1));
-    Brick c2(Position(5,0,0), Size(4,1,2), Color(1,0,0));
-
-	space.add(cx);
-	space.add(c3);
-	space.add(c);
-	space.add(c2);
 
 	glEnable(GL_DEPTH_TEST);
-
-	/* Light and material */
-	GLfloat light_ambient[]={0.1, 0.1, 0.1 ,1};
-	GLfloat light_diffuse[]={1, 1, 1, 1};
-	GLfloat light_specular[]={0.3, 0.3, 0.3, 1};
-	GLfloat linear_attenuation = 0.005;
-
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
-	/* glEnable(GL_COLOR_MATERIAL); */
-	/* glEnable(GL_NORMALIZE); */
-
-	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
-	glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, linear_attenuation);
-	/* glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 15.0); */
-
-
 	glClearColor(0.16,0.16,0.16,1);
+
+	/* hide cursor */
 	glutSetCursor(GLUT_CURSOR_NONE);
-	/* register callbacks */
+
 	glutSetKeyRepeat(GLUT_KEY_REPEAT_OFF);
 
-	glutDisplayFunc(renderScene);
-	glutReshapeFunc(changeScene);
+	/* Light */
+	set_light();
+
+	create_bricks();
+
+	/* register callbacks */
+	glutDisplayFunc(on_display);
+	glutReshapeFunc(on_reshape);
 	glutKeyboardFunc(keyboard_ascii_down);
 	glutSpecialFunc(keyboard_special_down);
 	glutSpecialUpFunc(keyboard_special_up);
 	glutKeyboardUpFunc(keyboard_ascii_up);
 	glutMouseFunc(mouse);
-    glutMotionFunc(mouseMotion);
-    glutPassiveMotionFunc(passiveMouse);
-	glutIdleFunc(renderScene);
+    glutMotionFunc(on_mouse_active_move);
+    glutPassiveMotionFunc(on_mouse_passive_move);
+	glutIdleFunc(on_display);
 
 	glutMainLoop();
 	
 	return 0;
 }
 
-void setWindow() {
+void set_window() {
 	glutInitWindowPosition(0,0);
-	glutInitWindowSize(windowWidth, windowHeight);
+	glutInitWindowSize(window_width, window_height);
 	glutCreateWindow("Kocka kocka kockica");
 }
 
+void set_light() {
+	GLfloat light_ambient[]={0.1, 0.1, 0.1 ,1};
+	GLfloat light_diffuse[]={1, 1, 1, 1};
+	GLfloat light_specular[]={0.3, 0.3, 0.3, 1};
+	GLfloat linear_attenuation = 0.005;
+
+	glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+	glLightf(GL_LIGHT0, GL_LINEAR_ATTENUATION, linear_attenuation);
+
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+}
 
 
-double inverseProject[16]={0.0};
+static double projection_inverse[16]={0.0};
 
-void renderScene(void) {
+void on_display(void) {
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -130,12 +110,10 @@ void renderScene(void) {
 		Brick& selected_brickBrick = space.bricks[space.selected_brick];
 		if (bt_brick_up.pressed) {
 			if (move(Up,selected_brickBrick,speed)) {
-				to.x = objX-cameraPosition.x;
-				to.z = objZ-cameraPosition.z;
-				to.y = objY-cameraPosition.y;
+				to.x = objX-camera_position.x;
+				to.z = objZ-camera_position.z;
+				to.y = objY-camera_position.y;
 				float modultheta = sqrt(to.x*to.x+to.z*to.z+to.y*to.y);
-				/* for polar coordinates */
-				/* float modultheta = sqrt(to.x*to.x+to.z*to.z); */
 
 				to.x /= modultheta;
 				to.z /= modultheta;
@@ -145,12 +123,10 @@ void renderScene(void) {
 
 		if (bt_brick_down.pressed) {
 			if (move(Down,selected_brickBrick,speed)) {
-				to.x = objX-cameraPosition.x;
-				to.z = objZ-cameraPosition.z;
-				to.y = objY-cameraPosition.y;
+				to.x = objX-camera_position.x;
+				to.z = objZ-camera_position.z;
+				to.y = objY-camera_position.y;
 				float modultheta = sqrt(to.x*to.x+to.z*to.z+to.y*to.y);
-				/* for polar coordinates */
-				/* float modultheta = sqrt(to.x*to.x+to.z*to.z); */
 
 				to.x /= modultheta;
 				to.z /= modultheta;
@@ -162,92 +138,44 @@ void renderScene(void) {
 
 	glLoadIdentity();
 
-	/* following camera because it's before lookat*/
+	/* set light at camera position */
 	GLfloat light_position[] = {0,0,0,1};
 	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 
-	gluLookAt(cameraPosition.x,cameraPosition.y,cameraPosition.z, cameraPosition.x + to.x,cameraPosition.y + to.y,cameraPosition.z + to.z, 0, 1, 0);
+	gluLookAt(camera_position.x,camera_position.y,camera_position.z,
+			  camera_position.x+to.x, camera_position.y+to.y, camera_position.z+to.z,
+			  0, 1, 0);
 
 
-	glTranslatef(-translate_x,0,0);
+	/* draw space */
+	space.render();
 
-	if (go) {
-		space.car.wheel_rotation_angle+=1;
-		translate_x += 0.02;
-		space.draw_car();
+
+	/* draw cursor */
+	if (space.selected_brick == -1) {
+		draw_cursor(ut_Point(-0.02, -0.02, 0),
+					ut_Point(0.02, -0.02, 0),
+					ut_Point());
 	}
 	else {
-		space.car.wheel_rotation_angle=0;
-		translate_x = 0;
-		space.render();
-	}
-
-
-
-	double modelMatrix[16];
-	double projMatrix[16];
-	GLint viewport[4];
-
-	glGetDoublev(GL_MODELVIEW_MATRIX,modelMatrix);
-	glGetDoublev(GL_PROJECTION_MATRIX,projMatrix);
-	glGetIntegerv(GL_VIEWPORT,viewport); 
-
-	GLdouble winX;
-	GLdouble winY;
-	GLdouble winZ;
-
-	if (space.selected_brick == -1) {
-		glPushMatrix();
-			glLoadIdentity();
-			glMultMatrixd(inverseProject);
-			glDisable(GL_DEPTH_TEST);
-			glDisable(GL_LIGHTING);
-			glBegin(GL_TRIANGLES);
-				glColor3f(0.6,0.4,0.8);
-				glVertex3f(-0.02, -0.02, 0);
-				glVertex3f(0.02, -0.02, 0);
-				glVertex3f(0, 0, 0);
-			glEnd();
-			glEnable(GL_DEPTH_TEST);
-			glEnable(GL_LIGHTING);
-		glPopMatrix();
-	} else {
-		gluProject(objX,objY,objZ,modelMatrix,projMatrix,viewport,&winX, &winY, &winZ);
-			winY = winY-windowHeight/2;
-			winX = winX - windowWidth/2;
-			winX  /= windowWidth/2;
-			winY /= windowHeight/2;
-
-		glPushMatrix();
-			glLoadIdentity();
-			glMultMatrixd(inverseProject);
-		
-			glDisable(GL_DEPTH_TEST);
-			glDisable(GL_LIGHTING);
-			glBegin(GL_TRIANGLES);
-				glColor3f(0.6,0.4,0.8);
-				glVertex3f(winX-0.02, winY-0.02, 0);
-				glVertex3f(winX+0.02, winY-0.02, 0);
-				glVertex3f(winX, winY, 0);
-			glEnd();
-			glEnable(GL_DEPTH_TEST);
-			glEnable(GL_LIGHTING);
-
-		glPopMatrix();
+		ut_Point screen_point = ut_world_to_screen_coordinates(ut_Point(objX, objY, objZ));
+		draw_cursor(ut_Point(screen_point.x-0.02, screen_point.y-0.02, 0),
+					ut_Point(screen_point.x+0.02, screen_point.y-0.02, 0), 
+					ut_Point(screen_point.x, screen_point.y, 0));
 	} 
 
 	glutSwapBuffers();
 }
 
-void changeScene(int w, int h) {
+void on_reshape(int w, int h) {
 	if (h == 0)
 		h = 1;
 
-	windowWidth=w;
-	windowHeight=h;
+	window_width=w;
+	window_height=h;
 
 
-	glutWarpPointer(windowWidth/2,windowHeight/2);
+	glutWarpPointer(window_width/2,window_height/2);
 
 	float ratio = 1.0 * w / h;
 
@@ -256,7 +184,7 @@ void changeScene(int w, int h) {
 	glMatrixMode(GL_PROJECTION);
 
 	glLoadIdentity();
-	gluPerspective(fovy, ratio, nearClippingPlaneDistance, 400);
+	gluPerspective(40, ratio, 1, 400);
 
 	glMatrixMode(GL_MODELVIEW);
 
@@ -290,11 +218,36 @@ void changeScene(int w, int h) {
 	double d = op[14];
 	double e = op[11];
 
-	inverseProject[0] = 1.0 / a;
-	inverseProject[5] = 1.0 / b;
-	inverseProject[11] = 1.0 / d;
-	inverseProject[14] = 1.0 / e;
-	inverseProject[15] = -c / (d * e);
+	projection_inverse[0] = 1.0 / a;
+	projection_inverse[5] = 1.0 / b;
+	projection_inverse[11] = 1.0 / d;
+	projection_inverse[14] = 1.0 / e;
+	projection_inverse[15] = -c / (d * e);
 }
 
 
+void create_bricks() {
+	/* TODO  destructor will not be called for this because of loop */
+    Brick brick_1(Position(4,5,0), Size(2,1,2), Color(1,0,0));
+    Brick brick_2(Position(0,0,0), Size(1,2,1), Color(0,1,0));
+    Brick brick_3(Position(0,5,0), Size(2,1,1), Color(0,0,1));
+    Brick brick_4(Position(5,0,0), Size(4,1,2), Color(1,0,0));
+
+	space.add(brick_1);
+	space.add(brick_2);
+	space.add(brick_3);
+	space.add(brick_4);
+}
+
+void draw_cursor(const ut_Point& A, const ut_Point& B, const ut_Point& C) {
+	glPushMatrix();
+	glLoadIdentity();
+	glMultMatrixd(projection_inverse);
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_LIGHTING);
+	glColor3f(0.6,0.4,0.8);
+	ut_draw_triangle(A, B, C);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_LIGHTING);
+	glPopMatrix();
+}

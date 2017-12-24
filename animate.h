@@ -1,8 +1,7 @@
 #include "globalVariables.h"
 #include "keyboard.h"
 
-#define TIMER_ID 0
-#define TIMER_INTERVAL 20  
+#define CAR_TIMER_ID 2
 
 bool move(Direction d, Brick& c,float speed);
-void on_timer(int value);
+void car_on_timer(int value);

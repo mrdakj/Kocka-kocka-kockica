@@ -1,11 +1,14 @@
 #include "globalVariables.h"
+#include <stdio.h>
 #include "keyboard.h"
 #include <GL/glut.h>
 #include "camera.h"
+#include "animate.h"
 
 #define unused_function_arg(x) ((void)x)
 
 extern bool camera_timer_active;
+extern bool car_timer_active;
 
 /* exit button */
 Button bt_exit(27);
@@ -34,7 +37,14 @@ Button bt_animation_stop('s');
 void activate_camera_timer() {
 	if (!camera_timer_active) {
 		camera_timer_active = true;
-		glutTimerFunc(10, camera_on_timer, CAMERA_TIMER_ID);
+		glutTimerFunc(TIMER_INTERVAL, camera_on_timer, CAMERA_TIMER_ID);
+	}
+}
+
+void activate_car_timer() {
+	if (!car_timer_active) {
+		car_timer_active = true;
+		glutTimerFunc(TIMER_INTERVAL, car_on_timer, CAR_TIMER_ID);
 	}
 }
 
@@ -81,10 +91,13 @@ void keyboard_ascii_down(unsigned char key, int x, int y) {
 		bt_brick_up.change_state();
 
 	/* animation */
-	if (key == bt_animation_go.key)
-		go = true;
-	if (key == bt_animation_stop.key)
-		go = false;
+	if (key == bt_animation_go.key) {
+		activate_car_timer();
+	}
+	if (key == bt_animation_stop.key) {
+		car_timer_active = false;
+		space.car.stop();
+	}
 }
 
 void keyboard_ascii_up(unsigned char key, int x, int y) {

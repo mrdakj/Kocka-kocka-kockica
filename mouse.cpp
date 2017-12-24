@@ -4,6 +4,11 @@
 #include "camera.h"
 #include "animate.h"
 
+extern float theta;
+extern float phi;
+extern float theta_step;
+extern float phi_step;
+
 /* 0.005 for mouse */
 float sensitivity = 0.01;
 static bool right_down=false;
@@ -12,15 +17,16 @@ static bool left_down=false;
 
 // get a direction of mouse picking ray
 Vector3f getDirection(float fx, float fy) {
-	fx -= windowWidth / 2.0;
-	fy = windowHeight / 2.0 - fy;
+	fx -= window_width / 2.0;
+	fy = window_height / 2.0 - fy;
 
-	fy /= (windowHeight / 2.0);
-	fx /= (windowWidth / 2.0);
+	fy /= (window_height / 2.0);
+	fx /= (window_width / 2.0);
 
-	Vector3f pos = cameraPosition + view*nearClippingPlaneDistance + hvector*fx + v*fy;
+	int nearClippingPlaneDistance = 1;
+	Vector3f pos = camera_position + view*nearClippingPlaneDistance + hvector*fx + v*fy;
 	
-	Vector3f dir = pos - cameraPosition;
+	Vector3f dir = pos - camera_position;
 
 	return dir;
 }
@@ -30,8 +36,8 @@ Vector3f getDirection(float fx, float fy) {
 void mouse(int button, int state, int x, int y) {
 	if (button == GLUT_LEFT_BUTTON &&  state == GLUT_DOWN) { 
 		left_down=true;
-		x=windowWidth/2;
-		y=windowHeight/2;
+		x=window_width/2;
+		y=window_height/2;
 
 		if (space.selected_brick!=-1) {
 			space.put_down();
@@ -50,15 +56,15 @@ void mouse(int button, int state, int x, int y) {
 		float clickX2, clickY2, clickZ2;
 
 		for (int i = 0; i < 3; i++) {
-		  float cPos = cameraPosition.get(i);
+		  float cPos = camera_position.get(i);
 		  float direc = dir.get(i);
 		  for (int currentPlane = 0; currentPlane < space.size; currentPlane++) {
 
 			  /* FIX check dividing by zero */
 				float k = ((i!=2) ? (currentPlane-cPos)/direc : (-currentPlane-cPos)/direc);
-				float xf = cameraPosition.x + k*dir.x;
-				float yf = cameraPosition.y + k*dir.y;
-				float zf = -(cameraPosition.z + k*dir.z);
+				float xf = camera_position.x + k*dir.x;
+				float yf = camera_position.y + k*dir.y;
+				float zf = -(camera_position.z + k*dir.z);
 				if (i==2 && (xf<0 || xf>=space.size || yf<0 || yf>=space.size))
 					continue;
 				if (i==1 && (xf<0 || xf>=space.size || zf<0 || zf>=space.size))
@@ -87,7 +93,7 @@ void mouse(int button, int state, int x, int y) {
 					if (x-1>=0) {
 						id = space.matrix[x-1][z][y]; 
 						if (id!=0 && id!=255) {
-							d = (cameraPosition-Vector3f(x, yf, -zf)).normSquared();
+							d = (camera_position-Vector3f(x, yf, -zf)).normSquared();
 							if (d<ds[i]) {
 								clickX0=x;
 								clickY0=yf;
@@ -100,7 +106,7 @@ void mouse(int button, int state, int x, int y) {
 
 					id = space.matrix[x][z][y]; 
 					if (id!=0 && id!=255) {
-						d = (cameraPosition-Vector3f(x, yf, -zf)).normSquared();
+						d = (camera_position-Vector3f(x, yf, -zf)).normSquared();
 						if (d<ds[i]) {
 							clickX0=x;
 							clickY0=yf;
@@ -115,7 +121,7 @@ void mouse(int button, int state, int x, int y) {
 					if (y-1>=0) {
 						id = space.matrix[x][z][y-1]; 
 						if (id!=0 && id!=255) {
-							d = (cameraPosition-Vector3f(xf, y, -zf)).normSquared();
+							d = (camera_position-Vector3f(xf, y, -zf)).normSquared();
 							if (d<ds[i]) {
 								clickX1=xf;
 								clickY1=y;
@@ -128,7 +134,7 @@ void mouse(int button, int state, int x, int y) {
 
 					id = space.matrix[x][z][y]; 
 					if (id!=0 && id!=255) {
-						d = (cameraPosition-Vector3f(xf, y, -zf)).normSquared();
+						d = (camera_position-Vector3f(xf, y, -zf)).normSquared();
 						if (d<ds[i]) {
 							clickX1=xf;
 							clickY1=y;
@@ -144,7 +150,7 @@ void mouse(int button, int state, int x, int y) {
 					if (z-1>=0) {
 						id = space.matrix[x][z-1][y]; 
 						if (id!=0 && id!=255) {
-							d = (cameraPosition-Vector3f(xf, yf, -z)).normSquared();
+							d = (camera_position-Vector3f(xf, yf, -z)).normSquared();
 							if (d<ds[i]) {
 								clickX2=xf;
 								clickY2=yf;
@@ -157,7 +163,7 @@ void mouse(int button, int state, int x, int y) {
 
 					id = space.matrix[x][z][y]; 
 					if (id!=0 && id!=255) {
-						d = (cameraPosition-Vector3f(xf, yf, -z)).normSquared();
+						d = (camera_position-Vector3f(xf, yf, -z)).normSquared();
 						if (d<ds[i]) {
 							clickX2=xf;
 							clickY2=yf;
@@ -193,9 +199,9 @@ void mouse(int button, int state, int x, int y) {
 		space.pick(id);
 
 		if (space.selected_brick != -1) {
-			to.x = objX-cameraPosition.x;
-			to.z = objZ-cameraPosition.z;
-			to.y = objY-cameraPosition.y;
+			to.x = objX-camera_position.x;
+			to.z = objZ-camera_position.z;
+			to.y = objY-camera_position.y;
 
 			/* for sphere coordinates */
 			float modultheta = sqrt(to.x*to.x+to.z*to.z+to.y*to.y);
@@ -245,24 +251,24 @@ void mouse(int button, int state, int x, int y) {
 }
 
 void mouseLook(int x, int y) {
-	theta_step = (x - windowWidth/2) * 0.0015;
-	phiStep = - (y - windowHeight/2) * 0.0015;
+	theta_step = (x - window_width/2) * 0.0015;
+	phi_step = - (y - window_height/2) * 0.0015;
 
 	if (theta_step) {
 		calculate_camera_look();
 	}
 
-	if (phiStep) {
+	if (phi_step) {
 		calculate_camera_look();
 	}
 
-	theta_step = phiStep = 0;
+	theta_step = phi_step = 0;
 	
-	if (x!=windowWidth/2 || y!=windowHeight/2)
-		glutWarpPointer(windowWidth / 2, windowHeight / 2);
+	if (x!=window_width/2 || y!=window_height/2)
+		glutWarpPointer(window_width / 2, window_height / 2);
 }
 
-void mouseMotion(int x, int y) {
+void on_mouse_active_move(int x, int y) {
 
 	if (space.selected_brick==-1) {
 		mouseLook(x,y);
@@ -271,12 +277,12 @@ void mouseMotion(int x, int y) {
 
 	
 
-	if (x == windowWidth/2 && y == windowHeight/2)
+	if (x == window_width/2 && y == window_height/2)
 		return;
 
 	Brick& selected_brickBrick = space.bricks[space.selected_brick];
 
-	float delta_x = x-windowWidth/2;
+	float delta_x = x-window_width/2;
 
 	delta_x *= sensitivity;
 
@@ -292,7 +298,7 @@ void mouseMotion(int x, int y) {
 	}
 
 
-	float delta_y = -y+windowHeight/2;
+	float delta_y = -y+window_height/2;
 
 	delta_y *= sensitivity;
 
@@ -339,9 +345,9 @@ void mouseMotion(int x, int y) {
 	}
 
 
-	to.x = objX-cameraPosition.x;
-	to.z = objZ-cameraPosition.z;
-	to.y = objY-cameraPosition.y;
+	to.x = objX-camera_position.x;
+	to.z = objZ-camera_position.z;
+	to.y = objY-camera_position.y;
 
 	/* for sphere coordinates */
 	float modultheta = sqrt(to.x*to.x+to.z*to.z+to.y*to.y);
@@ -353,11 +359,11 @@ void mouseMotion(int x, int y) {
 	to.y /= modultheta;
 
 
-	if (x!=windowWidth/2 || y!=windowHeight/2)
-		glutWarpPointer(windowWidth / 2, windowHeight / 2);
+	if (x!=window_width/2 || y!=window_height/2)
+		glutWarpPointer(window_width / 2, window_height / 2);
 }
 
 
-void passiveMouse(int x, int y) {
+void on_mouse_passive_move(int x, int y) {
 	mouseLook(x, y);
 }

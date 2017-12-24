@@ -6,7 +6,7 @@
 
 
 void mouse(int button, int state, int x, int y);
-void mouseMotion(int x, int y);
-void passiveMouse(int x, int y);
+void on_mouse_active_move(int x, int y);
+void on_mouse_passive_move(int x, int y);
 
 #endif

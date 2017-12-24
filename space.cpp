@@ -70,7 +70,7 @@ int Space::get_matrix_field(int i, int j, int k) const {
 }
 
 
-void Space::render() const {
+void Space::render_space() const {
 	car.draw_base();
 	
 	draw_grid(Color(1,1,1));
@@ -124,6 +124,17 @@ void Space::draw_car() {
 		if (c.in_car)
 			c.draw_brick();
 	}
+}
+
+void Space::render() {
+	glPushMatrix();
+	glTranslatef(-car.translate_x,0,0);
+
+	if (car.is_going) 
+		draw_car();
+	else
+		render_space();
+	glPopMatrix();
 }
 
 void Space::draw_grid(Color c) const {
