@@ -6,5 +6,3 @@
 
 bool move(Direction d, Brick& c,float speed);
 void on_timer(int value);
-/* void myIdleFunc(); */
-/* bool move(Direction d, Brick& c,float speed); */

@@ -16,11 +16,11 @@ public:
 	Car();
 	Car(int postion_x, int postion_y, int width, int depth);
 
-	void draw_base();
+	void draw_base() const;
 
 private:
-	void draw_cylinder();
-	void draw_brick();
+	void draw_cylinder() const;
+	void draw_brick() const;
 };
 
 #endif

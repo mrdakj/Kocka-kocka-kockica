@@ -11,6 +11,7 @@
 #include "camera.h"
 #include "loadModel.h"
 
+extern Button bt_brick_up, bt_brick_down;
 // define global variables
 float translate_x=0.01;
 bool go = false;
@@ -18,24 +19,17 @@ int windowWidth=1200;
 int windowHeight=700;
 float speed = 0.08;
 Space space;
-Button bUp('e');
-Button bDown('q');
-Button bLeft('a');
-Button bRight('d');
-Button bForward('s');
-Button bBackward('w');
-Button bSelectDeselect(32);
 Vector3f cameraPosition(0,3,4);
 Vector3f to(0,0,-1);
 Vector3f view, hvector, v;
 float fovy = 40;
 int nearClippingPlaneDistance=1;
-float moveFront = 0;
-float moveLeftRight = 0;
-float moveUpDown=0;
+float move_forward = 0;
+float move_left = 0;
+float move_up=0;
 float theta=-3.141592/2;
 float phi=3.141592/2;
-float thetaStep=0;
+float theta_step=0;
 float phiStep=0;
 
 GLdouble objX=0;
@@ -47,7 +41,7 @@ void setWindow();
 void renderScene(void);
 void changeScene(int w, int h);
 int animation_ongoing;
-void getVectors();
+void get_vectors();
 
 
 
@@ -103,10 +97,10 @@ int main(int argc, char** argv) {
 
 	glutDisplayFunc(renderScene);
 	glutReshapeFunc(changeScene);
-	glutKeyboardFunc(keyboard);
-	glutSpecialFunc(keyboardSpecial);
-	glutSpecialUpFunc(keyBoardSpecialUp);
-	glutKeyboardUpFunc(keyBoardUp);
+	glutKeyboardFunc(keyboard_ascii_down);
+	glutSpecialFunc(keyboard_special_down);
+	glutSpecialUpFunc(keyboard_special_up);
+	glutKeyboardUpFunc(keyboard_ascii_up);
 	glutMouseFunc(mouse);
     glutMotionFunc(mouseMotion);
     glutPassiveMotionFunc(passiveMouse);
@@ -131,27 +125,10 @@ void renderScene(void) {
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	if (moveUpDown)
-		getUpDownPosition();
-
-	if (moveFront)
-		getFrontPosition();
-
-	if (moveLeftRight)
-		getLeftRightPosition();
-
-	if (phiStep) {
-		calculateDirection();
-	}
-
-	if (thetaStep) {
-		calculateDirection();
-	}
-
 
 	if (space.selected_brick != -1) {
 		Brick& selected_brickBrick = space.bricks[space.selected_brick];
-		if (bUp.pressed) {
+		if (bt_brick_up.pressed) {
 			if (move(Up,selected_brickBrick,speed)) {
 				to.x = objX-cameraPosition.x;
 				to.z = objZ-cameraPosition.z;
@@ -166,7 +143,7 @@ void renderScene(void) {
 			}
 		}
 
-		if (bDown.pressed) {
+		if (bt_brick_down.pressed) {
 			if (move(Down,selected_brickBrick,speed)) {
 				to.x = objX-cameraPosition.x;
 				to.z = objZ-cameraPosition.z;
@@ -188,8 +165,6 @@ void renderScene(void) {
 	/* following camera because it's before lookat*/
 	GLfloat light_position[] = {0,0,0,1};
 	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-	/* GLfloat spot_direction[]={0,0,-1}; */
-	/* glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, spot_direction); */
 
 	gluLookAt(cameraPosition.x,cameraPosition.y,cameraPosition.z, cameraPosition.x + to.x,cameraPosition.y + to.y,cameraPosition.z + to.z, 0, 1, 0);
 
@@ -286,7 +261,7 @@ void changeScene(int w, int h) {
 	glMatrixMode(GL_MODELVIEW);
 
 
-	getVectors();
+	get_vectors();
 
 	/*
 	Based off http://bookofhook.com/mousepick.pdf

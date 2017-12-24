@@ -171,7 +171,7 @@ void mouse(int button, int state, int x, int y) {
 		  }//end of for
 		}//end of for
 		
-		int indeks = getIndexOfMinimum(ds[0], ds[1], ds[2]);
+		int indeks = ut_index_of_minimum(ds[0], ds[1], ds[2]);
 		if (indeks==0) {
 			objX = clickX0;
 			objY = clickY0+0.2;
@@ -229,7 +229,7 @@ void mouse(int button, int state, int x, int y) {
 		if (to.z<0)
 			theta *= -1;
 
-		getVectors();
+		get_vectors();
 
 		glutPostRedisplay();
 	}
@@ -245,18 +245,18 @@ void mouse(int button, int state, int x, int y) {
 }
 
 void mouseLook(int x, int y) {
-	thetaStep = (x - windowWidth/2) * 0.0015;
+	theta_step = (x - windowWidth/2) * 0.0015;
 	phiStep = - (y - windowHeight/2) * 0.0015;
 
-	if (thetaStep) {
-		calculateDirection();
+	if (theta_step) {
+		calculate_camera_look();
 	}
 
 	if (phiStep) {
-		calculateDirection();
+		calculate_camera_look();
 	}
 
-	thetaStep = phiStep = 0;
+	theta_step = phiStep = 0;
 	
 	if (x!=windowWidth/2 || y!=windowHeight/2)
 		glutWarpPointer(windowWidth / 2, windowHeight / 2);

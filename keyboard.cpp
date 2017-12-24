@@ -1,129 +1,152 @@
 #include "globalVariables.h"
 #include "keyboard.h"
-#include "vector3f.h"
-#include "animate.h"
+#include <GL/glut.h>
+#include "camera.h"
 
+#define unused_function_arg(x) ((void)x)
 
-void buttonChangeState(int key) {
-	if (key == bLeft.key) { 
-		bLeft.changeState();
-		return;
-	}
+extern bool camera_timer_active;
 
-	if (key == bRight.key) { 
-		bRight.changeState();
-		return;
-	}
+/* exit button */
+Button bt_exit(27);
 
-	if (key == bUp.key) { 
-		bUp.changeState();
-		return;
-	}
+/* brick buttons */
+Button bt_brick_up('e');
+Button bt_brick_down('q');
 
-	if (key == bDown.key) { 
-		bDown.changeState();
-		return;
-	}
+/* camera buttons */
+Button bt_camera_rotation_left('j');
+Button bt_camera_rotation_right('l');
+Button bt_camera_rotation_up('i');
+Button bt_camera_rotation_down('k');
 
-	if (key == bBackward.key) { 
-		bBackward.changeState();
-		return;
-	}
+Button bt_camera_translate_up('o');
+Button bt_camera_translate_down('u');
+Button bt_camera_translate_left(GLUT_KEY_LEFT);
+Button bt_camera_translate_right(GLUT_KEY_RIGHT);
+Button bt_camera_translate_forward(GLUT_KEY_UP);
+Button bt_camera_translate_backward(GLUT_KEY_DOWN);
 
-	if (key == bForward.key) { 
-		bForward.changeState();
-		return;
+/* animation buttons */
+Button bt_animation_go('g');
+Button bt_animation_stop('s');
+
+void activate_camera_timer() {
+	if (!camera_timer_active) {
+		camera_timer_active = true;
+		glutTimerFunc(10, camera_on_timer, CAMERA_TIMER_ID);
 	}
 }
 
-bool somethingIsPressed() {
-	return bLeft.pressed || bRight.pressed || bDown.pressed || bUp.pressed || bForward.pressed || bBackward.pressed;
-}
+void keyboard_ascii_down(unsigned char key, int x, int y) {
+	unused_function_arg(x);
+	unused_function_arg(y);
 
-void keyboard(unsigned char key, int x, int y) {
-	if (key==27)
+	/* exit program */
+	if (key == bt_exit.key)
 		exit(0);
-	if (key == 'j')
-		thetaStep=-0.02;
-	if (key == 'l')
-		thetaStep=0.02;
-	if (key == 'i')
-		phiStep=0.02;
-	if (key=='k')
-		phiStep=-0.02;
-	if (key=='u')
-		moveUpDown=0.02;
-	if (key=='o')
-		moveUpDown=-0.02;
-	if (key=='g')
+
+	/* camera rotation */
+	if (key == bt_camera_rotation_left.key) {
+		bt_camera_rotation_left.change_state();
+		activate_camera_timer();
+	}
+	if (key == bt_camera_rotation_right.key) {
+		bt_camera_rotation_right.change_state();
+		activate_camera_timer();
+	}
+	if (key == bt_camera_rotation_up.key) {
+		bt_camera_rotation_up.change_state();
+		activate_camera_timer();
+	}
+	if (key == bt_camera_rotation_down.key) {
+		bt_camera_rotation_down.change_state();
+		activate_camera_timer();
+	}
+
+	/* camera translation */
+	if (key == bt_camera_translate_up.key) {
+		bt_camera_translate_up.change_state();
+		activate_camera_timer();
+	}
+	if (key == bt_camera_translate_down.key) {
+		bt_camera_translate_down.change_state();
+		activate_camera_timer();
+	}
+
+	/* brick up and down */
+	if (key == bt_brick_down.key)
+		bt_brick_down.change_state();
+	if (key == bt_brick_up.key)
+		bt_brick_up.change_state();
+
+	/* animation */
+	if (key == bt_animation_go.key)
 		go = true;
-	if (key=='s')
+	if (key == bt_animation_stop.key)
 		go = false;
-
-	if (key == bSelectDeselect.key) {
-	  if (space.selected_brick!=-1) {
-		space.bricks[space.selected_brick].pos.z -= 0.2;
-		space.bricks[space.selected_brick].round();
-		space.deselect();
-		space.selected_brick = -1;
-		glutPostRedisplay();
-	  }
-	}
-
-
-
-	buttonChangeState(key);
-	 /* if (!animation_ongoing) { */
-            /* glutTimerFunc(TIMER_INTERVAL, on_timer, TIMER_ID); */
-            /* animation_ongoing = 1; */
-     /* } */
 }
 
-void keyBoardSpecialUp( int key, int x, int y ) { 
-	if (key == GLUT_KEY_UP) {
-		moveFront = 0;
-	
-	}
-	if (key == GLUT_KEY_DOWN) {
-		moveFront = 0;
-	}
+void keyboard_ascii_up(unsigned char key, int x, int y) {
+	unused_function_arg(x);
+	unused_function_arg(y);
 
-	if (key == GLUT_KEY_LEFT) {
-		moveLeftRight = 0;
+	if (key == bt_camera_rotation_left.key) 
+		bt_camera_rotation_left.change_state();
+	if (key == bt_camera_rotation_right.key)
+		bt_camera_rotation_right.change_state();
+	if (key == bt_camera_rotation_up.key)
+		bt_camera_rotation_up.change_state();
+	if (key == bt_camera_rotation_down.key)
+		bt_camera_rotation_down.change_state();
+
+	if (key == bt_camera_translate_down.key)
+		bt_camera_translate_down.change_state();
+	if (key == bt_camera_translate_up.key)
+		bt_camera_translate_up.change_state();
+
+	if (key == bt_brick_down.key)
+		bt_brick_down.change_state();
+	if (key == bt_brick_up.key)
+		bt_brick_up.change_state();
+}
+
+void keyboard_special_down(int key, int x, int y) {
+	unused_function_arg(x);
+	unused_function_arg(y);
+
+	if (key == bt_camera_translate_forward.key) {
+		bt_camera_translate_forward.change_state();
+		activate_camera_timer();
 	}
-	if (key == GLUT_KEY_RIGHT) {
-		moveLeftRight = 0;
+	if (key == bt_camera_translate_backward.key) {
+		bt_camera_translate_backward.change_state();
+		activate_camera_timer();
 	}
+	if (key == bt_camera_translate_left.key) {
+		bt_camera_translate_left.change_state();
+		activate_camera_timer();
+	}
+	if (key == bt_camera_translate_right.key) {
+		bt_camera_translate_right.change_state();
+		activate_camera_timer();
+	}
+}
+
+void keyboard_special_up( int key, int x, int y ) { 
+	unused_function_arg(x);
+	unused_function_arg(y);
+
+	if (key == bt_camera_translate_forward.key)
+		bt_camera_translate_forward.change_state();
+	if (key == bt_camera_translate_backward.key)
+		bt_camera_translate_backward.change_state();
+	if (key == bt_camera_translate_left.key)
+		bt_camera_translate_left.change_state();
+	if (key == bt_camera_translate_right.key)
+		bt_camera_translate_right.change_state();
 
 }
 
-void keyBoardUp(unsigned char key, int x, int y) {
-	if (key == 'j' || key=='l')
-		thetaStep=0;
-	if (key == 'i' || key=='k')
-		phiStep=0;
-	if (key == 'u' || key=='o')
-		moveUpDown=0;
-
-	buttonChangeState(key);
-	/* if (!somethingIsPressed()) */
-	/* 	animation_ongoing=0; */
-}
-
-void keyboardSpecial(int key, int x, int y) {
-
-	if (key == GLUT_KEY_UP) {
-		moveFront = 0.5;
-	}
-	if (key == GLUT_KEY_DOWN) {
-		moveFront = -0.5;
-	}
-	if (key == GLUT_KEY_LEFT) {
-		moveLeftRight = 0.5;
-	}
-	if (key == GLUT_KEY_RIGHT) {
-		moveLeftRight = -0.5;
-	}
-}
 
 

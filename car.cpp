@@ -7,7 +7,7 @@ Car::Car() : Car(5, 10, 12, 8) {}
 Car::Car(int position_x, int position_y, int width, int depth) : position_x(position_x), position_y(position_y), width(width), depth(depth), wheel_rotation_angle(0) {}
 
 
-void Car::draw_base() {
+void Car::draw_base() const {
 
 	draw_brick();
 
@@ -43,7 +43,7 @@ void Car::draw_base() {
 }
 
 
-void Car::draw_cylinder() {
+void Car::draw_cylinder() const {
 	int w = width;
 	float h = 0.2;
 	int d = depth-1;
@@ -58,14 +58,14 @@ void Car::draw_cylinder() {
 	}
 }
 
-void Car::draw_brick() {
+void Car::draw_brick() const {
 	glPushMatrix();
 	glTranslatef(position_x,-0.2,-1-position_y);
 
 	glEnable(GL_COLOR_MATERIAL);
 	glColor3f(0, 1, 0);
 
-	draw_cuboid_u(width, depth-1, 0.2);
+	ut_draw_cuboid(width, depth-1, 0.2);
 	draw_cylinder();
 
 	glDisable(GL_COLOR_MATERIAL);

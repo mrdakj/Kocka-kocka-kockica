@@ -59,68 +59,68 @@ bool move(Direction d, Brick& c,float speed) {
 
 
 void on_timer(int value) {
-	if (value != TIMER_ID)
-	  return;
+	/* if (value != TIMER_ID) */
+	/*   return; */
 
-	if (space.selected_brick==-1 || !somethingIsPressed())
-		return;
+	/* if (space.selected_brick==-1 || !somethingIsPressed()) */
+	/* 	return; */
 
-	Brick& selected_brickBrick = space.bricks[space.selected_brick];
+	/* Brick& selected_brickBrick = space.bricks[space.selected_brick]; */
 
-	if (bLeft.pressed) {
-		if (to.x-to.z>=0 && -to.x-to.z>=0)
-			move(Left,selected_brickBrick,speed);
-		if (-to.x-to.z>=0 && -to.x+to.z>=0)
-			move(Forward,selected_brickBrick,speed);
-		if (-to.x+to.z>=0 && to.x+to.z>=0)
-			move(Right,selected_brickBrick,speed);
-		if (to.x+to.z>=0 && to.x-to.z>=0)
-			move(Backward,selected_brickBrick,speed);
-	}
+	/* if (bLeft.pressed) { */
+	/* 	if (to.x-to.z>=0 && -to.x-to.z>=0) */
+	/* 		move(Left,selected_brickBrick,speed); */
+	/* 	if (-to.x-to.z>=0 && -to.x+to.z>=0) */
+	/* 		move(Forward,selected_brickBrick,speed); */
+	/* 	if (-to.x+to.z>=0 && to.x+to.z>=0) */
+	/* 		move(Right,selected_brickBrick,speed); */
+	/* 	if (to.x+to.z>=0 && to.x-to.z>=0) */
+	/* 		move(Backward,selected_brickBrick,speed); */
+	/* } */
 
-	if (bRight.pressed) {
-		if (to.x-to.z>=0 && -to.x-to.z>=0)
-			move(Right,selected_brickBrick,speed);
-		if (-to.x-to.z>=0 && -to.x+to.z>=0)
-			move(Backward,selected_brickBrick,speed);
-		if (-to.x+to.z>=0 && to.x+to.z>=0)
-			move(Left,selected_brickBrick,speed);
-		if (to.x+to.z>=0 && to.x-to.z>=0)
-			move(Forward,selected_brickBrick,speed);
-	}
+	/* if (bRight.pressed) { */
+	/* 	if (to.x-to.z>=0 && -to.x-to.z>=0) */
+	/* 		move(Right,selected_brickBrick,speed); */
+	/* 	if (-to.x-to.z>=0 && -to.x+to.z>=0) */
+	/* 		move(Backward,selected_brickBrick,speed); */
+	/* 	if (-to.x+to.z>=0 && to.x+to.z>=0) */
+	/* 		move(Left,selected_brickBrick,speed); */
+	/* 	if (to.x+to.z>=0 && to.x-to.z>=0) */
+	/* 		move(Forward,selected_brickBrick,speed); */
+	/* } */
 
-	if (bForward.pressed) {
-		if (to.x-to.z>=0 && -to.x-to.z>=0)
-			move(Forward,selected_brickBrick,speed);
-		if (-to.x-to.z>=0 && -to.x+to.z>=0)
-			move(Right,selected_brickBrick,speed);
-		if (-to.x+to.z>=0 && to.x+to.z>=0)
-			move(Backward,selected_brickBrick,speed);
-		if (to.x+to.z>=0 && to.x-to.z>=0)
-			move(Left,selected_brickBrick,speed);
-	}
+	/* if (bForward.pressed) { */
+	/* 	if (to.x-to.z>=0 && -to.x-to.z>=0) */
+	/* 		move(Forward,selected_brickBrick,speed); */
+	/* 	if (-to.x-to.z>=0 && -to.x+to.z>=0) */
+	/* 		move(Right,selected_brickBrick,speed); */
+	/* 	if (-to.x+to.z>=0 && to.x+to.z>=0) */
+	/* 		move(Backward,selected_brickBrick,speed); */
+	/* 	if (to.x+to.z>=0 && to.x-to.z>=0) */
+	/* 		move(Left,selected_brickBrick,speed); */
+	/* } */
 
-	if (bBackward.pressed) {
-		if (to.x-to.z>=0 && -to.x-to.z>=0)
-			move(Backward,selected_brickBrick,speed);
-		if (-to.x-to.z>=0 && -to.x+to.z>=0)
-			move(Left,selected_brickBrick,speed);
-		if (-to.x+to.z>=0 && to.x+to.z>=0)
-			move(Forward,selected_brickBrick,speed);
-		if (to.x+to.z>=0 && to.x-to.z>=0)
-			move(Right,selected_brickBrick,speed);
-	}
+	/* if (bBackward.pressed) { */
+	/* 	if (to.x-to.z>=0 && -to.x-to.z>=0) */
+	/* 		move(Backward,selected_brickBrick,speed); */
+	/* 	if (-to.x-to.z>=0 && -to.x+to.z>=0) */
+	/* 		move(Left,selected_brickBrick,speed); */
+	/* 	if (-to.x+to.z>=0 && to.x+to.z>=0) */
+	/* 		move(Forward,selected_brickBrick,speed); */
+	/* 	if (to.x+to.z>=0 && to.x-to.z>=0) */
+	/* 		move(Right,selected_brickBrick,speed); */
+	/* } */
 
-	if (bUp.pressed)
-		move(Up,selected_brickBrick,speed);
+	/* if (bt_brick_up.pressed) */
+	/* 	move(Up,selected_brickBrick,speed); */
 
-	if (bDown.pressed)
-		move(Down,selected_brickBrick,speed);
+	/* if (bt_brick_down.pressed) */
+	/* 	move(Down,selected_brickBrick,speed); */
 
 
-	glutPostRedisplay();
+	/* glutPostRedisplay(); */
 
-	if (animation_ongoing)
-	  glutTimerFunc(TIMER_INTERVAL, on_timer, TIMER_ID);
+	/* if (animation_ongoing) */
+	/*   glutTimerFunc(TIMER_INTERVAL, on_timer, TIMER_ID); */
 
 }

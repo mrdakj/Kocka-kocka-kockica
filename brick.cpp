@@ -28,7 +28,7 @@ void Brick::draw_cuboid() const {
 	glColor3f(color.r, color.g, color.b);
 
 	/* call from utility */
-	draw_cuboid_u(w, d, h);
+	ut_draw_cuboid(w, d, h);
 
 	glDisable(GL_COLOR_MATERIAL);
 }

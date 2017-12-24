@@ -1,6 +1,13 @@
+#include "camera.h"
 #include "globalVariables.h"
 
-void getVectors() {
+bool camera_timer_active = false;
+
+extern Button bt_camera_rotation_up, bt_camera_rotation_down, bt_camera_rotation_left, bt_camera_rotation_right,
+	   bt_camera_translate_up, bt_camera_translate_down, bt_camera_translate_left, bt_camera_translate_right,
+	   bt_camera_translate_forward, bt_camera_translate_backward;
+
+void get_vectors() {
 	view = to;
 	view.normalize();
 	hvector = view * Vector3f(0,1,0);
@@ -15,51 +22,26 @@ void getVectors() {
 }
 
 
-void getFrontPosition() {
-	float d = sqrt(to.x*to.x+to.z*to.z); // not necessary for polar coordinates
-	cameraPosition.x += moveFront * to.x/d * 0.2;
-	cameraPosition.z += moveFront * to.z/d * 0.2;
+void calculate_camera_forward_position() {
+	float d = sqrt(to.x*to.x+to.z*to.z);
+	cameraPosition.x += move_forward * to.x/d * 0.2;
+	cameraPosition.z += move_forward * to.z/d * 0.2;
 }
 
-void getLeftRightPosition() {
-	float d = sqrt(to.x*to.x+to.z*to.z); // not necessary for polar coordinates
-	cameraPosition.x += moveLeftRight * to.z/d * 0.2;
-	cameraPosition.z += moveLeftRight * -to.x/d * 0.2;
+void calculate_camera_left_position() {
+	float d = sqrt(to.x*to.x+to.z*to.z); 
+	cameraPosition.x += move_left * to.z/d * 0.2;
+	cameraPosition.z += move_left * -to.x/d * 0.2;
 }
 
-void getUpDownPosition() {
-
-	cameraPosition.y += moveUpDown;
+void calculate_camera_up_position() {
+	cameraPosition.y += move_up;
 }
 
-void calculateDirection() {
-	/* theta = thetaStep; */
-	/* phi = phiStep; */
+void calculate_camera_look() {
 
-	/* float toxtmp = std::cos(theta)*to.x-std::sin(theta)*to.z; */
-	/* float toztmp = std::sin(theta)*to.x+std::cos(theta)*to.z; */
-	/* to.x = toxtmp; */
-	/* to.z = toztmp; */
-
-
-	/* float toytmp = std::cos(phi)*to.y-std::sin(phi)*to.z; */
-	/* toztmp = std::sin(phi)*to.y+std::cos(phi)*to.z; */
-	/* to.y = toytmp; */
-	/* to.z = toztmp; */
-
-	
-	theta += thetaStep;
+	theta += theta_step;
 	phi += phiStep;
-
-	/* if (phi >= 1.8) { */
-	/* 	phi = 1.8; */
-	/* } else if (phi <= -1.8) { */
-	/* 	phi = -1.8; */
-	/* } */
-
-	/* to.x = std::sin(theta); */
-	/* to.y = std::sin(phi); */
-	/* to.z = -std::cos(theta); */
 
 
 
@@ -70,10 +52,79 @@ void calculateDirection() {
 		phi= 0.001;
 	}
 
-	/*FIX calculate sin and cos only once */
-	to.x = std::sin(phi)*std::cos(theta);
-	to.z = std::sin(phi)*std::sin(theta);
-	to.y = -std::cos(phi);
+	float sin_phi = std::sin(phi);
+	float cos_phi = std::cos(phi);
+	float sin_theta = std::sin(theta);
+	float cos_theta = std::cos(theta);
 
-	getVectors();
+	to.x = sin_phi*cos_theta;
+	to.z = sin_phi*sin_theta;
+	to.y = -cos_phi;
+
+	get_vectors();
+}
+
+void camera_on_timer(int value) {
+	if (value != CAMERA_TIMER_ID) return;
+
+	/* rotation */
+	if (bt_camera_rotation_left.pressed)
+		theta_step=-0.02;
+
+	if (bt_camera_rotation_right.pressed)
+		theta_step=0.02;
+
+	if (!bt_camera_rotation_left.pressed && !bt_camera_rotation_right.pressed)
+		theta_step = 0;
+
+	if (bt_camera_rotation_up.pressed)
+		phiStep=0.02;
+
+	if (bt_camera_rotation_down.pressed)
+		phiStep=-0.02;
+
+	if (!bt_camera_rotation_up.pressed && !bt_camera_rotation_down.pressed)
+		phiStep = 0;
+
+	/* translation */
+	if (bt_camera_translate_up.pressed)
+		move_up = 0.02;
+	if (bt_camera_translate_down.pressed)
+		move_up = -0.02;
+	if (bt_camera_translate_forward.pressed)
+		move_forward = 0.5;
+	if (bt_camera_translate_backward.pressed)
+		move_forward = -0.5;
+	if (bt_camera_translate_left.pressed)
+		move_left = 0.5;
+	if (bt_camera_translate_right.pressed)
+		move_left = -0.5;
+
+	if (!bt_camera_translate_up.pressed && !bt_camera_translate_down.pressed)
+		move_up = 0;
+	if (!bt_camera_translate_forward.pressed && !bt_camera_translate_backward.pressed)
+		move_forward = 0;
+	if (!bt_camera_translate_left.pressed && !bt_camera_translate_right.pressed)
+		move_left = 0;
+
+	if (!theta_step && !phiStep && !move_up && !move_forward && !move_left)
+		camera_timer_active = false;
+
+
+	if (theta_step != 0 || phiStep != 0)
+		calculate_camera_look();
+
+	if (move_up)
+		calculate_camera_up_position();
+
+	if (move_forward)
+		calculate_camera_forward_position();
+
+	if (move_left)
+		calculate_camera_left_position();
+
+	/* glutPostRedisplay(); */
+
+	if (camera_timer_active)
+		glutTimerFunc(10, camera_on_timer, CAMERA_TIMER_ID);
 }

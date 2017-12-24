@@ -1,6 +1,13 @@
 #include "utility.h"
 
-void draw_cuboid_u(float width, float depth, float height) {
+void ut_draw_line(const ut_Point& A,const ut_Point& B) {
+	glBegin(GL_LINES);
+	glVertex3f(A.x, A.y, A.z);
+	glVertex3f(B.x, B.y, B.z);
+	glEnd();
+}
+
+void ut_draw_cuboid(float width, float depth, float height) {
 	glBegin(GL_QUADS);
 
     //Front
@@ -48,14 +55,12 @@ void draw_cuboid_u(float width, float depth, float height) {
     glEnd();
 }
 
-int getIndexOfMinimum(const float& a, const float& b, const float& c) {
+int ut_index_of_minimum(const float& a, const float& b, const float& c) {
 	if (a <= b) {
-		if (a <= c)
-			return 0;
+		if (a <= c) return 0;
 		return 2;
 	}
 
-	if (b <= c)
-		return 1;
+	if (b <= c) return 1;
 	return 2;
 }
