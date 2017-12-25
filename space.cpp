@@ -2,6 +2,7 @@
 #include <GL/glut.h>
 #include <cmath>
 #include "utility.h"
+#include "collision.h"
 
 /* constuctors */
 

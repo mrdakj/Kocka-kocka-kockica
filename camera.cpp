@@ -1,4 +1,5 @@
 #include "camera.h"
+#include <stdio.h>
 #include "globalVariables.h"
 
 bool camera_timer_active = false;
@@ -83,7 +84,7 @@ void camera_on_timer(int value) {
 	if (bt_camera_rotation_right.pressed)
 		theta_step=0.02;
 
-	if (!bt_camera_rotation_left.pressed && !bt_camera_rotation_right.pressed)
+	if ((bt_camera_rotation_left.pressed == bt_camera_rotation_right.pressed) || space.selected_brick != NONE)
 		theta_step = 0;
 
 	if (bt_camera_rotation_up.pressed)
@@ -92,7 +93,7 @@ void camera_on_timer(int value) {
 	if (bt_camera_rotation_down.pressed)
 		phi_step=-0.02;
 
-	if (!bt_camera_rotation_up.pressed && !bt_camera_rotation_down.pressed)
+	if ((bt_camera_rotation_up.pressed == bt_camera_rotation_down.pressed) || space.selected_brick != NONE)
 		phi_step = 0;
 
 	/* translation */
@@ -109,14 +110,18 @@ void camera_on_timer(int value) {
 	if (bt_camera_translate_right.pressed)
 		move_left = -0.5;
 
-	if (!bt_camera_translate_up.pressed && !bt_camera_translate_down.pressed)
+	if ((bt_camera_translate_up.pressed == bt_camera_translate_down.pressed) || space.selected_brick != NONE)
 		move_up = 0;
-	if (!bt_camera_translate_forward.pressed && !bt_camera_translate_backward.pressed)
+	if ((bt_camera_translate_forward.pressed == bt_camera_translate_backward.pressed) || space.selected_brick != NONE)
 		move_forward = 0;
-	if (!bt_camera_translate_left.pressed && !bt_camera_translate_right.pressed)
+	if ((bt_camera_translate_left.pressed == bt_camera_translate_right.pressed) || space.selected_brick != NONE)
 		move_left = 0;
 
-	if (!theta_step && !phi_step && !move_up && !move_forward && !move_left)
+	if (!bt_camera_translate_up.pressed && !bt_camera_translate_down.pressed
+		&& !bt_camera_translate_left.pressed && !bt_camera_translate_right.pressed
+		&& !bt_camera_translate_forward.pressed && !bt_camera_translate_backward.pressed
+		&& !bt_camera_rotation_up.pressed && !bt_camera_rotation_down.pressed
+		&& !bt_camera_rotation_left.pressed && !bt_camera_rotation_right.pressed)
 		camera_timer_active = false;
 
 
@@ -132,7 +137,7 @@ void camera_on_timer(int value) {
 	if (move_left)
 		calculate_camera_left_position();
 
-	/* glutPostRedisplay(); */
+	glutPostRedisplay();
 
 	if (camera_timer_active)
 		glutTimerFunc(TIMER_INTERVAL, camera_on_timer, CAMERA_TIMER_ID);

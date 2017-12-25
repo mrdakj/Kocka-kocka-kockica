@@ -9,6 +9,7 @@
 
 extern bool camera_timer_active;
 extern bool car_timer_active;
+extern bool brick_keyboard_timer_active;
 
 /* exit button */
 Button bt_exit(27);
@@ -45,6 +46,13 @@ void activate_car_timer() {
 	if (!car_timer_active) {
 		car_timer_active = true;
 		glutTimerFunc(TIMER_INTERVAL, car_on_timer, CAR_TIMER_ID);
+	}
+}
+
+void activate_brick_keyboard_timer() {
+	if (!brick_keyboard_timer_active) {
+		brick_keyboard_timer_active = true;
+		glutTimerFunc(TIMER_INTERVAL, brick_keyboard_on_timer, BRICK_KEYBOARD_TIMER_ID);
 	}
 }
 
@@ -85,10 +93,14 @@ void keyboard_ascii_down(unsigned char key, int x, int y) {
 	}
 
 	/* brick up and down */
-	if (key == bt_brick_down.key)
+	if (key == bt_brick_down.key) {
 		bt_brick_down.change_state();
-	if (key == bt_brick_up.key)
+		activate_brick_keyboard_timer();
+	}
+	if (key == bt_brick_up.key) {
 		bt_brick_up.change_state();
+		activate_brick_keyboard_timer();
+	}
 
 	/* animation */
 	if (key == bt_animation_go.key) {

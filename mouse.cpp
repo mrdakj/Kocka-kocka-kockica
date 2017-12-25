@@ -3,6 +3,7 @@
 #include "globalVariables.h"
 #include "camera.h"
 #include "animate.h"
+#include "collision.h"
 
 extern float theta;
 extern float phi;
@@ -15,7 +16,7 @@ static bool right_down=false;
 static bool left_down=false;
 
 
-// get a direction of mouse picking ray
+/* get a direction of mouse picking ray */
 Vector3f getDirection(float fx, float fy) {
 	fx -= window_width / 2.0;
 	fy = window_height / 2.0 - fy;
@@ -272,23 +273,20 @@ void on_mouse_active_move(int x, int y) {
 
 	if (space.selected_brick==-1) {
 		mouseLook(x,y);
+		glutPostRedisplay();
 		return;
 	}
-
-	
 
 	if (x == window_width/2 && y == window_height/2)
 		return;
 
-	Brick& selected_brickBrick = space.bricks[space.selected_brick];
+	Brick& current_brick = space.bricks[space.selected_brick];
 
 	float delta_x = x-window_width/2;
 
 	delta_x *= sensitivity;
 
-
-
-	float d = sqrt(to.x*to.x+to.z*to.z); // not necessary for polar coordinates
+	float d = sqrt(to.x*to.x+to.z*to.z);
 
 	float ax=0,bx=0,ay=0,by=0;
 
@@ -324,13 +322,13 @@ void on_mouse_active_move(int x, int y) {
 			b = -0.9;
 
 		if (b>0)
-			move(Right,selected_brickBrick,b);
+			move_brick(Right,current_brick,b);
 		if (b<0)
-			move(Left,selected_brickBrick,-b);
+			move_brick(Left,current_brick,-b);
 		if (a>0)
-			move(Backward,selected_brickBrick,a);
+			move_brick(Backward,current_brick,a);
 		if (a<0)
-			move(Forward,selected_brickBrick,-a);
+			move_brick(Forward,current_brick,-a);
 	}
 
 	if (left_down && right_down) {
@@ -339,31 +337,19 @@ void on_mouse_active_move(int x, int y) {
 		if (delta_y<-0.9)
 			delta_y = -0.9;
 		if (delta_y>0)
-			move(Up, selected_brickBrick, delta_y);
+			move_brick(Up, current_brick, delta_y);
 		else if (delta_y<0)
-			move(Down, selected_brickBrick, -delta_y);
+			move_brick(Down, current_brick, -delta_y);
 	}
-
-
-	to.x = objX-camera_position.x;
-	to.z = objZ-camera_position.z;
-	to.y = objY-camera_position.y;
-
-	/* for sphere coordinates */
-	float modultheta = sqrt(to.x*to.x+to.z*to.z+to.y*to.y);
-	/* for polar coordinates */
-	/* float modultheta = sqrt(to.x*to.x+to.z*to.z); */
-
-	to.x /= modultheta;
-	to.z /= modultheta;
-	to.y /= modultheta;
-
 
 	if (x!=window_width/2 || y!=window_height/2)
 		glutWarpPointer(window_width / 2, window_height / 2);
+
+	glutPostRedisplay();
 }
 
 
 void on_mouse_passive_move(int x, int y) {
 	mouseLook(x, y);
+	glutPostRedisplay();
 }

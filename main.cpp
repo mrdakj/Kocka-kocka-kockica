@@ -11,14 +11,14 @@
 #include "camera.h"
 #include "loadModel.h"
 #include "utility.h"
+#include "collision.h"
 
-extern Button bt_brick_up, bt_brick_down;
 // define global variables
-int window_width=1200;
-int window_height=700;
+int window_width=1100;
+int window_height=600;
 float speed = 0.08;
 Space space;
-Vector3f camera_position(0,3,4);
+Vector3f camera_position(2,3,4);
 Vector3f to(0,0,-1);
 Vector3f view, hvector, v;
 
@@ -70,7 +70,7 @@ int main(int argc, char** argv) {
 	glutMouseFunc(mouse);
     glutMotionFunc(on_mouse_active_move);
     glutPassiveMotionFunc(on_mouse_passive_move);
-	glutIdleFunc(on_display);
+	/* glutIdleFunc(on_display); */
 
 	glutMainLoop();
 	
@@ -102,40 +102,9 @@ void set_light() {
 static double projection_inverse[16]={0.0};
 
 void on_display(void) {
-
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
-	if (space.selected_brick != -1) {
-		Brick& selected_brickBrick = space.bricks[space.selected_brick];
-		if (bt_brick_up.pressed) {
-			if (move(Up,selected_brickBrick,speed)) {
-				to.x = objX-camera_position.x;
-				to.z = objZ-camera_position.z;
-				to.y = objY-camera_position.y;
-				float modultheta = sqrt(to.x*to.x+to.z*to.z+to.y*to.y);
-
-				to.x /= modultheta;
-				to.z /= modultheta;
-				to.y /= modultheta;
-			}
-		}
-
-		if (bt_brick_down.pressed) {
-			if (move(Down,selected_brickBrick,speed)) {
-				to.x = objX-camera_position.x;
-				to.z = objZ-camera_position.z;
-				to.y = objY-camera_position.y;
-				float modultheta = sqrt(to.x*to.x+to.z*to.z+to.y*to.y);
-
-				to.x /= modultheta;
-				to.z /= modultheta;
-				to.y /= modultheta;
-			}
-		}
-	}
-
-
+	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
 	/* set light at camera position */
@@ -186,7 +155,6 @@ void on_reshape(int w, int h) {
 	glLoadIdentity();
 	gluPerspective(40, ratio, 1, 400);
 
-	glMatrixMode(GL_MODELVIEW);
 
 
 	get_vectors();

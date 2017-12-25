@@ -3,73 +3,46 @@
 #include <unistd.h>
 #include "globalVariables.h" 
 #include "camera.h"
+#include "collision.h"
 
 bool car_timer_active = false;
 
-bool move(Direction d, Brick& c,float speed) {
-	if (abs(speed)>1)
-		return false;
-
-	bool returnVal = false;
-	float xstart = c.pos.x;
-	float ystart = c.pos.y;
-	float zstart = c.pos.z;
-
-	float& coordinate =
-		(d == Left || d == Right) ? c.pos.x : ((d == Forward || d == Backward) ? c.pos.y : c.pos.z);
-
-	int z = (d == Left || d == Forward || d == Down) ? -1 : 1;
-
-	int line = (z == 1) ? ceil(coordinate) : floor(coordinate);
+bool brick_keyboard_timer_active = false;
 
 
-	float limit = 1.2 * speed; // 1.2>1 so we are sure the brick cannot go inside
-	if (d == Down)
-		limit += 0.2;
-
-	if (fabs(line - coordinate) <= limit) {
-		if (d != Down)
-			coordinate = line;
-
-		if (space.move(space.selected_brick, d)) 
-		{
-			coordinate += z*speed;
-			returnVal =true;
-		}
-		else
-		{
-			if (d == Down)
-				coordinate = line+0.2;
-			returnVal=false;
-		}
-	}
-	else
-	{
-		coordinate += z*speed;
-		returnVal=true;
-	}
-
-	if (d==Left || d==Right)
-		objX += c.pos.x - xstart;
-	if (d==Forward || d==Backward)
-		objZ += -c.pos.y + ystart;
-	if (d==Up || d==Down)
-		objY += c.pos.z-zstart;
-
-	return returnVal;
-}
-
-
+extern Button bt_brick_up, bt_brick_down;
 
 void car_on_timer(int value) {
 	if (value != CAR_TIMER_ID) return;
 
 	space.car.go();
 
-	/* glutPostRedisplay(); */
+	glutPostRedisplay();
 
 	if (car_timer_active)
 		glutTimerFunc(TIMER_INTERVAL, car_on_timer, CAR_TIMER_ID);
 	else
 		space.car.stop();
+}
+
+void brick_keyboard_on_timer(int value) {
+	if (value != BRICK_KEYBOARD_TIMER_ID) return;
+
+	if (space.selected_brick != -1) {
+		Brick& current_brick = space.bricks[space.selected_brick];
+
+		if (bt_brick_up.pressed)
+			move_brick(Up,current_brick,speed);
+
+		if (bt_brick_down.pressed)
+			move_brick(Down,current_brick,speed);
+	}
+
+	if (!bt_brick_up.pressed && !bt_brick_down.pressed)
+		brick_keyboard_timer_active = false;
+
+	glutPostRedisplay();
+
+	if (brick_keyboard_timer_active)
+		glutTimerFunc(TIMER_INTERVAL, brick_keyboard_on_timer, BRICK_KEYBOARD_TIMER_ID);
 }
