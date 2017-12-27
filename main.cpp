@@ -16,11 +16,9 @@
 // define global variables
 int window_width=1100;
 int window_height=600;
-float speed = 0.08;
 Space space;
-Vector3f camera_position(2,3,4);
 Vector3f to(0,0,-1);
-Vector3f view, hvector, v;
+Vector3f view, horizontal_vector, vertical_vector;
 
 GLdouble objX=0;
 GLdouble objY=0;
@@ -70,7 +68,6 @@ int main(int argc, char** argv) {
 	glutMouseFunc(mouse);
     glutMotionFunc(on_mouse_active_move);
     glutPassiveMotionFunc(on_mouse_passive_move);
-	/* glutIdleFunc(on_display); */
 
 	glutMainLoop();
 	
@@ -121,17 +118,9 @@ void on_display(void) {
 
 
 	/* draw cursor */
-	if (space.selected_brick == -1) {
-		draw_cursor(ut_Point(-0.02, -0.02, 0),
-					ut_Point(0.02, -0.02, 0),
-					ut_Point());
-	}
-	else {
-		ut_Point screen_point = ut_world_to_screen_coordinates(ut_Point(objX, objY, objZ));
-		draw_cursor(ut_Point(screen_point.x-0.02, screen_point.y-0.02, 0),
-					ut_Point(screen_point.x+0.02, screen_point.y-0.02, 0), 
-					ut_Point(screen_point.x, screen_point.y, 0));
-	} 
+	draw_cursor(ut_Point(-0.02, -0.02, 0),
+				ut_Point(0.02, -0.02, 0),
+				ut_Point());
 
 	glutSwapBuffers();
 }

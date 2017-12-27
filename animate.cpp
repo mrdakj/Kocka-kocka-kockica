@@ -32,10 +32,10 @@ void brick_keyboard_on_timer(int value) {
 		Brick& current_brick = space.bricks[space.selected_brick];
 
 		if (bt_brick_up.pressed)
-			move_brick(Up,current_brick,speed);
+			move_brick(Up,current_brick, space.brick_move_speed);
 
 		if (bt_brick_down.pressed)
-			move_brick(Down,current_brick,speed);
+			move_brick(Down,current_brick, space.brick_move_speed);
 	}
 
 	if (!bt_brick_up.pressed && !bt_brick_down.pressed)

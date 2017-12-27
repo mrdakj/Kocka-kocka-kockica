@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "globalVariables.h"
 
+Vector3f camera_position(0,3,4);
 bool camera_timer_active = false;
 float theta=-3.141592/2;
 float phi=3.141592/2;
@@ -18,17 +19,17 @@ extern Button bt_camera_rotation_up, bt_camera_rotation_down, bt_camera_rotation
 void get_vectors() {
 	view = to;
 	view.normalize();
-	hvector = view * Vector3f(0,1,0);
-	hvector.normalize();
-	v=hvector*view;
-	v.normalize();
+	horizontal_vector = view * Vector3f(0,1,0);
+	horizontal_vector.normalize();
+	vertical_vector=horizontal_vector*view;
+	vertical_vector.normalize();
 	int nearClippingPlaneDistance = 1;
 	int fovy = 40;
 	float rad = fovy * 3.14159 / 180;
 	float vLength = tan( rad / 2 ) * nearClippingPlaneDistance;
 	float hLength = vLength * ((float)window_width / window_height);
-	v = v*vLength;
-	hvector = hvector*hLength;
+	vertical_vector = vertical_vector*vLength;
+	horizontal_vector = horizontal_vector*hLength;
 }
 
 

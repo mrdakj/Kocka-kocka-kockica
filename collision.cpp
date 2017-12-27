@@ -1,7 +1,7 @@
 #include "collision.h"
 
-bool move_brick(Direction d, Brick& c,float speed) {
-	if (abs(speed)>1)
+bool move_brick(Direction d, Brick& c,float brick_move_speed) {
+	if (abs(brick_move_speed)>1)
 		return false;
 
 	bool returnVal = false;
@@ -17,7 +17,7 @@ bool move_brick(Direction d, Brick& c,float speed) {
 	int line = (z == 1) ? ceil(coordinate) : floor(coordinate);
 
 
-	float limit = 1.2 * speed; // 1.2>1 so we are sure the brick cannot go inside
+	float limit = 1.2 * brick_move_speed; // 1.2>1 so we are sure the brick cannot go inside
 	if (d == Down)
 		limit += 0.2;
 
@@ -26,17 +26,18 @@ bool move_brick(Direction d, Brick& c,float speed) {
 			coordinate = line;
 
 		if (space.move(space.selected_brick, d)) {
-			coordinate += z*speed;
+			coordinate += z*brick_move_speed;
 			returnVal =true;
 		}
 		else {
 			if (d == Down)
 				coordinate = line+0.2;
+
 			returnVal=false;
 		}
 	}
 	else {
-		coordinate += z*speed;
+		coordinate += z*brick_move_speed;
 		returnVal=true;
 	}
 
@@ -47,15 +48,14 @@ bool move_brick(Direction d, Brick& c,float speed) {
 	if (d==Up || d==Down)
 		objY += c.pos.z-zstart;
 
-	if (returnVal) {
-		to.x = objX-camera_position.x;
-		to.z = objZ-camera_position.z;
-		to.y = objY-camera_position.y;
-		float modultheta = sqrt(to.x*to.x+to.z*to.z+to.y*to.y);
+	to.x = objX-camera_position.x;
+	to.z = objZ-camera_position.z;
+	to.y = objY-camera_position.y;
+	float modultheta = sqrt(to.x*to.x+to.z*to.z+to.y*to.y);
 
-		to.x /= modultheta;
-		to.z /= modultheta;
-		to.y /= modultheta;
-	}
+	to.x /= modultheta;
+	to.z /= modultheta;
+	to.y /= modultheta;
+
 	return returnVal;
 }

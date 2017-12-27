@@ -45,6 +45,8 @@ class Space {
 		/* index of selected brick brick in vector bricks, -1 if nothing is selected */
 		int selected_brick;
 
+		float brick_move_speed;
+
 		/* index of brick with id is id-1 */
 		std::vector<Brick> bricks;
 

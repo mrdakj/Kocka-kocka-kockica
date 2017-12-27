@@ -13,6 +13,7 @@ Space::Space(int size) {
 	selected_brick = NONE;
 	bricks.reserve(255);
 	num = 0;
+	brick_move_speed = 0.08;
 
 	/* set matrix */
 	init_matrix();

@@ -25,7 +25,7 @@ Vector3f getDirection(float fx, float fy) {
 	fx /= (window_width / 2.0);
 
 	int nearClippingPlaneDistance = 1;
-	Vector3f pos = camera_position + view*nearClippingPlaneDistance + hvector*fx + v*fy;
+	Vector3f pos = camera_position + view*nearClippingPlaneDistance + horizontal_vector*fx + vertical_vector*fy;
 	
 	Vector3f dir = pos - camera_position;
 

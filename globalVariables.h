@@ -12,13 +12,12 @@ extern int window_width;
 extern int window_height;
 
 extern Space space;
-extern float speed;
 
-extern float yplane;
 extern Vector3f camera_position;
 extern Vector3f to;
-extern Vector3f view, hvector, v;
-// coordinates of selected_brick object
+extern Vector3f view, horizontal_vector, vertical_vector;
+
+/* coordinates of selected_brick object */
 extern GLdouble objX;
 extern GLdouble objY;
 extern GLdouble objZ;
