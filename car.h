@@ -12,7 +12,7 @@ public:
 	int width;
 	int depth;
 	int wheel_rotation_angle;
-	float translate_x;
+	float translation_x;
 	bool is_going;
 
 	Car();

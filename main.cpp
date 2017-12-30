@@ -51,8 +51,6 @@ int main(int argc, char** argv) {
 	glutDisplayFunc(on_display);
 	glutReshapeFunc(on_reshape);
 	glutKeyboardFunc(keyboard_ascii_down);
-	glutSpecialFunc(keyboard_special_down);
-	glutSpecialUpFunc(keyboard_special_up);
 	glutKeyboardUpFunc(keyboard_ascii_up);
 	glutMouseFunc(mouse);
 	glutMotionFunc(on_mouse_active_move);
@@ -147,14 +145,43 @@ void on_reshape(int new_width, int new_height) {
 
 void create_bricks() {
 	Brick brick_1(Position(4,5,0), Size(2,1,2), Color(1,0,0));
-	Brick brick_2(Position(0,0,0), Size(1,2,1), Color(0,1,0));
+	Brick brick_2(Position(0,0,0), Size(1,2,4), Color(0.5,0.5,0.5));
 	Brick brick_3(Position(0,5,0), Size(2,1,1), Color(0,0,1));
-	Brick brick_4(Position(5,0,0), Size(4,1,2), Color(1,0,0));
+	Brick brick_4(Position(5,0,0), Size(4,1,2), Color(0.5,0,0));
+	Brick brick_5(Position(5,7,0), Size(1,1,1), Color(1,1,0));
+	Brick brick_6(Position(5,8,0), Size(1,1,2), Color(1,1,1));
+	Brick brick_7(Position(0,8,0), Size(1,2,1), Color(0,1,1));
+	Brick brick_8(Position(0,15,0), Size(1,1,1), Color(0.3,0.3,0.3));
+
+	Brick brick_9(Position(4,5,3), Size(2,1,2), Color(1,0,0));
+	Brick brick_10(Position(0,0,3), Size(1,2,4), Color(0.5,0.5,0.5));
+	Brick brick_11(Position(0,5,3), Size(2,1,1), Color(0,0,1));
+	Brick brick_12(Position(5,0,3), Size(4,1,2), Color(0.5,0,0));
+	Brick brick_13(Position(5,7,3), Size(1,1,1), Color(1,1,0));
+	Brick brick_14(Position(5,8,3), Size(1,1,2), Color(1,1,1));
+	Brick brick_15(Position(0,8,3), Size(1,2,1), Color(0,1,1));
+	Brick brick_16(Position(0,15,3), Size(1,1,1), Color(0.3,0.3,0.3));
+
+
 
 	space.add(brick_1);
 	space.add(brick_2);
 	space.add(brick_3);
 	space.add(brick_4);
+	space.add(brick_5);
+	space.add(brick_6);
+	space.add(brick_7);
+	space.add(brick_8);
+
+	space.add(brick_9);
+	space.add(brick_10);
+	space.add(brick_11);
+	space.add(brick_12);
+	space.add(brick_13);
+	space.add(brick_14);
+	space.add(brick_15);
+	space.add(brick_16);
+
 }
 
 void draw_cursor(const ut_Point& A, const ut_Point& B, const ut_Point& C) {

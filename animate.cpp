@@ -1,8 +1,6 @@
-/* animate car and brick */
-/* car move and brick up/down move on keyboard */
+/* animate car and brick on keyboard */
 
 #include <GL/glut.h>
-#include "global_variables.h"
 #include "collision.h"
 
 void car_on_timer(int value);
@@ -28,17 +26,34 @@ void brick_keyboard_on_timer(int value) {
 	if (space.selected_brick != NONE) {
 		Brick& current_brick = space.bricks[space.selected_brick];
 
-		if (bt_brick_up.pressed)
+
+		if (brick_buttons[translation_up].pressed)
 			move_brick(Up, current_brick, space.brick_move_speed);
 
-		if (bt_brick_down.pressed)
+		if (brick_buttons[translation_down].pressed)
 			move_brick(Down, current_brick, space.brick_move_speed);
+
+		float delta_x = brick_buttons[translation_left].pressed ? -space.brick_move_speed :
+						brick_buttons[translation_right].pressed ? space.brick_move_speed : 0;
+
+		if (brick_buttons[translation_left].pressed == brick_buttons[translation_right].pressed)
+			delta_x = 0;
+
+
+		float delta_y = brick_buttons[translation_forward].pressed ? space.brick_move_speed :
+						brick_buttons[translation_backward].pressed ? -space.brick_move_speed : 0;
+
+		if (brick_buttons[translation_forward].pressed == brick_buttons[translation_backward].pressed)
+			delta_y = 0;
+
+		move_delta(delta_x, delta_y, current_brick);
+
+		glutPostRedisplay();
 	}
 
-	if (!bt_brick_up.pressed && !bt_brick_down.pressed)
+	if (all_released(brick_buttons))
 		t_brick.stop();
 
-	glutPostRedisplay();
 
 	t_brick.cont();
 }

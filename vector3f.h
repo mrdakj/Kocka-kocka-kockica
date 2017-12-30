@@ -28,6 +28,10 @@ class Vector3f {
 		float normSquared() {
 			return x*x+y*y+z*z;
 		}
+		
+		float dot(Vector3f& v) {
+			return x*v.x+y*v.y+z*v.z;
+		}
 
 		float norm() {
 			return (float)sqrt(x*x+y*y+z*z);

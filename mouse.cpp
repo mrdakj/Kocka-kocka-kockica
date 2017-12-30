@@ -6,40 +6,37 @@
 
 extern Vector3f view, horizontal_vector, vertical_vector;
 extern Vector3f camera_position, to;
-extern float theta;
-extern float phi;
-extern float theta_step;
-extern float phi_step;
 
-/* 0.005 for mouse */
-float sensitivity = 0.01;
-static bool right_down=false;
-static bool left_down=false;
+static float sensitivity = 0.01;
+static bool mouse_right_button_clicked = false;
+static bool mouse_left_button_clicked = false;
 
 float objX, objY, objZ;
 
 
 /* get a direction of mouse picking ray */
-Vector3f getDirection(float fx, float fy) {
-	fx -= window_width / 2.0;
-	fy = window_height / 2.0 - fy;
+Vector3f get_ray_direction(float fx, float fy) {
+	fx -= window_width/2.0;
+	fy = window_height/2.0 - fy;
 
-	fy /= (window_height / 2.0);
-	fx /= (window_width / 2.0);
+	fy /= window_height/2.0;
+	fx /= window_width/2.0;
 
-	int nearClippingPlaneDistance = 1;
-	Vector3f pos = camera_position + view*nearClippingPlaneDistance + horizontal_vector*fx + vertical_vector*fy;
+	int clipping_plane_dist = 1;
+
+	Vector3f point_at_clipping_plane = 
+		camera_position + view*clipping_plane_dist + horizontal_vector*fx + vertical_vector*fy;
 	
-	Vector3f dir = pos - camera_position;
+	Vector3f direction = point_at_clipping_plane - camera_position;
 
-	return dir;
+	return direction;
 }
 
 
 
 void mouse(int button, int state, int x, int y) {
 	if (button == GLUT_LEFT_BUTTON &&  state == GLUT_DOWN) { 
-		left_down=true;
+		mouse_left_button_clicked=true;
 		x=window_width/2;
 		y=window_height/2;
 
@@ -48,7 +45,7 @@ void mouse(int button, int state, int x, int y) {
 			glutPostRedisplay();	
 		}
 
-		Vector3f dir = getDirection(x,y);
+		Vector3f dir = get_ray_direction(x,y);
 
 
 		/* find intersection of planes and ray */
@@ -97,8 +94,9 @@ void mouse(int button, int state, int x, int y) {
 					if (x-1>=0) {
 						id = space.matrix[x-1][z][y]; 
 						if (id!=0 && id!=255) {
+							Vector3f pick_vector = Vector3f(x, yf, -zf) - camera_position;
 							d = (camera_position-Vector3f(x, yf, -zf)).normSquared();
-							if (d<ds[i]) {
+							if (d<ds[i] && view.dot(pick_vector)>0) {
 								clickX0=x;
 								clickY0=yf;
 								clickZ0=-zf;
@@ -110,8 +108,9 @@ void mouse(int button, int state, int x, int y) {
 
 					id = space.matrix[x][z][y]; 
 					if (id!=0 && id!=255) {
+						Vector3f pick_vector = Vector3f(x, yf, -zf) - camera_position;
 						d = (camera_position-Vector3f(x, yf, -zf)).normSquared();
-						if (d<ds[i]) {
+						if (d<ds[i] && view.dot(pick_vector)>0) {
 							clickX0=x;
 							clickY0=yf;
 							clickZ0=-zf;
@@ -125,8 +124,9 @@ void mouse(int button, int state, int x, int y) {
 					if (y-1>=0) {
 						id = space.matrix[x][z][y-1]; 
 						if (id!=0 && id!=255) {
+							Vector3f pick_vector = Vector3f(xf, y, -zf) - camera_position;
 							d = (camera_position-Vector3f(xf, y, -zf)).normSquared();
-							if (d<ds[i]) {
+							if (d<ds[i] &&  view.dot(pick_vector)>0) {
 								clickX1=xf;
 								clickY1=y;
 								clickZ1=-zf;
@@ -138,8 +138,9 @@ void mouse(int button, int state, int x, int y) {
 
 					id = space.matrix[x][z][y]; 
 					if (id!=0 && id!=255) {
+						Vector3f pick_vector = Vector3f(xf, y, -zf) - camera_position;
 						d = (camera_position-Vector3f(xf, y, -zf)).normSquared();
-						if (d<ds[i]) {
+						if (d<ds[i] &&  view.dot(pick_vector)>0) {
 							clickX1=xf;
 							clickY1=y;
 							clickZ1=-zf;
@@ -154,8 +155,9 @@ void mouse(int button, int state, int x, int y) {
 					if (z-1>=0) {
 						id = space.matrix[x][z-1][y]; 
 						if (id!=0 && id!=255) {
+							Vector3f pick_vector = Vector3f(xf, yf, -z) - camera_position;
 							d = (camera_position-Vector3f(xf, yf, -z)).normSquared();
-							if (d<ds[i]) {
+							if (d<ds[i] &&  view.dot(pick_vector)>0) {
 								clickX2=xf;
 								clickY2=yf;
 								clickZ2=-z;
@@ -167,8 +169,9 @@ void mouse(int button, int state, int x, int y) {
 
 					id = space.matrix[x][z][y]; 
 					if (id!=0 && id!=255) {
+						Vector3f pick_vector = Vector3f(xf, yf, -z) - camera_position;
 						d = (camera_position-Vector3f(xf, yf, -z)).normSquared();
-						if (d<ds[i]) {
+						if (d<ds[i] &&  view.dot(pick_vector)>0) {
 							clickX2=xf;
 							clickY2=yf;
 							clickZ2=-z;
@@ -207,10 +210,7 @@ void mouse(int button, int state, int x, int y) {
 			to.z = objZ-camera_position.z;
 			to.y = objY-camera_position.y;
 
-			/* for sphere coordinates */
-			float modultheta = sqrt(to.x*to.x+to.z*to.z+to.y*to.y);
-			/* for polar coordinates */
-			/* float modultheta = sqrt(to.x*to.x+to.z*to.z); */
+			float modultheta = std::sqrt(to.x*to.x+to.z*to.z+to.y*to.y);
 
 			to.x /= modultheta;
 			to.z /= modultheta;
@@ -222,137 +222,78 @@ void mouse(int button, int state, int x, int y) {
 
 
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_UP) {
-		left_down=false;
+		mouse_left_button_clicked=false;
 		space.put_down();
 
-		/* for polar coordinates */
-		phi = std::asin(to.y);
-		theta = std::acos(-to.z);
-		if (to.x<0)
-			theta *= -1;
-
-
-
-		/* for sphere coordinates */
-		phi = std::acos(-to.y);
-		theta = std::acos(to.x/(std::sin(phi)));
-		if (to.z<0)
-			theta *= -1;
-
-		get_vectors();
+		recover_angles();
 
 		glutPostRedisplay();
 	}
 
 	if (button == GLUT_RIGHT_BUTTON &&  state == GLUT_DOWN) { 
-		right_down=true;
+		mouse_right_button_clicked=true;
 	}
 
 	if (button == GLUT_RIGHT_BUTTON &&  state == GLUT_UP) { 
-		right_down=false;
+		mouse_right_button_clicked=false;
 	}
 
 }
 
-void mouseLook(int x, int y) {
-	theta_step = (x - window_width/2) * 0.0015;
-	phi_step = - (y - window_height/2) * 0.0015;
-
-	if (theta_step) {
-		calculate_camera_look();
-	}
-
-	if (phi_step) {
-		calculate_camera_look();
-	}
-
-	theta_step = phi_step = 0;
-	
-	if (x!=window_width/2 || y!=window_height/2)
-		glutWarpPointer(window_width / 2, window_height / 2);
+static bool mouse_at_center(int x, int y) {
+	return x == window_width/2 && y == window_height/2;
 }
+
+void mouse_look(int x, int y) {
+	float theta_step = (x - window_width/2) * 0.0015;
+	float phi_step = - (y - window_height/2) * 0.0015;
+
+	if (theta_step) calculate_camera_look(theta_step, phi_step);
+	if (phi_step) calculate_camera_look(theta_step, phi_step);
+
+	if (!mouse_at_center(x, y)) glutWarpPointer(window_width/2, window_height/2);
+}
+
 
 void on_mouse_active_move(int x, int y) {
 
-	if (space.selected_brick==-1) {
-		mouseLook(x,y);
+	if (space.selected_brick == NONE) {
+		mouse_look(x,y);
 		glutPostRedisplay();
 		return;
 	}
-
-	if (x == window_width/2 && y == window_height/2)
-		return;
+	
+	if (mouse_at_center(x, y)) return;
 
 	Brick& current_brick = space.bricks[space.selected_brick];
 
 	float delta_x = x-window_width/2;
-
 	delta_x *= sensitivity;
 
-	float d = sqrt(to.x*to.x+to.z*to.z);
-
-	float ax=0,bx=0,ay=0,by=0;
-
-	if (delta_x) {
-		bx=-to.z*(delta_x/d);
-		ax=-to.x*(delta_x/d);
-	}
-
-
 	float delta_y = -y+window_height/2;
-
 	delta_y *= sensitivity;
 
 
-
-	if (delta_y) {
-		by=to.x*(delta_y/d);
-		ay=-to.z*(delta_y/d);
+	if (mouse_left_button_clicked && !mouse_right_button_clicked) {
+		move_delta(delta_x, delta_y, current_brick);
 	}
 
-	if (left_down && !right_down) {
-		float a = ax+ay;
-		float b = bx+by;
-
-		/* if this is > 1 collision will not work properly because we cannot skip a field */
-		if (a>0.9)
-			a = 0.9;
-		if (a<-0.9)
-			a = -0.9;
-		if (b>0.9)
-			b = 0.9;
-		if (b<-0.9)
-			b = -0.9;
-
-		if (b>0)
-			move_brick(Right,current_brick,b);
-		if (b<0)
-			move_brick(Left,current_brick,-b);
-		if (a>0)
-			move_brick(Backward,current_brick,a);
-		if (a<0)
-			move_brick(Forward,current_brick,-a);
-	}
-
-	if (left_down && right_down) {
-		if (delta_y>0.9)
-			delta_y = 0.9;
-		if (delta_y<-0.9)
-			delta_y = -0.9;
-		if (delta_y>0)
+	if (mouse_left_button_clicked && mouse_right_button_clicked) {
+		if (delta_y > 0.9) delta_y = 0.9;
+		if (delta_y < -0.9) delta_y = -0.9;
+		if (delta_y > 0)
 			move_brick(Up, current_brick, delta_y);
-		else if (delta_y<0)
+		else if (delta_y < 0)
 			move_brick(Down, current_brick, -delta_y);
 	}
 
-	if (x!=window_width/2 || y!=window_height/2)
-		glutWarpPointer(window_width / 2, window_height / 2);
+	if (!mouse_at_center(x, y)) glutWarpPointer(window_width/2, window_height/2);
 
 	glutPostRedisplay();
 }
 
 
 void on_mouse_passive_move(int x, int y) {
-	mouseLook(x, y);
+	mouse_look(x, y);
 	glutPostRedisplay();
 }

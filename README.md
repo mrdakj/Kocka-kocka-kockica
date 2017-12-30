@@ -1,30 +1,121 @@
 # RG001-kocka-kocka-kockica
-Kocka kocka kockica
 
-![Alt text](screenshots/kockice.png?raw=true "kocka kocka kockica")
+![Could not be displayed](screenshots/30.12.2017.png?raw=true "kocka kocka kockica")
 
-![Alt text](screenshots/12.12.2017.png?raw=true "kocka kocka kockica")
+***
+## :package: Installation
+:exclamation: Requirements: Freeglut 
 
-Napomene:
+### Manual
 
-Kursor je sakriven
+1. Clone this repository somewhere on your machine.
 
-Komande:
+    ```sh
+    git clone https://github.com/MATF-RG17/RG001-kocka-kocka-kockica.git ~/
 
-selektovanje kockice - levi klik misa
+    ```
+2. Compile
 
-pomeranje kockice u ravni xy - levi klik misa
+    ```sh
+    cd RG001-kocka-kocka-kockica
+	make
 
-pomeranje kockice gore dole - levi+desni klik misa (oba se drze istovremeno, ali se prvo pritisne levo dugme) / levi klik misa + e ili q
+    ```
 
-kamera:
+3. Start
 
-a, s, d, w, q, e za transliranje
+    ```sh
+	./main
 
-mis / j, k, l, i za rotaciju
+    ```
 
-pokretanje auta - n
+***
 
-zaustavljanje auta - m
+## :video_game: Controls
 
-exit - esc
+<table>
+  <tr>
+    <th colspan="2">Global</th>
+  </tr>
+  <tr>
+    <td>Exit</td><td>Esc</td>
+  </tr>
+
+  <tr>
+    <th colspan="2">Camera</th>
+  </tr>
+  <tr>
+    <td colspan="2">Translation</td>
+  </tr>
+  <tr>
+    <td>Left</td><td>a</td>
+  </tr>
+  <tr>
+    <td>Right</td><td>d</td>
+  </tr>
+  <tr>
+    <td>Forward</td><td>w</td>
+  </tr>
+  <tr>
+    <td>Backward</td><td>s</td>
+  </tr>
+  <tr>
+    <td>Up</td><td>e</td>
+  </tr>
+  <tr>
+    <td>Down</td><td>q</td>
+  </tr>
+  <tr>
+    <td colspan="2">Rotation</td>
+  </tr>
+  <tr>
+    <td>Left</td><td>mouse or j</td>
+  </tr>
+  <tr>
+    <td>Right</td><td>mouse or l</td>
+  </tr>
+  <tr>
+    <td>Up</td><td>mouse or i</td>
+  </tr>
+  <tr>
+    <td>Down</td><td>mouse or k</td>
+  </tr>
+
+  <tr>
+    <th colspan="2">Brick</th>
+  </tr>
+  <tr>
+    <td>Selection</td><td>mouse left button</td>
+  </tr>
+  <tr>
+    <td colspan="2">Translation (only when the brick is selected)</td>
+  </tr>
+  <tr>
+    <td>Left</td><td>mouse or a</td>
+  </tr>
+  <tr>
+    <td>Right</td><td>mouse or d</td>
+  </tr>
+  <tr>
+    <td>Forward</td><td>mouse or w</td>
+  </tr>
+  <tr>
+    <td>Backward</td><td>mouse or s</td>
+  </tr>
+  <tr>
+    <td>Up</td><td>mouse (left and right buttons) or e</td>
+  </tr>
+  <tr>
+    <td>Down</td><td>mouse (left and right buttons)or q</td>
+  </tr>
+
+  <tr>
+    <th colspan="2">Car</th>
+  </tr>
+  <tr>
+    <td>Go</td><td>n</td>
+  </tr>
+  <tr>
+    <td>Stop</td><td>m</td>
+  </tr>
+</table>

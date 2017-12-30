@@ -11,13 +11,13 @@ Vector3f camera_position(0,3,4);
 
 Timer t_camera(camera_on_timer);
 
-float theta=-3.141592/2;
-float phi=3.141592/2;
-float theta_step=0;
-float phi_step=0;
-float move_forward = 0;
-float move_left = 0;
-float move_up=0;
+static float theta = -PI/2;
+static float phi = PI/2;
+static float theta_step = 0;
+static float phi_step = 0;
+static float move_forward = 0;
+static float move_left = 0;
+static float move_up = 0;
 
 void get_vectors() {
 	view = to;
@@ -35,6 +35,14 @@ void get_vectors() {
 	horizontal_vector = horizontal_vector*hLength;
 }
 
+void recover_angles() {
+	phi = std::acos(-to.y);
+	theta = std::acos(to.x/(std::sin(phi)));
+	if (to.z<0)
+		theta *= -1;
+
+	get_vectors();
+}
 
 void calculate_camera_forward_position() {
 	float d = std::sqrt(to.x*to.x+to.z*to.z);
@@ -43,7 +51,7 @@ void calculate_camera_forward_position() {
 }
 
 void calculate_camera_left_position() {
-	float d = std::sqrt(to.x*to.x+to.z*to.z); 
+	float d = std::sqrt(to.x*to.x+to.z*to.z);
 	camera_position.x += move_left * to.z/d * 0.2;
 	camera_position.z += move_left * -to.x/d * 0.2;
 }
@@ -52,16 +60,13 @@ void calculate_camera_up_position() {
 	camera_position.y += move_up;
 }
 
-void calculate_camera_look() {
+void calculate_camera_look(float theta_step, float phi_step) {
 
 	theta += theta_step;
 	phi += phi_step;
 
-	if (phi >= PI)
-		phi = PI;
-	if (phi<0.001) {
-		phi= 0.001;
-	}
+	if (phi >= PI) phi = PI;
+	if (phi < 0.001) phi= 0.001;
 
 	float sin_phi = std::sin(phi);
 	float cos_phi = std::cos(phi);
@@ -75,71 +80,66 @@ void calculate_camera_look() {
 	get_vectors();
 }
 
+/* get steps from keyboard buttons */
+void get_theta_and_phi_step() {
+	theta_step = camera_buttons[rotation_left].pressed ? -0.02 :
+				 camera_buttons[rotation_right].pressed ? 0.02 : 0;
+
+	if (camera_buttons[rotation_left].pressed == camera_buttons[rotation_right].pressed)
+		theta_step = 0;
+
+	phi_step = camera_buttons[rotation_up].pressed ? 0.02 :
+			   camera_buttons[rotation_down].pressed ? -0.02 : 0;
+
+	if (camera_buttons[rotation_up].pressed == camera_buttons[rotation_down].pressed)
+		phi_step = 0;
+}
+
+/* get move_up, move_left and move_forward from keyboard buttons */
+void get_move_up_left_forward() {
+	move_up = camera_buttons[translation_up].pressed ? 0.05 :
+			  camera_buttons[translation_down].pressed ? -0.05 : 0;
+
+	if (camera_buttons[translation_up].pressed == camera_buttons[translation_down].pressed)
+		move_up = 0;
+
+	move_left = camera_buttons[translation_left].pressed ? 0.5 :
+				camera_buttons[translation_right].pressed ? -0.5 : 0;
+
+	if (camera_buttons[translation_left].pressed == camera_buttons[translation_right].pressed)
+		move_left = 0;
+
+	move_forward = camera_buttons[translation_forward].pressed ? 0.5 :
+				   camera_buttons[translation_backward].pressed ? -0.5 : 0;
+
+	if (camera_buttons[translation_forward].pressed == camera_buttons[translation_backward].pressed)
+		move_forward = 0;
+}
+
 void camera_on_timer(int value) {
 	if (!t_camera.check(value)) return;
 
-	/* rotation */
-	if (camera_buttons[rotation_left].pressed)
-		theta_step=-0.02;
-	if (camera_buttons[rotation_right].pressed)
-		theta_step=0.02;
+	if (space.selected_brick == NONE) {
+		/* rotation */
+		get_theta_and_phi_step();
 
-	if ((camera_buttons[rotation_left].pressed == camera_buttons[rotation_right].pressed) || space.selected_brick != NONE)
-		theta_step = 0;
+		/* translation */
+		get_move_up_left_forward();
 
-	if (camera_buttons[rotation_up].pressed)
-		phi_step=0.02;
+		if (theta_step || phi_step) calculate_camera_look(theta_step, phi_step);
 
-	if (camera_buttons[rotation_down].pressed)
-		phi_step=-0.02;
+		if (move_up) calculate_camera_up_position();
 
-	if ((camera_buttons[rotation_up].pressed == camera_buttons[rotation_down].pressed) || space.selected_brick != NONE)
-		phi_step = 0;
+		if (move_forward) calculate_camera_forward_position();
 
+		if (move_left) calculate_camera_left_position();
 
-	/* translation */
-	if (camera_buttons[translate_up].pressed)
-		move_up = 0.02;
-	if (camera_buttons[translate_down].pressed)
-		move_up = -0.02;
-	if (camera_buttons[translate_left].pressed)
-		move_left = 0.5;
-	if (camera_buttons[translate_right].pressed)
-		move_left = -0.5;
-	if (camera_buttons[translate_forward].pressed)
-		move_forward = 0.5;
-	if (camera_buttons[translate_backward].pressed)
-		move_forward = -0.5;
-
-	if ((camera_buttons[translate_up].pressed == camera_buttons[translate_down].pressed) || space.selected_brick != NONE)
-		move_up = 0;
-	if ((camera_buttons[translate_forward].pressed == camera_buttons[translate_backward].pressed) || space.selected_brick != NONE)
-		move_forward = 0;
-	if ((camera_buttons[translate_left].pressed == camera_buttons[translate_right].pressed) || space.selected_brick != NONE)
-		move_left = 0;
-
-	bool all_released = true;
-	for (Button& bt : camera_buttons) {
-		if (bt.pressed)
-			all_released = false;
+		glutPostRedisplay();
 	}
-	if (all_released)
+
+
+	if (all_released(camera_buttons))
 		t_camera.stop();
-
-
-	if (theta_step != 0 || phi_step != 0)
-		calculate_camera_look();
-
-	if (move_up)
-		calculate_camera_up_position();
-
-	if (move_forward)
-		calculate_camera_forward_position();
-
-	if (move_left)
-		calculate_camera_left_position();
-
-	glutPostRedisplay();
 
 	t_camera.cont();
 }

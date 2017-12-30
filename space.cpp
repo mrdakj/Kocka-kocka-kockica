@@ -130,7 +130,7 @@ void Space::draw_car() {
 
 void Space::render() {
 	glPushMatrix();
-	glTranslatef(-car.translate_x,0,0);
+	glTranslatef(-car.translation_x,0,0);
 
 	if (car.is_going) 
 		draw_car();

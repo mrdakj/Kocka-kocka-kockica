@@ -3,8 +3,8 @@
 #include "car.h"
 #include "utility.h"
 
-Car::Car() : Car(5, 10, 12, 8) {}
-Car::Car(int position_x, int position_y, int width, int depth) : position_x(position_x), position_y(position_y), width(width), depth(depth), wheel_rotation_angle(0), translate_x(0), is_going(false) {}
+Car::Car() : Car(5, 10, 12, 7) {}
+Car::Car(int position_x, int position_y, int width, int depth) : position_x(position_x), position_y(position_y), width(width), depth(depth), wheel_rotation_angle(0), translation_x(0), is_going(false) {}
 
 
 void Car::draw_base() const {
@@ -75,11 +75,11 @@ void Car::draw_brick() const {
 void Car::stop() {
 	is_going = false;
 	wheel_rotation_angle = 0;
-	translate_x = 0;
+	translation_x = 0;
 }
 
 void Car::go() {
 	is_going = true;
 	wheel_rotation_angle+=1;
-	translate_x += 0.02;
+	translation_x += 0.02;
 }

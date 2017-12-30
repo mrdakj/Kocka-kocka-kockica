@@ -1,6 +1,8 @@
 #ifndef _KEYBOARD_H_
 #define _KEYBOARD_H_
 
+#include <vector>
+
 struct Button {
 	const int key;
 	bool pressed;
@@ -11,7 +13,8 @@ struct Button {
 
 void keyboard_ascii_down(unsigned char key, int x, int y);
 void keyboard_ascii_up(unsigned char key, int x,int y);
-void keyboard_special_down(int key, int x, int y);
-void keyboard_special_up(int key, int x, int y );
+
+/* returns true if all buttons are released */
+bool all_released(const std::vector<Button>& buttons);
 
 #endif
