@@ -1,15 +1,8 @@
-#include "globalVariables.h"
-#include <stdio.h>
-#include "keyboard.h"
 #include <GL/glut.h>
-#include "camera.h"
-#include "animate.h"
+#include "global_variables.h"
+#include "keyboard.h"
 
 #define unused_function_arg(x) ((void)x)
-
-extern bool camera_timer_active;
-extern bool car_timer_active;
-extern bool brick_keyboard_timer_active;
 
 /* exit button */
 Button bt_exit(27);
@@ -35,26 +28,6 @@ Button bt_camera_translate_backward(GLUT_KEY_DOWN);
 Button bt_animation_go('g');
 Button bt_animation_stop('s');
 
-void activate_camera_timer() {
-	if (!camera_timer_active) {
-		camera_timer_active = true;
-		glutTimerFunc(TIMER_INTERVAL, camera_on_timer, CAMERA_TIMER_ID);
-	}
-}
-
-void activate_car_timer() {
-	if (!car_timer_active) {
-		car_timer_active = true;
-		glutTimerFunc(TIMER_INTERVAL, car_on_timer, CAR_TIMER_ID);
-	}
-}
-
-void activate_brick_keyboard_timer() {
-	if (!brick_keyboard_timer_active) {
-		brick_keyboard_timer_active = true;
-		glutTimerFunc(TIMER_INTERVAL, brick_keyboard_on_timer, BRICK_KEYBOARD_TIMER_ID);
-	}
-}
 
 void keyboard_ascii_down(unsigned char key, int x, int y) {
 	unused_function_arg(x);
@@ -67,47 +40,47 @@ void keyboard_ascii_down(unsigned char key, int x, int y) {
 	/* camera rotation */
 	if (key == bt_camera_rotation_left.key) {
 		bt_camera_rotation_left.change_state();
-		activate_camera_timer();
+		t_camera.activate();
 	}
 	if (key == bt_camera_rotation_right.key) {
 		bt_camera_rotation_right.change_state();
-		activate_camera_timer();
+		t_camera.activate();
 	}
 	if (key == bt_camera_rotation_up.key) {
 		bt_camera_rotation_up.change_state();
-		activate_camera_timer();
+		t_camera.activate();
 	}
 	if (key == bt_camera_rotation_down.key) {
 		bt_camera_rotation_down.change_state();
-		activate_camera_timer();
+		t_camera.activate();
 	}
 
 	/* camera translation */
 	if (key == bt_camera_translate_up.key) {
 		bt_camera_translate_up.change_state();
-		activate_camera_timer();
+		t_camera.activate();
 	}
 	if (key == bt_camera_translate_down.key) {
 		bt_camera_translate_down.change_state();
-		activate_camera_timer();
+		t_camera.activate();
 	}
 
 	/* brick up and down */
 	if (key == bt_brick_down.key) {
 		bt_brick_down.change_state();
-		activate_brick_keyboard_timer();
+		t_brick.activate();
 	}
 	if (key == bt_brick_up.key) {
 		bt_brick_up.change_state();
-		activate_brick_keyboard_timer();
+		t_brick.activate();
 	}
 
 	/* animation */
 	if (key == bt_animation_go.key) {
-		activate_car_timer();
+		t_car.activate();
 	}
 	if (key == bt_animation_stop.key) {
-		car_timer_active = false;
+		t_car.stop();
 		space.car.stop();
 	}
 }
@@ -142,19 +115,19 @@ void keyboard_special_down(int key, int x, int y) {
 
 	if (key == bt_camera_translate_forward.key) {
 		bt_camera_translate_forward.change_state();
-		activate_camera_timer();
+		t_camera.activate();
 	}
 	if (key == bt_camera_translate_backward.key) {
 		bt_camera_translate_backward.change_state();
-		activate_camera_timer();
+		t_camera.activate();
 	}
 	if (key == bt_camera_translate_left.key) {
 		bt_camera_translate_left.change_state();
-		activate_camera_timer();
+		t_camera.activate();
 	}
 	if (key == bt_camera_translate_right.key) {
 		bt_camera_translate_right.change_state();
-		activate_camera_timer();
+		t_camera.activate();
 	}
 }
 

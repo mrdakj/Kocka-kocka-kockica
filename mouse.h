@@ -1,7 +1,7 @@
 #ifndef _MOUSE_H_
 #define _MOUSE_H_
 
-#include "globalVariables.h"
+#include "global_variables.h"
 #include "vector3f.h"
 
 

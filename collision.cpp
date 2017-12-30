@@ -1,7 +1,12 @@
 #include "collision.h"
+#include <cmath>
+#include "vector3f.h"
+
+extern float objX, objY, objZ;
+extern Vector3f camera_position, to;
 
 bool move_brick(Direction d, Brick& c,float brick_move_speed) {
-	if (abs(brick_move_speed)>1)
+	if (std::fabs(brick_move_speed)>1)
 		return false;
 
 	bool returnVal = false;
@@ -14,14 +19,14 @@ bool move_brick(Direction d, Brick& c,float brick_move_speed) {
 
 	int z = (d == Left || d == Forward || d == Down) ? -1 : 1;
 
-	int line = (z == 1) ? ceil(coordinate) : floor(coordinate);
+	int line = (z == 1) ? std::ceil(coordinate) : std::floor(coordinate);
 
 
 	float limit = 1.2 * brick_move_speed; // 1.2>1 so we are sure the brick cannot go inside
 	if (d == Down)
 		limit += 0.2;
 
-	if (fabs(line - coordinate) <= limit) {
+	if (std::fabs(line - coordinate) <= limit) {
 		if (d != Down)
 			coordinate = line;
 
@@ -51,7 +56,7 @@ bool move_brick(Direction d, Brick& c,float brick_move_speed) {
 	to.x = objX-camera_position.x;
 	to.z = objZ-camera_position.z;
 	to.y = objY-camera_position.y;
-	float modultheta = sqrt(to.x*to.x+to.z*to.z+to.y*to.y);
+	float modultheta = std::sqrt(to.x*to.x+to.z*to.z+to.y*to.y);
 
 	to.x /= modultheta;
 	to.z /= modultheta;

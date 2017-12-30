@@ -1,9 +1,16 @@
+#include <GL/glut.h>
 #include "camera.h"
 #include <stdio.h>
-#include "globalVariables.h"
+#include "global_variables.h"
+#include "vector3f.h"
+#include "keyboard.h"
 
+Vector3f to(0,0,-1);
+Vector3f view, horizontal_vector, vertical_vector;
 Vector3f camera_position(0,3,4);
-bool camera_timer_active = false;
+
+Timer t_camera(camera_on_timer);
+
 float theta=-3.141592/2;
 float phi=3.141592/2;
 float theta_step=0;
@@ -26,7 +33,7 @@ void get_vectors() {
 	int nearClippingPlaneDistance = 1;
 	int fovy = 40;
 	float rad = fovy * 3.14159 / 180;
-	float vLength = tan( rad / 2 ) * nearClippingPlaneDistance;
+	float vLength = std::tan( rad / 2 ) * nearClippingPlaneDistance;
 	float hLength = vLength * ((float)window_width / window_height);
 	vertical_vector = vertical_vector*vLength;
 	horizontal_vector = horizontal_vector*hLength;
@@ -34,13 +41,13 @@ void get_vectors() {
 
 
 void calculate_camera_forward_position() {
-	float d = sqrt(to.x*to.x+to.z*to.z);
+	float d = std::sqrt(to.x*to.x+to.z*to.z);
 	camera_position.x += move_forward * to.x/d * 0.2;
 	camera_position.z += move_forward * to.z/d * 0.2;
 }
 
 void calculate_camera_left_position() {
-	float d = sqrt(to.x*to.x+to.z*to.z); 
+	float d = std::sqrt(to.x*to.x+to.z*to.z); 
 	camera_position.x += move_left * to.z/d * 0.2;
 	camera_position.z += move_left * -to.x/d * 0.2;
 }
@@ -54,9 +61,6 @@ void calculate_camera_look() {
 	theta += theta_step;
 	phi += phi_step;
 
-
-
-	float PI=3.141592;
 	if (phi >= PI)
 		phi = PI;
 	if (phi<0.001) {
@@ -76,7 +80,7 @@ void calculate_camera_look() {
 }
 
 void camera_on_timer(int value) {
-	if (value != CAMERA_TIMER_ID) return;
+	if (!t_camera.check(value)) return;
 
 	/* rotation */
 	if (bt_camera_rotation_left.pressed)
@@ -123,7 +127,7 @@ void camera_on_timer(int value) {
 		&& !bt_camera_translate_forward.pressed && !bt_camera_translate_backward.pressed
 		&& !bt_camera_rotation_up.pressed && !bt_camera_rotation_down.pressed
 		&& !bt_camera_rotation_left.pressed && !bt_camera_rotation_right.pressed)
-		camera_timer_active = false;
+		t_camera.stop();
 
 
 	if (theta_step != 0 || phi_step != 0)
@@ -140,6 +144,5 @@ void camera_on_timer(int value) {
 
 	glutPostRedisplay();
 
-	if (camera_timer_active)
-		glutTimerFunc(TIMER_INTERVAL, camera_on_timer, CAMERA_TIMER_ID);
+	t_camera.cont();
 }

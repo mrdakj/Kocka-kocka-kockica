@@ -1,29 +1,34 @@
-LDFLAGS = -lGL -lGLU -lglut -lm -g
+PROGRAM = main
+CC = g++
+CFLAGS  = -std=c++11 -g
+LDLIBS = -lGL -lGLU -lglut -lm
 
-main: main.o brick.o space.o keyboard.o animate.o mouse.o utility.o camera.o loadModel.o car.o collision.o
-	g++  -o main *.o $(LDFLAGS)
-main.o: main.cpp brick.h globalVariables.h
-	g++ -c main.cpp $(LDFLAGS)
+main: main.o brick.o space.o keyboard.o animate.o mouse.o utility.o camera.o loadModel.o car.o collision.o timer.o
+	$(CC) $(CFLAGS)  -o main *.o $(LDLIBS)
+main.o: main.cpp brick.h 
+	$(CC) $(CFLAGS) -c main.cpp $(LDLIBS)
 brick.o: brick.cpp brick.h
-	g++ -c brick.cpp $(LDFLAGS)
+	$(CC) $(CFLAGS) -c brick.cpp $(LDLIBS)
 space.o: space.cpp space.h
-	g++ -c space.cpp $(LDFLAGS)
-keyboard.o: keyboard.cpp keyboard.h globalVariables.h
-	g++ -c keyboard.cpp $(LDFLAGS)
-mouse.o: mouse.cpp mouse.h globalVariables.h
-	g++ -c mouse.cpp $(LDFLAGS)
-animate.o: animate.cpp animate.h
-	g++ -c animate.cpp $(LDFLAGS)
+	$(CC) $(CFLAGS) -c space.cpp $(LDLIBS)
+keyboard.o: keyboard.cpp keyboard.h 
+	$(CC) $(CFLAGS) -c keyboard.cpp $(LDLIBS)
+mouse.o: mouse.cpp mouse.h 
+	$(CC) $(CFLAGS) -c mouse.cpp $(LDLIBS)
+animate.o: animate.cpp
+	$(CC) $(CFLAGS) -c animate.cpp $(LDLIBS)
 utility.o: utility.cpp utility.h
-	g++ -c utility.cpp $(LDFLAGS)
+	$(CC) $(CFLAGS) -c utility.cpp $(LDLIBS)
 camera.o: camera.cpp camera.h
-	g++ -c camera.cpp $(LDFLAGS)
+	$(CC) $(CFLAGS) -c camera.cpp $(LDLIBS)
 loadModel.o: loadModel.cpp loadModel.h
-	g++ -c loadModel.cpp $(LDFLAGS)
+	$(CC) $(CFLAGS) -c loadModel.cpp $(LDLIBS)
 car.o: car.cpp car.h
-	g++ -c car.cpp $(LDFLAGS)
+	$(CC) $(CFLAGS) -c car.cpp $(LDLIBS)
 collision.o: collision.cpp collision.h
-	g++ -c collision.cpp $(LDFLAGS)
+	$(CC) $(CFLAGS) -c collision.cpp $(LDLIBS)
+timer.o: timer.cpp timer.h
+	$(CC) $(CFLAGS) -c timer.cpp $(LDLIBS)
 
 clean:
 	@rm -f *.o main

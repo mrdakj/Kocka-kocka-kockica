@@ -1,32 +1,32 @@
-#include "animate.h"
+#include <GL/glut.h>
 #include <stdio.h>
 #include <unistd.h>
-#include "globalVariables.h" 
+#include "global_variables.h" 
 #include "camera.h"
 #include "collision.h"
+#include "keyboard.h"
 
-bool car_timer_active = false;
+void car_on_timer(int value);
+void brick_keyboard_on_timer(int value);
 
-bool brick_keyboard_timer_active = false;
-
+Timer t_car(car_on_timer);
+Timer t_brick(brick_keyboard_on_timer);
 
 extern Button bt_brick_up, bt_brick_down;
 
 void car_on_timer(int value) {
-	if (value != CAR_TIMER_ID) return;
+	if (!t_car.check(value)) return;
 
 	space.car.go();
 
 	glutPostRedisplay();
 
-	if (car_timer_active)
-		glutTimerFunc(TIMER_INTERVAL, car_on_timer, CAR_TIMER_ID);
-	else
+	if (!t_car.cont())
 		space.car.stop();
 }
 
 void brick_keyboard_on_timer(int value) {
-	if (value != BRICK_KEYBOARD_TIMER_ID) return;
+	if (!t_brick.check(value)) return;
 
 	if (space.selected_brick != -1) {
 		Brick& current_brick = space.bricks[space.selected_brick];
@@ -39,10 +39,9 @@ void brick_keyboard_on_timer(int value) {
 	}
 
 	if (!bt_brick_up.pressed && !bt_brick_down.pressed)
-		brick_keyboard_timer_active = false;
+		t_brick.stop();
 
 	glutPostRedisplay();
 
-	if (brick_keyboard_timer_active)
-		glutTimerFunc(TIMER_INTERVAL, brick_keyboard_on_timer, BRICK_KEYBOARD_TIMER_ID);
+	t_brick.cont();
 }

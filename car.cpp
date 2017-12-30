@@ -1,4 +1,4 @@
-#include "globalVariables.h"
+#include "global_variables.h"
 #include "loadModel.h"
 #include "car.h"
 #include "utility.h"

@@ -1,10 +1,11 @@
 #include "mouse.h"
 #include "utility.h"
-#include "globalVariables.h"
+#include "global_variables.h"
 #include "camera.h"
-#include "animate.h"
 #include "collision.h"
 
+extern Vector3f view, horizontal_vector, vertical_vector;
+extern Vector3f camera_position, to;
 extern float theta;
 extern float phi;
 extern float theta_step;
@@ -14,6 +15,8 @@ extern float phi_step;
 float sensitivity = 0.01;
 static bool right_down=false;
 static bool left_down=false;
+
+float objX, objY, objZ;
 
 
 /* get a direction of mouse picking ray */
