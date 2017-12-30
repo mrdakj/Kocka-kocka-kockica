@@ -19,10 +19,6 @@ float move_forward = 0;
 float move_left = 0;
 float move_up=0;
 
-extern Button bt_camera_rotation_up, bt_camera_rotation_down, bt_camera_rotation_left, bt_camera_rotation_right,
-	   bt_camera_translate_up, bt_camera_translate_down, bt_camera_translate_left, bt_camera_translate_right,
-	   bt_camera_translate_forward, bt_camera_translate_backward;
-
 void get_vectors() {
 	view = to;
 	view.normalize();
@@ -83,50 +79,51 @@ void camera_on_timer(int value) {
 	if (!t_camera.check(value)) return;
 
 	/* rotation */
-	if (bt_camera_rotation_left.pressed)
+	if (camera_buttons[rotation_left].pressed)
 		theta_step=-0.02;
-
-	if (bt_camera_rotation_right.pressed)
+	if (camera_buttons[rotation_right].pressed)
 		theta_step=0.02;
 
-	if ((bt_camera_rotation_left.pressed == bt_camera_rotation_right.pressed) || space.selected_brick != NONE)
+	if ((camera_buttons[rotation_left].pressed == camera_buttons[rotation_right].pressed) || space.selected_brick != NONE)
 		theta_step = 0;
 
-	if (bt_camera_rotation_up.pressed)
+	if (camera_buttons[rotation_up].pressed)
 		phi_step=0.02;
 
-	if (bt_camera_rotation_down.pressed)
+	if (camera_buttons[rotation_down].pressed)
 		phi_step=-0.02;
 
-	if ((bt_camera_rotation_up.pressed == bt_camera_rotation_down.pressed) || space.selected_brick != NONE)
+	if ((camera_buttons[rotation_up].pressed == camera_buttons[rotation_down].pressed) || space.selected_brick != NONE)
 		phi_step = 0;
 
-	/* translation */
-	if (bt_camera_translate_up.pressed)
-		move_up = 0.02;
-	if (bt_camera_translate_down.pressed)
-		move_up = -0.02;
-	if (bt_camera_translate_forward.pressed)
-		move_forward = 0.5;
-	if (bt_camera_translate_backward.pressed)
-		move_forward = -0.5;
-	if (bt_camera_translate_left.pressed)
-		move_left = 0.5;
-	if (bt_camera_translate_right.pressed)
-		move_left = -0.5;
 
-	if ((bt_camera_translate_up.pressed == bt_camera_translate_down.pressed) || space.selected_brick != NONE)
+	/* translation */
+	if (camera_buttons[translate_up].pressed)
+		move_up = 0.02;
+	if (camera_buttons[translate_down].pressed)
+		move_up = -0.02;
+	if (camera_buttons[translate_left].pressed)
+		move_left = 0.5;
+	if (camera_buttons[translate_right].pressed)
+		move_left = -0.5;
+	if (camera_buttons[translate_forward].pressed)
+		move_forward = 0.5;
+	if (camera_buttons[translate_backward].pressed)
+		move_forward = -0.5;
+
+	if ((camera_buttons[translate_up].pressed == camera_buttons[translate_down].pressed) || space.selected_brick != NONE)
 		move_up = 0;
-	if ((bt_camera_translate_forward.pressed == bt_camera_translate_backward.pressed) || space.selected_brick != NONE)
+	if ((camera_buttons[translate_forward].pressed == camera_buttons[translate_backward].pressed) || space.selected_brick != NONE)
 		move_forward = 0;
-	if ((bt_camera_translate_left.pressed == bt_camera_translate_right.pressed) || space.selected_brick != NONE)
+	if ((camera_buttons[translate_left].pressed == camera_buttons[translate_right].pressed) || space.selected_brick != NONE)
 		move_left = 0;
 
-	if (!bt_camera_translate_up.pressed && !bt_camera_translate_down.pressed
-		&& !bt_camera_translate_left.pressed && !bt_camera_translate_right.pressed
-		&& !bt_camera_translate_forward.pressed && !bt_camera_translate_backward.pressed
-		&& !bt_camera_rotation_up.pressed && !bt_camera_rotation_down.pressed
-		&& !bt_camera_rotation_left.pressed && !bt_camera_rotation_right.pressed)
+	bool all_released = true;
+	for (Button& bt : camera_buttons) {
+		if (bt.pressed)
+			all_released = false;
+	}
+	if (all_released)
 		t_camera.stop();
 
 

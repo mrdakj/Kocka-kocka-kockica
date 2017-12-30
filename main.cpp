@@ -55,11 +55,11 @@ int main(int argc, char** argv) {
 	glutSpecialUpFunc(keyboard_special_up);
 	glutKeyboardUpFunc(keyboard_ascii_up);
 	glutMouseFunc(mouse);
-    glutMotionFunc(on_mouse_active_move);
-    glutPassiveMotionFunc(on_mouse_passive_move);
+	glutMotionFunc(on_mouse_active_move);
+	glutPassiveMotionFunc(on_mouse_passive_move);
 
 	glutMainLoop();
-	
+
 	return 0;
 }
 
@@ -146,10 +146,10 @@ void on_reshape(int new_width, int new_height) {
 
 
 void create_bricks() {
-    Brick brick_1(Position(4,5,0), Size(2,1,2), Color(1,0,0));
-    Brick brick_2(Position(0,0,0), Size(1,2,1), Color(0,1,0));
-    Brick brick_3(Position(0,5,0), Size(2,1,1), Color(0,0,1));
-    Brick brick_4(Position(5,0,0), Size(4,1,2), Color(1,0,0));
+	Brick brick_1(Position(4,5,0), Size(2,1,2), Color(1,0,0));
+	Brick brick_2(Position(0,0,0), Size(1,2,1), Color(0,1,0));
+	Brick brick_3(Position(0,5,0), Size(2,1,1), Color(0,0,1));
+	Brick brick_4(Position(5,0,0), Size(4,1,2), Color(1,0,0));
 
 	space.add(brick_1);
 	space.add(brick_2);

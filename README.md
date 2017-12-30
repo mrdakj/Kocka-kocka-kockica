@@ -19,12 +19,12 @@ pomeranje kockice gore dole - levi+desni klik misa (oba se drze istovremeno, ali
 
 kamera:
 
-strelice, u, o za transliranje
+a, s, d, w, q, e za transliranje
 
 mis / j, k, l, i za rotaciju
 
-pokretanje auta - g
+pokretanje auta - n
 
-zaustavljanje auta - s
+zaustavljanje auta - m
 
 exit - esc

@@ -1,7 +1,6 @@
 #ifndef _KEYBOARD_H_
 #define _KEYBOARD_H_
 
-
 struct Button {
 	const int key;
 	bool pressed;
