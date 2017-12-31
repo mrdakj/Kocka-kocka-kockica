@@ -27,6 +27,7 @@ bool move_brick(Direction d, Brick& c,float brick_move_speed) {
 	if (d == Down)
 		limit += 0.2;
 
+
 	if (std::fabs(line - coordinate) <= limit) {
 		if (d != Down)
 			coordinate = line;
@@ -63,7 +64,6 @@ bool move_brick(Direction d, Brick& c,float brick_move_speed) {
 	to.z /= modultheta;
 	to.y /= modultheta;
 
-
 	return returnVal;
 }
 
@@ -74,19 +74,28 @@ void move_delta(float delta_x, float delta_y, Brick& current_brick) {
 
 	float ax=0,bx=0,ay=0,by=0;
 
+	/* project normal vector of (projection of TO vector in XZ plane) of length delta_x to x and z axes */
 	if (delta_x) {
 		bx=-to.z*(delta_x/d);
-		ax=-to.x*(delta_x/d);
+		ax=to.x*(delta_x/d);
 	}
 
 
+	/* project (projection of TO) vector of length delta_y to x and z axes */
 	if (delta_y) {
 		by=to.x*(delta_y/d);
-		ay=-to.z*(delta_y/d);
+		ay=to.z*(delta_y/d);
 	}
 
 	float a = ax+ay;
 	float b = bx+by;
+
+	/* move only along tangent of circle */
+	float distance =Vector3f(objX-camera_position.x, 0, objZ-camera_position.z).normSquared();
+	if (distance<1*1 && delta_y<0) {
+		a=ax;
+		b=bx;
+	}
 
 	/* if this is > 1 collision will not work properly because we cannot skip a field */
 	if (a>0.9)
@@ -98,27 +107,14 @@ void move_delta(float delta_x, float delta_y, Brick& current_brick) {
 	if (b<-0.9)
 		b = -0.9;
 
+
 	if (b>0)
 		move_brick(Right,current_brick,b);
 	if (b<0)
 		move_brick(Left,current_brick,-b);
 	if (a>0)
-		move_brick(Backward,current_brick,a);
+		move_brick(Forward,current_brick,a);
 	if (a<0)
-		move_brick(Forward,current_brick,-a);
+		move_brick(Backward,current_brick,-a);
 
-	if (std::fabs(to.x) < 0.1 && std::fabs(to.z) < 0.1 && (std::fabs(to.y+1) < 0.001 || std::fabs(to.y-1) < 0.001)) {
-		if (b>0)
-			move_brick(Left,current_brick,b);
-		if (b<0)
-			move_brick(Right,current_brick,-b);
-		if (a>0)
-			move_brick(Forward,current_brick,a);
-		if (a<0)
-			move_brick(Backward,current_brick,-a);
-	}
-
-	delta_x=delta_y=0;
-	ax = ay = bx = by =0;
-	a = b=0;
 }

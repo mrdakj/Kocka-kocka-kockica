@@ -215,6 +215,7 @@ void mouse(int button, int state, int x, int y) {
 			to.x /= modultheta;
 			to.z /= modultheta;
 			to.y /= modultheta;
+
 		}
 
 		glutPostRedisplay();

@@ -41,6 +41,12 @@ void recover_angles() {
 	if (to.z<0)
 		theta *= -1;
 
+	/* important */
+	if (std::isnan(theta)) {
+		printf("here\n");
+		theta = 0;
+	}
+
 	get_vectors();
 }
 
