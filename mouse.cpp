@@ -3,9 +3,8 @@
 #include "global_variables.h"
 #include "camera.h"
 #include "collision.h"
+#include <stdio.h>
 
-extern Vector3f view, horizontal_vector, vertical_vector;
-extern Vector3f camera_position, to;
 
 static float sensitivity = 0.01;
 static bool mouse_right_button_clicked = false;
@@ -16,18 +15,30 @@ float objX, objY, objZ;
 
 /* get a direction of mouse picking ray */
 Vector3f get_ray_direction(float fx, float fy) {
+
+	Vector3f horizontal_vector = camera.view * Vector3f(0,1,0);
+	horizontal_vector.normalize();
+	Vector3f vertical_vector=horizontal_vector*camera.view;
+	vertical_vector.normalize();
+
+	float rad = fovy * PI / 180;
+	float vLength = std::tan( rad / 2 ) * near_clipping_distance;
+	float hLength = vLength * ((float)(window_width) / (window_height));
+	
+	vertical_vector = vertical_vector*vLength;
+	horizontal_vector = horizontal_vector*hLength;
+
 	fx -= window_width/2.0;
 	fy = window_height/2.0 - fy;
 
 	fy /= window_height/2.0;
 	fx /= window_width/2.0;
 
-	int clipping_plane_dist = 1;
 
 	Vector3f point_at_clipping_plane = 
-		camera_position + view*clipping_plane_dist + horizontal_vector*fx + vertical_vector*fy;
+		camera.position + near_clipping_distance*camera.view + fx*horizontal_vector + fy*vertical_vector;
 	
-	Vector3f direction = point_at_clipping_plane - camera_position;
+	Vector3f direction = point_at_clipping_plane - camera.position;
 
 	return direction;
 }
@@ -57,15 +68,15 @@ void mouse(int button, int state, int x, int y) {
 		float clickX2, clickY2, clickZ2;
 
 		for (int i = 0; i < 3; i++) {
-		  float cPos = camera_position.get(i);
+		  float cPos = camera.position.get(i);
 		  float direc = dir.get(i);
 		  for (int currentPlane = 0; currentPlane < space.size; currentPlane++) {
 
 			  /* FIX check dividing by zero */
 				float k = ((i!=2) ? (currentPlane-cPos)/direc : (-currentPlane-cPos)/direc);
-				float xf = camera_position.x + k*dir.x;
-				float yf = camera_position.y + k*dir.y;
-				float zf = -(camera_position.z + k*dir.z);
+				float xf = camera.position.x + k*dir.x;
+				float yf = camera.position.y + k*dir.y;
+				float zf = -(camera.position.z + k*dir.z);
 				if (i==2 && (xf<0 || xf>=space.size || yf<0 || yf>=space.size))
 					continue;
 				if (i==1 && (xf<0 || xf>=space.size || zf<0 || zf>=space.size))
@@ -94,9 +105,9 @@ void mouse(int button, int state, int x, int y) {
 					if (x-1>=0) {
 						id = space.matrix[x-1][z][y]; 
 						if (id!=0 && id!=255) {
-							Vector3f pick_vector = Vector3f(x, yf, -zf) - camera_position;
-							d = (camera_position-Vector3f(x, yf, -zf)).normSquared();
-							if (d<ds[i] && view.dot(pick_vector)>0) {
+							Vector3f pick_vector = Vector3f(x, yf, -zf) - camera.position;
+							d = (camera.position-Vector3f(x, yf, -zf)).norm_squared();
+							if (d<ds[i] && camera.view.dot(pick_vector)>0) {
 								clickX0=x;
 								clickY0=yf;
 								clickZ0=-zf;
@@ -108,9 +119,9 @@ void mouse(int button, int state, int x, int y) {
 
 					id = space.matrix[x][z][y]; 
 					if (id!=0 && id!=255) {
-						Vector3f pick_vector = Vector3f(x, yf, -zf) - camera_position;
-						d = (camera_position-Vector3f(x, yf, -zf)).normSquared();
-						if (d<ds[i] && view.dot(pick_vector)>0) {
+						Vector3f pick_vector = Vector3f(x, yf, -zf) - camera.position;
+						d = (camera.position-Vector3f(x, yf, -zf)).norm_squared();
+						if (d<ds[i] && camera.view.dot(pick_vector)>0) {
 							clickX0=x;
 							clickY0=yf;
 							clickZ0=-zf;
@@ -124,9 +135,9 @@ void mouse(int button, int state, int x, int y) {
 					if (y-1>=0) {
 						id = space.matrix[x][z][y-1]; 
 						if (id!=0 && id!=255) {
-							Vector3f pick_vector = Vector3f(xf, y, -zf) - camera_position;
-							d = (camera_position-Vector3f(xf, y, -zf)).normSquared();
-							if (d<ds[i] &&  view.dot(pick_vector)>0) {
+							Vector3f pick_vector = Vector3f(xf, y, -zf) - camera.position;
+							d = (camera.position-Vector3f(xf, y, -zf)).norm_squared();
+							if (d<ds[i] &&  camera.view.dot(pick_vector)>0) {
 								clickX1=xf;
 								clickY1=y;
 								clickZ1=-zf;
@@ -138,9 +149,9 @@ void mouse(int button, int state, int x, int y) {
 
 					id = space.matrix[x][z][y]; 
 					if (id!=0 && id!=255) {
-						Vector3f pick_vector = Vector3f(xf, y, -zf) - camera_position;
-						d = (camera_position-Vector3f(xf, y, -zf)).normSquared();
-						if (d<ds[i] &&  view.dot(pick_vector)>0) {
+						Vector3f pick_vector = Vector3f(xf, y, -zf) - camera.position;
+						d = (camera.position-Vector3f(xf, y, -zf)).norm_squared();
+						if (d<ds[i] &&  camera.view.dot(pick_vector)>0) {
 							clickX1=xf;
 							clickY1=y;
 							clickZ1=-zf;
@@ -155,9 +166,9 @@ void mouse(int button, int state, int x, int y) {
 					if (z-1>=0) {
 						id = space.matrix[x][z-1][y]; 
 						if (id!=0 && id!=255) {
-							Vector3f pick_vector = Vector3f(xf, yf, -z) - camera_position;
-							d = (camera_position-Vector3f(xf, yf, -z)).normSquared();
-							if (d<ds[i] &&  view.dot(pick_vector)>0) {
+							Vector3f pick_vector = Vector3f(xf, yf, -z) - camera.position;
+							d = (camera.position-Vector3f(xf, yf, -z)).norm_squared();
+							if (d<ds[i] &&  camera.view.dot(pick_vector)>0) {
 								clickX2=xf;
 								clickY2=yf;
 								clickZ2=-z;
@@ -169,9 +180,9 @@ void mouse(int button, int state, int x, int y) {
 
 					id = space.matrix[x][z][y]; 
 					if (id!=0 && id!=255) {
-						Vector3f pick_vector = Vector3f(xf, yf, -z) - camera_position;
-						d = (camera_position-Vector3f(xf, yf, -z)).normSquared();
-						if (d<ds[i] &&  view.dot(pick_vector)>0) {
+						Vector3f pick_vector = Vector3f(xf, yf, -z) - camera.position;
+						d = (camera.position-Vector3f(xf, yf, -z)).norm_squared();
+						if (d<ds[i] &&  camera.view.dot(pick_vector)>0) {
 							clickX2=xf;
 							clickY2=yf;
 							clickZ2=-z;
@@ -206,15 +217,15 @@ void mouse(int button, int state, int x, int y) {
 		space.pick(id);
 
 		if (space.selected_brick != -1) {
-			to.x = objX-camera_position.x;
-			to.z = objZ-camera_position.z;
-			to.y = objY-camera_position.y;
+			camera.view.x = objX-camera.position.x;
+			camera.view.z = objZ-camera.position.z;
+			camera.view.y = objY-camera.position.y;
 
-			float modultheta = std::sqrt(to.x*to.x+to.z*to.z+to.y*to.y);
+			float modultheta = std::sqrt(camera.view.x*camera.view.x+camera.view.z*camera.view.z+camera.view.y*camera.view.y);
 
-			to.x /= modultheta;
-			to.z /= modultheta;
-			to.y /= modultheta;
+			camera.view.x /= modultheta;
+			camera.view.z /= modultheta;
+			camera.view.y /= modultheta;
 
 		}
 
@@ -226,7 +237,7 @@ void mouse(int button, int state, int x, int y) {
 		mouse_left_button_clicked=false;
 		space.put_down();
 
-		recover_angles();
+		camera.recover_angles();
 
 		glutPostRedisplay();
 	}
@@ -249,10 +260,14 @@ void mouse_look(int x, int y) {
 	float theta_step = (x - window_width/2) * 0.0015;
 	float phi_step = - (y - window_height/2) * 0.0015;
 
-	if (theta_step) calculate_camera_look(theta_step, phi_step);
-	if (phi_step) calculate_camera_look(theta_step, phi_step);
+	if (theta_step)
+		camera.rotate(theta_step, phi_step);
 
-	if (!mouse_at_center(x, y)) glutWarpPointer(window_width/2, window_height/2);
+	if (phi_step)
+		camera.rotate(theta_step, phi_step);
+
+	if (!mouse_at_center(x, y))
+		glutWarpPointer(window_width/2, window_height/2);
 }
 
 

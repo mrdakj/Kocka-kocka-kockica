@@ -10,10 +10,24 @@ class Vector3f {
 	public:
 		Vector3f() : x(0), y(0), z(0) {}
 		Vector3f(float x, float y, float z) : x(x), y(y), z(z) {}
+		Vector3f(const Vector3f& v) : x(v.x), y(v.y), z(v.z) {}
+
+		void operator=(const Vector3f& v) {
+			x = v.x;
+			y = v.y;
+			z = v.z;
+		}
+
 
 		Vector3f operator+(const Vector3f& v) {
 			Vector3f result(x+v.x, y+v.y, z+v.z);
 			return result;
+		}
+
+		Vector3f operator+=(const Vector3f& v) {
+			x += v.x;
+			y += v.y;
+			z += v.z;
 		}
 
 		Vector3f operator-(const Vector3f& v) {
@@ -22,10 +36,18 @@ class Vector3f {
 		}
 
 		Vector3f set(Vector3f v) {
-			return Vector3f(v.x, v.y, v.z);
+			x = v.x;
+			y = v.y;
+			z = v.z;
 		}
 
-		float normSquared() {
+		void set(float x, float y, float z) {
+			this->x = x;
+			this->y = y;
+			this->z = z;
+		}
+
+		float norm_squared() {
 			return x*x+y*y+z*z;
 		}
 		
@@ -34,7 +56,7 @@ class Vector3f {
 		}
 
 		float norm() {
-			return (float)sqrt(x*x+y*y+z*z);
+			return (float)std::sqrt(x*x+y*y+z*z);
 		}
 
 
@@ -46,6 +68,10 @@ class Vector3f {
 		Vector3f operator*(const float& scalar) {
 			Vector3f result(x*scalar, y*scalar, z*scalar);
 			return result;
+		}
+		
+		friend Vector3f operator*(float scalar, Vector3f v) {
+			return v*scalar;
 		}
 
 		void normalize() {

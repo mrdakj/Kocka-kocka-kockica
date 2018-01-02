@@ -5,13 +5,13 @@
 
 /* constuctors */
 
-Brick::Brick() : Brick(Position(0,0,0), Size(1,1,1)) {}
+Brick::Brick() : Brick(Vector3f(0,0,0), Size(1,1,1)) {}
 
-Brick::Brick(Position pos, Size size) : pos(pos), size(size) {
+Brick::Brick(Vector3f pos, Size size) : pos(pos), size(size) {
 	in_car=false;
 }
 
-Brick::Brick(Position pos, Size size, Color color) : Brick(pos, size) { 
+Brick::Brick(Vector3f pos, Size size, Color color) : Brick(pos, size) { 
 	this->color = color;
 }
 

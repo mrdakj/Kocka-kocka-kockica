@@ -1,6 +1,7 @@
 #include <GL/glut.h>
 #include "global_variables.h"
 #include "keyboard.h"
+#include <stdio.h>
 
 #define unused_function_arg(x) ((void)x)
 
@@ -59,6 +60,14 @@ void keyboard_ascii_down(unsigned char key, int x, int y) {
 	unused_function_arg(x);
 	unused_function_arg(y);
 
+	if (key == 'f') {
+		if (space.selected_brick == NONE)
+		{
+			space.pick(1);
+		}
+		else
+			space.put_down();
+	}
 
 	/* exit program */
 	if (key == bt_exit.key)

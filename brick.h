@@ -1,6 +1,8 @@
 #ifndef _BRICK_H_
 #define _BRICK_H_
 
+#include "vector3f.h"
+
 /* FIX move this enum somewhere else */
 enum Direction {
 	Up, Down,
@@ -14,11 +16,6 @@ struct Color {
 	Color(float r, float g, float b) : r(r), g(g), b(b) {}
 };
 
-struct Position {
-	float x, y, z;
-	Position() : x(0), y(0), z(0) {}
-	Position(int x, int y, int z) : x(x), y(y), z(z) {}
-};
 
 struct Size {
 	int width, height, depth;
@@ -31,14 +28,14 @@ class Brick {
 
 	public:
 		/* attributes */
-		Position pos;
+		Vector3f pos;
 		Size size;
 		Color color;
 
 		/* constructors */
 		Brick();
-		Brick(Position pos, Size size);
-		Brick(Position pos, Size size, Color color);
+		Brick(Vector3f pos, Size size);
+		Brick(Vector3f pos, Size size, Color color);
 
 		/* FIX this should be private */
 		/* place a brick at the nearest matrix field */

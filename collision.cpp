@@ -4,7 +4,6 @@
 #include <stdio.h>
 
 extern float objX, objY, objZ;
-extern Vector3f camera_position, to;
 
 bool move_brick(Direction d, Brick& c,float brick_move_speed) {
 	if (std::fabs(brick_move_speed)>1)
@@ -55,43 +54,43 @@ bool move_brick(Direction d, Brick& c,float brick_move_speed) {
 	if (d==Up || d==Down)
 		objY += c.pos.z-zstart;
 
-	to.x = objX-camera_position.x;
-	to.z = objZ-camera_position.z;
-	to.y = objY-camera_position.y;
-	float modultheta = std::sqrt(to.x*to.x+to.z*to.z+to.y*to.y);
+	camera.view.x = objX-camera.position.x;
+	camera.view.z = objZ-camera.position.z;
+	camera.view.y = objY-camera.position.y;
+	float modultheta = std::sqrt(camera.view.x*camera.view.x+camera.view.z*camera.view.z+camera.view.y*camera.view.y);
 
-	to.x /= modultheta;
-	to.z /= modultheta;
-	to.y /= modultheta;
+	camera.view.x /= modultheta;
+	camera.view.z /= modultheta;
+	camera.view.y /= modultheta;
 
 	return returnVal;
 }
 
 void move_delta(float delta_x, float delta_y, Brick& current_brick) {
 
-	float d = std::sqrt(to.x*to.x+to.z*to.z);
+	float d = std::sqrt(camera.view.x*camera.view.x+camera.view.z*camera.view.z);
 
 
 	float ax=0,bx=0,ay=0,by=0;
 
-	/* project normal vector of (projection of TO vector in XZ plane) of length delta_x to x and z axes */
+	/* project normal vector of (projection of TO vector in XZ plane) of length delta_x camera.view x and z axes */
 	if (delta_x) {
-		bx=-to.z*(delta_x/d);
-		ax=to.x*(delta_x/d);
+		bx=-camera.view.z*(delta_x/d);
+		ax=camera.view.x*(delta_x/d);
 	}
 
 
-	/* project (projection of TO) vector of length delta_y to x and z axes */
+	/* project (projection of TO) vector of length delta_y camera.view x and z axes */
 	if (delta_y) {
-		by=to.x*(delta_y/d);
-		ay=to.z*(delta_y/d);
+		by=camera.view.x*(delta_y/d);
+		ay=camera.view.z*(delta_y/d);
 	}
 
 	float a = ax+ay;
 	float b = bx+by;
 
 	/* move only along tangent of circle */
-	float distance =Vector3f(objX-camera_position.x, 0, objZ-camera_position.z).normSquared();
+	float distance =Vector3f(objX-camera.position.x, 0, objZ-camera.position.z).norm_squared();
 	if (distance<1*1 && delta_y<0) {
 		a=ax;
 		b=bx;

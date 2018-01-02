@@ -203,12 +203,12 @@ bool Space::move(int index, Direction d) const {
 	int y = c.pos.y;
 	int z = c.pos.z;
 
-	int minx = floor(c.pos.x);
-	int maxx = ceil(c.pos.x);
-	int miny = floor(c.pos.y);
-	int maxy = ceil(c.pos.y);
-	int minz = floor(c.pos.z);
-	int maxz = ceil(c.pos.z);
+	int minx = std::floor(c.pos.x);
+	int maxx = std::ceil(c.pos.x);
+	int miny = std::floor(c.pos.y);
+	int maxy = std::ceil(c.pos.y);
+	int minz = std::floor(c.pos.z);
+	int maxz = std::ceil(c.pos.z);
 
 	int width = c.size.width;
 	int depth = c.size.depth;
@@ -272,3 +272,116 @@ void Space::pick(int id) {
 	select();
 	c.pos.z += 0.2;
 }
+
+/* bool Space::move_brick(Direction d, Brick& c,float brick_move_speed) { */
+/* 	if (std::fabs(brick_move_speed)>1) */
+/* 		return false; */
+
+/* 	bool returnVal = false; */
+/* 	float xstart = c.pos.x; */
+/* 	float ystart = c.pos.y; */
+/* 	float zstart = c.pos.z; */
+
+/* 	float& coordinate = */
+/* 		(d == Left || d == Right) ? c.pos.x : ((d == Forward || d == Backward) ? c.pos.y : c.pos.z); */
+
+/* 	int z = (d == Left || d == Forward || d == Down) ? -1 : 1; */
+
+/* 	int line = (z == 1) ? std::ceil(coordinate) : std::floor(coordinate); */
+
+
+/* 	float limit = 1.2 * brick_move_speed; // 1.2>1 so we are sure the brick cannot go inside */
+/* 	if (d == Down) */
+/* 		limit += 0.2; */
+
+
+/* 	if (std::fabs(line - coordinate) <= limit) { */
+/* 		if (d != Down) */
+/* 			coordinate = line; */
+
+/* 		if (space.move(space.selected_brick, d)) { */
+/* 			coordinate += z*brick_move_speed; */
+/* 			returnVal =true; */
+/* 		} */
+/* 		else { */
+/* 			if (d == Down) */
+/* 				coordinate = line+0.2; */
+
+/* 			returnVal=false; */
+/* 		} */
+/* 	} */
+/* 	else { */
+/* 		coordinate += z*brick_move_speed; */
+/* 		returnVal=true; */
+/* 	} */
+
+	/* if (d==Left || d==Right) */
+	/* 	objX += c.pos.x - xstart; */
+	/* if (d==Forward || d==Backward) */
+	/* 	objZ += -c.pos.y + ystart; */
+	/* if (d==Up || d==Down) */
+	/* 	objY += c.pos.z-zstart; */
+
+	/* to.x = objX-position.x; */
+	/* to.z = objZ-position.z; */
+	/* to.y = objY-position.y; */
+	/* float modultheta = std::sqrt(to.x*to.x+to.z*to.z+to.y*to.y); */
+
+	/* to.x /= modultheta; */
+	/* to.z /= modultheta; */
+	/* to.y /= modultheta; */
+
+	/* return returnVal; */
+/* } */
+
+/* void Space::move_delta(float delta_x, float delta_y, Brick& current_brick) { */
+
+	/* float d = std::sqrt(to.x*to.x+to.z*to.z); */
+
+
+	/* float ax=0,bx=0,ay=0,by=0; */
+
+	/* /1* project normal vector of (projection of TO vector in XZ plane) of length delta_x to x and z axes *1/ */
+	/* if (delta_x) { */
+	/* 	bx=-to.z*(delta_x/d); */
+	/* 	ax=to.x*(delta_x/d); */
+	/* } */
+
+
+	/* /1* project (projection of TO) vector of length delta_y to x and z axes *1/ */
+	/* if (delta_y) { */
+	/* 	by=to.x*(delta_y/d); */
+	/* 	ay=to.z*(delta_y/d); */
+	/* } */
+
+	/* float a = ax+ay; */
+	/* float b = bx+by; */
+
+	/* /1* move only along tangent of circle *1/ */
+	/* float distance =Vector3f(objX-position.x, 0, objZ-position.z).norm_squared(); */
+	/* if (distance<1*1 && delta_y<0) { */
+	/* 	a=ax; */
+	/* 	b=bx; */
+	/* } */
+
+	/* /1* if this is > 1 collision will not work properly because we cannot skip a field *1/ */
+	/* if (a>0.9) */
+	/* 	a = 0.9; */
+	/* if (a<-0.9) */
+	/* 	a = -0.9; */
+	/* if (b>0.9) */
+	/* 	b = 0.9; */
+	/* if (b<-0.9) */
+	/* 	b = -0.9; */
+
+
+	/* if (b>0) */
+	/* 	move_brick(Right,current_brick,b); */
+	/* if (b<0) */
+	/* 	move_brick(Left,current_brick,-b); */
+	/* if (a>0) */
+	/* 	move_brick(Forward,current_brick,a); */
+	/* if (a<0) */
+	/* 	move_brick(Backward,current_brick,-a); */
+
+/* } */

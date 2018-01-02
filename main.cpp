@@ -1,16 +1,18 @@
 #include <GL/glut.h>
 #include "global_variables.h"
 
+#include <stdio.h>
 #include "mouse.h"
 #include "keyboard.h"
 #include "utility.h"
 
 int window_width;
 int window_height;
+int near_clipping_distance = 1;
+int fovy = 40;
 Space space;
+Camera camera;
 
-extern Vector3f view, horizontal_vector, vertical_vector;
-extern Vector3f camera_position, to;
 
 static double projection_matrix_inverse[16]={0.0};
 
@@ -20,9 +22,8 @@ void on_reshape(int new_width, int new_height);
 void set_light();
 void draw_cursor(const ut_Point& A, const ut_Point& B, const ut_Point& C);
 void get_projection_matrix_inverse();
-extern void get_vectors();
 
-/* crate bricks and add them to the space */
+/* crate bricks and add them camera.view the space */
 void create_bricks();
 
 int main(int argc, char** argv) {
@@ -93,16 +94,12 @@ void on_display(void) {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
+
 	/* set light at camera position */
 	GLfloat light_position[] = {0,0,0,1};
 	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 
-	gluLookAt(
-		camera_position.x,camera_position.y,camera_position.z,
-		camera_position.x+to.x, camera_position.y+to.y, camera_position.z+to.z,
-		0, 1, 0
-	);
-
+	camera.look_at();
 
 	/* draw space */
 	space.render();
@@ -135,32 +132,30 @@ void on_reshape(int new_width, int new_height) {
 	glMatrixMode(GL_PROJECTION);
 
 	glLoadIdentity();
-	gluPerspective(40, ratio, 1, 400);
-
-	get_vectors();
+	gluPerspective(fovy, ratio, near_clipping_distance, 100);
 
 	get_projection_matrix_inverse();
 }
 
 
 void create_bricks() {
-	Brick brick_1(Position(4,5,0), Size(2,1,2), Color(1,0,0));
-	Brick brick_2(Position(0,0,0), Size(1,2,4), Color(0.5,0.5,0.5));
-	Brick brick_3(Position(0,5,0), Size(2,1,1), Color(0,0,1));
-	Brick brick_4(Position(5,0,0), Size(4,1,2), Color(0.5,0,0));
-	Brick brick_5(Position(5,7,0), Size(1,1,1), Color(1,1,0));
-	Brick brick_6(Position(5,8,0), Size(1,1,2), Color(1,1,1));
-	Brick brick_7(Position(0,8,0), Size(1,2,1), Color(0,1,1));
-	Brick brick_8(Position(0,15,0), Size(1,1,1), Color(0.3,0.3,0.3));
+	Brick brick_1(Vector3f(4,5,0), Size(2,1,2), Color(1,0,0));
+	Brick brick_2(Vector3f(0,0,0), Size(1,2,4), Color(0.5,0.5,0.5));
+	Brick brick_3(Vector3f(0,5,0), Size(2,1,1), Color(0,0,1));
+	Brick brick_4(Vector3f(5,0,0), Size(4,1,2), Color(0.5,0,0));
+	Brick brick_5(Vector3f(5,7,0), Size(1,1,1), Color(1,1,0));
+	Brick brick_6(Vector3f(5,8,0), Size(1,1,2), Color(1,1,1));
+	Brick brick_7(Vector3f(0,8,0), Size(1,2,1), Color(0,1,1));
+	Brick brick_8(Vector3f(0,15,0), Size(1,1,1), Color(0.3,0.3,0.3));
 
-	Brick brick_9(Position(4,5,3), Size(2,1,2), Color(1,0,0));
-	Brick brick_10(Position(0,0,3), Size(1,2,4), Color(0.5,0.5,0.5));
-	Brick brick_11(Position(0,5,3), Size(2,1,1), Color(0,0,1));
-	Brick brick_12(Position(5,0,3), Size(4,1,2), Color(0.5,0,0));
-	Brick brick_13(Position(5,7,3), Size(1,1,1), Color(1,1,0));
-	Brick brick_14(Position(5,8,3), Size(1,1,2), Color(1,1,1));
-	Brick brick_15(Position(0,8,3), Size(1,2,1), Color(0,1,1));
-	Brick brick_16(Position(0,15,3), Size(1,1,1), Color(0.3,0.3,0.3));
+	Brick brick_9(Vector3f(4,5,3), Size(2,1,2), Color(1,0,0));
+	Brick brick_10(Vector3f(0,0,3), Size(1,2,4), Color(0.5,0.5,0.5));
+	Brick brick_11(Vector3f(0,5,3), Size(2,1,1), Color(0,0,1));
+	Brick brick_12(Vector3f(5,0,3), Size(4,1,2), Color(0.5,0,0));
+	Brick brick_13(Vector3f(5,7,3), Size(1,1,1), Color(1,1,0));
+	Brick brick_14(Vector3f(5,8,3), Size(1,1,2), Color(1,1,1));
+	Brick brick_15(Vector3f(0,8,3), Size(1,2,1), Color(0,1,1));
+	Brick brick_16(Vector3f(0,15,3), Size(1,1,1), Color(0.3,0.3,0.3));
 
 
 

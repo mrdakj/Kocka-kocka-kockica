@@ -4,18 +4,22 @@
 #include "space.h"
 #include "timer.h"
 #include "keyboard.h"
+#include "camera.h"
 
 #define PI 3.141592
 
 /* window size */
 extern int window_width;
 extern int window_height;
+extern int near_clipping_distance;
+extern int fovy;
 
 /* out space */
 extern Space space;
 
 /* timers */
 extern Timer t_camera, t_car, t_brick;
+extern Camera camera;
 
 /* buttons */
 extern std::vector<Button> camera_buttons;
