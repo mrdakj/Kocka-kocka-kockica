@@ -3,7 +3,7 @@
 #include "headers/vector3f.h"
 #include <stdio.h>
 
-extern float objX, objY, objZ;
+extern Vector3f selection;
 
 bool move_brick(Direction d, Brick& c,float brick_move_speed) {
 	if (std::fabs(brick_move_speed)>1)
@@ -48,20 +48,16 @@ bool move_brick(Direction d, Brick& c,float brick_move_speed) {
 	}
 
 	if (d==Left || d==Right)
-		objX += c.pos.x - xstart;
+		selection += Vector3f(c.pos.x-xstart, 0, 0);
+		/* objX += c.pos.x - xstart; */
 	if (d==Forward || d==Backward)
-		objZ += -c.pos.y + ystart;
+		selection += Vector3f(0, 0,  -c.pos.y + ystart);
+		/* objZ += -c.pos.y + ystart; */
 	if (d==Up || d==Down)
-		objY += c.pos.z-zstart;
+		selection += Vector3f(0, c.pos.z-zstart, 0);
+		/* objY += c.pos.z-zstart; */
 
-	camera.view.x = objX-camera.position.x;
-	camera.view.z = objZ-camera.position.z;
-	camera.view.y = objY-camera.position.y;
-	float modultheta = std::sqrt(camera.view.x*camera.view.x+camera.view.z*camera.view.z+camera.view.y*camera.view.y);
-
-	camera.view.x /= modultheta;
-	camera.view.z /= modultheta;
-	camera.view.y /= modultheta;
+	camera.look_at_point(selection);
 
 	return returnVal;
 }
@@ -90,7 +86,7 @@ void move_delta(float delta_x, float delta_y, Brick& current_brick) {
 	float b = bx+by;
 
 	/* move only along tangent of circle */
-	float distance =Vector3f(objX-camera.position.x, 0, objZ-camera.position.z).norm_squared();
+	float distance =Vector3f(selection.x-camera.position.x, 0, selection.z-camera.position.z).norm_squared();
 	if (distance<1*1 && delta_y<0) {
 		a=ax;
 		b=bx;

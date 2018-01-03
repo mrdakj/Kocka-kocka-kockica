@@ -20,6 +20,11 @@ void Camera::look_at() const {
 }
 
 
+void Camera::look_at_point(const Vector3f& A) {
+	view = A - position;
+	view.normalize();
+}
+
 void Camera::recover_angles() {
 	phi = std::acos(-view.y);
 	theta = std::acos(view.x/(std::sin(phi)));

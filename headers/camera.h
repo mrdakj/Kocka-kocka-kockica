@@ -22,6 +22,9 @@ public:
 	Camera();
 	void look_at() const;
 
+	/* set camera to look directly to the point A */
+	void look_at_point(const Vector3f& A);
+
 	/* get theta and phi from view vector */
 	void recover_angles();
 

@@ -15,13 +15,15 @@ struct Mouse {
 	bool right_button_down;
 	bool left_button_down;
 
-	Mouse(float sensitivity) : sensitivity(sensitivity), right_button_down(false), left_button_down(false) {}
+	Mouse(float sensitivity) : sensitivity(sensitivity),
+							   right_button_down(false), 
+							   left_button_down(false) {}
 };
 
 static Mouse mouse(0.01);
 
-
-float objX, objY, objZ;
+/* world coordinates of selection */
+Vector3f selection;
 
 static void get_axes_of_near_clipping_plane(Vector3f& x_axis, Vector3f& y_axis) {
 	x_axis = camera.view * Vector3f(0,1,0);
@@ -48,7 +50,7 @@ static void transform_coordinates(float& x, float& y) {
 	x /= window_width/2.0;
 }
 
-static Vector3f get_point_at_near_clipping_plane(float& x, float& y) {
+static Vector3f get_point_at_near_clipping_plane(float x, float y) {
 	Vector3f x_axis, y_axis;
 	get_axes_of_near_clipping_plane(x_axis, y_axis);
 
@@ -74,7 +76,7 @@ struct Plane {
 };
 
 /* intersect ray with plane in the space */
-static Vector3f	intersect_ray_and_plane(int x, int y, const Plane& plane) {
+static Vector3f	intersect_ray_and_plane(float x, float y, const Plane& plane) {
 	Vector3f direction = get_ray_direction(x, y);
 	Vector3f plane_up = Vector3f(plane.a, plane.b, plane.c);
 	float k = (-plane.d-camera.position.dot(plane_up)) / direction.dot(plane_up);
@@ -105,18 +107,21 @@ enum Plane_family {
 struct PlanesXYZ {
 	float min_distance;
 	int id;
-	PlanesXYZ() : min_distance(INF), id(-1) {}
+	Vector3f selection;
+	PlanesXYZ() : min_distance(INF), id(-1), selection(Vector3f(0 ,0 ,0)) {}
 
 	void reset() {
+		selection = Vector3f(0, 0, 0);
 		min_distance = INF;
 		id = -1;
 	}
 
 	/* try to update distance and id */
-	bool update(float distance, int id) {
+	bool update(float distance, int id, const Vector3f& A) {
 		if (id==0 || id==255 || id == -1) return false;
 
 		if (distance < min_distance) {
+			selection = A;
 			this->id = id;
 			min_distance = distance;
 			return true;
@@ -141,96 +146,89 @@ static Plane get_plane(const Plane_family& plane_family, int d) {
 	);
 }
 
+/* get id of the brick under the mouse cursor, if there is no such brick return -1 */
+static int get_id(float mouse_x, float mouse_y) {
+
+	for (Plane_family plane_family : {X, Y, Z}) {
+		planesXYZ[plane_family].reset();
+
+		for (int d = 0; d <= space.size; d++) {
+			/* this is a vector OA, or just a point A */
+			Vector3f A = intersect_ray_and_plane(mouse_x, mouse_y, get_plane(plane_family, d));
+
+			Vector3f intersection_vector = get_intersection_vector(A);
+			if (intersection_vector.is_nan())
+				continue;
+			float distance = intersection_vector.norm_squared();
+
+			/* matrix indices */
+			/* important to set d instead of A.* because of float precision */
+			int x = (plane_family == X) ? d : A.x;
+			int y = (plane_family == Y) ? d : A.y;
+			int z = (plane_family == Z) ? d : -A.z;
+
+			int id = space.get_matrix_field(
+					x - (plane_family == X),
+					z - (plane_family == Z), 
+					y - (plane_family == Y)
+			); 
+
+			planesXYZ[plane_family].update(distance, id, A);
+
+			id = space.get_matrix_field(x,z,y);
+
+			planesXYZ[plane_family].update(distance, id, A);
+
+		}
+	}
+
+	
+	int plane_family_with_min_distance = ut_index_of_minimum(planesXYZ[X].min_distance, planesXYZ[Y].min_distance, planesXYZ[Z].min_distance);
+
+	selection = planesXYZ[plane_family_with_min_distance].selection + Vector3f(0, 0.2, 0);
+
+	return planesXYZ[plane_family_with_min_distance].id;
+}
+
+
 void on_mouse_click(int button, int state, int x, int y) {
+
 	if (button == GLUT_LEFT_BUTTON &&  state == GLUT_DOWN) { 
+
+		/* left click is pressed, try to select a brick */
 
 		mouse.left_button_down = true;
 
 		x = window_width/2;
 		y = window_height/2;
 
-
-		for (Plane_family plane_family : {X, Y, Z}) {
-			planesXYZ[plane_family].reset();
-
-			for (int d = 0; d <= space.size; d++) {
-				/* this is a vector OA, or just a point A */
-				Vector3f A = intersect_ray_and_plane(x, y, get_plane(plane_family, d));
-
-				Vector3f intersection_vector = get_intersection_vector(A);
-				if (intersection_vector.is_nan())
-					continue;
-				float distance = intersection_vector.norm_squared();
-
-				/* matrix indices */
-				/* important to set d instead of A.* because of float precision */
-				int x = (plane_family == X) ? d : A.x;
-				int y = (plane_family == Y) ? d : A.y;
-				int z = (plane_family == Z) ? d : -A.z;
-
-				int id;
-				if (plane_family == X)
-					id = space.get_matrix_field(x-1,z,y);
-				if (plane_family == Y)
-					id = space.get_matrix_field(x,z,y-1);
-				if (plane_family == Z)
-					id = space.get_matrix_field(x,z-1,y);
-
-				if (planesXYZ[plane_family].update(distance, id)) {
-					objX = A.x;
-					objY = A.y+0.2;
-					objZ = A.z;
-				}
-
-				if (planesXYZ[plane_family].update(distance, space.get_matrix_field(x,z,y))) {
-					objX = A.x;
-					objY = A.y+0.2;
-					objZ = A.z;
-				}
-
-			}
-		}
-
-		
-		int plane_family_with_min_distance = ut_index_of_minimum(planesXYZ[X].min_distance, planesXYZ[Y].min_distance, planesXYZ[Z].min_distance);
-
-		int id = planesXYZ[plane_family_with_min_distance].id;
+		int id = get_id(x, y);
 
 		space.pick(id);
 
-		if (space.selected_brick != -1) {
-			camera.view.x = objX-camera.position.x;
-			camera.view.z = objZ-camera.position.z;
-			camera.view.y = objY-camera.position.y;
-
-			float modultheta = std::sqrt(camera.view.x*camera.view.x+camera.view.z*camera.view.z+camera.view.y*camera.view.y);
-
-			camera.view.x /= modultheta;
-			camera.view.z /= modultheta;
-			camera.view.y /= modultheta;
-
+		if (!space.nothing_selected()) {
+			camera.look_at_point(selection);
+			glutPostRedisplay();
 		}
-
-		glutPostRedisplay();
 	}	
 
 
 	if (button == GLUT_LEFT_BUTTON && state == GLUT_UP) {
-		mouse.left_button_down=false;
+
+		/* left button is released, put previously seleced brick down */
+
+		mouse.left_button_down = false;
+
 		space.put_down();
-
 		camera.recover_angles();
-
 		glutPostRedisplay();
 	}
 
-	if (button == GLUT_RIGHT_BUTTON &&  state == GLUT_DOWN) { 
+	if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN)
 		mouse.right_button_down=true;
-	}
 
-	if (button == GLUT_RIGHT_BUTTON &&  state == GLUT_UP) { 
+	if (button == GLUT_RIGHT_BUTTON && state == GLUT_UP)
 		mouse.right_button_down=false;
-	}
 
 }
 
