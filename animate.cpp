@@ -1,7 +1,7 @@
 /* animate car and brick on keyboard */
 
 #include <GL/glut.h>
-#include "collision.h"
+#include "headers/collision.h"
 
 void car_on_timer(int value);
 void brick_keyboard_on_timer(int value);

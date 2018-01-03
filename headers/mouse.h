@@ -5,7 +5,7 @@
 #include "vector3f.h"
 
 
-void mouse(int button, int state, int x, int y);
+void on_mouse_click(int button, int state, int x, int y);
 void on_mouse_active_move(int x, int y);
 void on_mouse_passive_move(int x, int y);
 

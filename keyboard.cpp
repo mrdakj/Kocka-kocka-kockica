@@ -1,6 +1,6 @@
 #include <GL/glut.h>
-#include "global_variables.h"
-#include "keyboard.h"
+#include "headers/global_variables.h"
+#include "headers/keyboard.h"
 #include <stdio.h>
 
 #define unused_function_arg(x) ((void)x)

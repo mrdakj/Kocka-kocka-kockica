@@ -1,7 +1,6 @@
-#include "global_variables.h"
-#include "loadModel.h"
-#include "car.h"
-#include "utility.h"
+#include "headers/loadModel.h"
+#include "headers/car.h"
+#include "headers/utility.h"
 
 Car::Car() : Car(5, 10, 12, 7) {}
 Car::Car(int position_x, int position_y, int width, int depth) : position_x(position_x), position_y(position_y), width(width), depth(depth), wheel_rotation_angle(0), translation_x(0), is_going(false) {}

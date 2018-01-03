@@ -1,8 +1,8 @@
-#include "space.h"
+#include "headers/space.h"
 #include <GL/glut.h>
 #include <cmath>
-#include "utility.h"
-#include "collision.h"
+#include "headers/utility.h"
+#include "headers/collision.h"
 
 /* constuctors */
 

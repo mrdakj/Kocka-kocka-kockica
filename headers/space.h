@@ -16,8 +16,6 @@ class Space {
 		/* returns false if some index is out of range, otherwise sets field (i,j,k) to value and returns true */
 		bool set_matrix_field(int i, int j, int k, unsigned char value);
 
-		/* returns -1 if some index is out of range, otherwise gets field (i,j,k) */
-		int get_matrix_field(int i, int j, int k) const;
 
 		/* fill matrix with id=number (ranges from 1 to 255) at position determied by c */
 		void update_matrix(unsigned char number, Brick& c);
@@ -56,6 +54,9 @@ class Space {
 		/* constructors */
 		Space();
 		Space(int size);
+
+		/* returns -1 if some index is out of range, otherwise gets field (i,j,k) */
+		int get_matrix_field(int i, int j, int k) const;
 
 		/* draw a grid */
 		void draw_grid(Color c) const;

@@ -1,10 +1,10 @@
 #include <GL/glut.h>
-#include "global_variables.h"
+#include "headers/global_variables.h"
 
 #include <stdio.h>
-#include "mouse.h"
-#include "keyboard.h"
-#include "utility.h"
+#include "headers/mouse.h"
+#include "headers/keyboard.h"
+#include "headers/utility.h"
 
 int window_width;
 int window_height;
@@ -53,7 +53,7 @@ int main(int argc, char** argv) {
 	glutReshapeFunc(on_reshape);
 	glutKeyboardFunc(keyboard_ascii_down);
 	glutKeyboardUpFunc(keyboard_ascii_up);
-	glutMouseFunc(mouse);
+	glutMouseFunc(on_mouse_click);
 	glutMotionFunc(on_mouse_active_move);
 	glutPassiveMotionFunc(on_mouse_passive_move);
 

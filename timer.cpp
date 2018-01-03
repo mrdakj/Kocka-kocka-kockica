@@ -1,5 +1,5 @@
 #include <GL/glut.h>
-#include "timer.h"
+#include "headers/timer.h"
 
 int Timer::number = 0;
 

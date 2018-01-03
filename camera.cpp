@@ -1,5 +1,5 @@
 #include <GL/glut.h>
-#include "camera.h"
+#include "headers/camera.h"
 
 #define PI 3.141592
 

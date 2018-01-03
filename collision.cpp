@@ -1,6 +1,6 @@
-#include "collision.h"
+#include "headers/collision.h"
 #include <cmath>
-#include "vector3f.h"
+#include "headers/vector3f.h"
 #include <stdio.h>
 
 extern float objX, objY, objZ;

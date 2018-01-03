@@ -1,7 +1,7 @@
-#include  "brick.h"
+#include "headers/brick.h"
 #include <GL/glut.h>
-#include "loadModel.h"
-#include "utility.h"
+#include "headers/loadModel.h"
+#include "headers/utility.h"
 
 /* constuctors */
 
