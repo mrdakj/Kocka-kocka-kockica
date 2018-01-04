@@ -11,9 +11,10 @@ enum Direction {
 };
 
 struct Color {
-	float r, g, b;
-	Color() : r(1), g(0), b(0) {}
-	Color(float r, float g, float b) : r(r), g(g), b(b) {}
+	float r, g, b, a;
+	Color() : r(1), g(0), b(0), a(1) {}
+	Color(float r, float g, float b) : r(r), g(g), b(b), a(1) {}
+	Color(float r, float g, float b, float a) : r(r), g(g), b(b), a(a) {}
 };
 
 
@@ -43,6 +44,8 @@ class Brick {
 
 		/* draw a brick of a given size at a given position */
 		void draw_brick() const;
+		void draw_transparent_brick() const;
+		void draw_normal_brick() const;
 
 	private:
 		bool in_car;

@@ -3,7 +3,7 @@ CC = g++
 CFLAGS  = -std=c++11 -g
 LDLIBS = -lGL -lGLU -lglut -lm
 
-main: main.o brick.o space.o keyboard.o animate.o mouse.o utility.o camera.o loadModel.o car.o collision.o timer.o
+main: main.o brick.o space.o keyboard.o animate.o mouse.o utility.o camera.o loadModel.o car.o collision.o timer.o image.o textures.o
 	$(CC) $(CFLAGS)  -o main *.o $(LDLIBS)
 main.o: main.cpp  
 	$(CC) $(CFLAGS) -c main.cpp $(LDLIBS)
@@ -29,6 +29,10 @@ collision.o: collision.cpp
 	$(CC) $(CFLAGS) -c collision.cpp $(LDLIBS)
 timer.o: timer.cpp 
 	$(CC) $(CFLAGS) -c timer.cpp $(LDLIBS)
+image.o: image.cpp 
+	$(CC) $(CFLAGS) -c image.cpp $(LDLIBS)
+textures.o: textures.cpp 
+	$(CC) $(CFLAGS) -c textures.cpp $(LDLIBS)
 
 clean:
 	@rm -f *.o main

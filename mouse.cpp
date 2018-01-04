@@ -26,6 +26,7 @@ static Mouse mouse(0.01);
 Vector3f selection;
 
 static void get_axes_of_near_clipping_plane(Vector3f& x_axis, Vector3f& y_axis) {
+
 	x_axis = camera.view * Vector3f(0,1,0);
 	x_axis.normalize();
 
@@ -43,6 +44,7 @@ static void get_axes_of_near_clipping_plane(Vector3f& x_axis, Vector3f& y_axis) 
 
 /* transform origin from the top left corner to the center of the screen */
 static void transform_coordinates(float& x, float& y) {
+
 	x -= window_width/2.0;
 	y = window_height/2.0 - y;
 
@@ -51,6 +53,7 @@ static void transform_coordinates(float& x, float& y) {
 }
 
 static Vector3f get_point_at_near_clipping_plane(float x, float y) {
+
 	Vector3f x_axis, y_axis;
 	get_axes_of_near_clipping_plane(x_axis, y_axis);
 
@@ -75,8 +78,9 @@ struct Plane {
 	Plane(int a, int b, int c, int d) : a(a), b(b), c(c), d(d) {};
 };
 
-/* intersect ray with plane in the space */
-static Vector3f	intersect_ray_and_plane(float x, float y, const Plane& plane) {
+/* intersect ray with plane in the space and set distance from camera postion to intersection point */
+static Vector3f	intersect_ray_and_plane(float x, float y, const Plane& plane, float& distance) {
+
 	Vector3f direction = get_ray_direction(x, y);
 	Vector3f plane_up = Vector3f(plane.a, plane.b, plane.c);
 	float k = (-plane.d-camera.position.dot(plane_up)) / direction.dot(plane_up);
@@ -86,15 +90,9 @@ static Vector3f	intersect_ray_and_plane(float x, float y, const Plane& plane) {
 	if (std::isnan(k) || k < near_clipping_distance || A.x < 0 || A.x > space.size || A.y < 0 || A.y > space.size || A.z > 0 || A.z < -space.size)
 		A.set_nan();
 
+	distance = k;
+
 	return A;
-}
-
-static Vector3f get_intersection_vector(const Vector3f& A) {
-
-	Vector3f intersection_vector = (A.is_nan()) ? A :
-									A-camera.position;
-
-	return intersection_vector;
 }
 
 
@@ -116,7 +114,7 @@ struct PlanesXYZ {
 		id = -1;
 	}
 
-	/* try to update distance and id */
+	/* try to update distance, id and selection */
 	bool update(float distance, int id, const Vector3f& A) {
 		if (id==0 || id==255 || id == -1) return false;
 
@@ -154,12 +152,10 @@ static int get_id(float mouse_x, float mouse_y) {
 
 		for (int d = 0; d <= space.size; d++) {
 			/* this is a vector OA, or just a point A */
-			Vector3f A = intersect_ray_and_plane(mouse_x, mouse_y, get_plane(plane_family, d));
+			float distance;
+			Vector3f A = intersect_ray_and_plane(mouse_x, mouse_y, get_plane(plane_family, d), distance);
 
-			Vector3f intersection_vector = get_intersection_vector(A);
-			if (intersection_vector.is_nan())
-				continue;
-			float distance = intersection_vector.norm_squared();
+			if (A.is_nan()) continue;
 
 			/* matrix indices */
 			/* important to set d instead of A.* because of float precision */
@@ -237,6 +233,7 @@ static bool mouse_at_center(int x, int y) {
 }
 
 void mouse_look(int x, int y) {
+
 	float theta_step = (x - window_width/2) * 0.0015;
 	float phi_step = - (y - window_height/2) * 0.0015;
 

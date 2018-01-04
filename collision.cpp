@@ -49,13 +49,10 @@ bool move_brick(Direction d, Brick& c,float brick_move_speed) {
 
 	if (d==Left || d==Right)
 		selection += Vector3f(c.pos.x-xstart, 0, 0);
-		/* objX += c.pos.x - xstart; */
 	if (d==Forward || d==Backward)
 		selection += Vector3f(0, 0,  -c.pos.y + ystart);
-		/* objZ += -c.pos.y + ystart; */
 	if (d==Up || d==Down)
 		selection += Vector3f(0, c.pos.z-zstart, 0);
-		/* objY += c.pos.z-zstart; */
 
 	camera.look_at_point(selection);
 

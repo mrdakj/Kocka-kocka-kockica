@@ -3,6 +3,7 @@
 #include <cmath>
 #include "headers/utility.h"
 #include "headers/collision.h"
+#include "headers/textures.h"
 
 /* constuctors */
 
@@ -71,11 +72,33 @@ int Space::get_matrix_field(int i, int j, int k) const {
 	return matrix[i][j][k];
 }
 
+void Space::draw_wall() const {
+
+	glColor3f(0.7, 0, 0);
+    glBindTexture(GL_TEXTURE_2D, names[0]);
+
+	glPushMatrix();
+	glTranslatef(size, -0.5, 0);
+	ut_draw_rectangle_with_texture_YZ(size/2, size);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0, -0.5, -size);
+	ut_draw_rectangle_with_texture_XY(size, size/2);
+	glPopMatrix();
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
 
 void Space::render_space() const {
-	car.draw_base();
+
+	draw_wall();
 	
 	draw_grid(Color(1,1,1));
+
+	draw_floor();
+
+	car.draw_base();
 
 	for (const Brick& b : bricks) {
 		b.draw_brick();
@@ -139,6 +162,41 @@ void Space::render() {
 	glPopMatrix();
 }
 
+void Space::draw_floor() const {
+
+    glBindTexture(GL_TEXTURE_2D, names[1]);
+
+	ut_draw_rectangle_with_texture_XZ(car.position_x-1, size);
+
+	glPushMatrix();
+	glTranslatef(car.position_x-1, 0, 0);
+	ut_draw_rectangle_with_texture_XZ(car.width+2, car.position_y);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(car.position_x-1+car.width+2, 0, 0);
+	ut_draw_rectangle_with_texture_XZ(size-car.position_x-car.width-1, size);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(car.position_x-1, 0, -car.position_y-car.depth-1);
+	ut_draw_rectangle_with_texture_XZ(car.width+2, size-car.position_y-car.depth-1);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0, -0.5, 0);
+	ut_draw_rectangle_with_texture_XY(size, 0.5);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0, -0.5, 0);
+	ut_draw_rectangle_with_texture_YZ(0.5, size);
+	glPopMatrix();
+	
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+}
+
 void Space::draw_grid(Color c) const {
 	glDisable(GL_LIGHTING);
 
@@ -158,6 +216,7 @@ void Space::draw_grid(Color c) const {
 	}
 
 	glEnable(GL_LIGHTING);
+
 }
 
 void Space::update_matrix(unsigned char number, Brick& c) {

@@ -10,6 +10,7 @@ void Car::draw_base() const {
 
 	draw_brick();
 
+	glDisable(GL_COLOR_MATERIAL);
 	/* wheel 1 */
 	glPushMatrix();
 	glTranslatef(position_x,0,-0.5-position_y);
@@ -39,6 +40,8 @@ void Car::draw_base() const {
 	glRotatef(180,1,0,0);
 	renderWheel();
 	glPopMatrix();
+
+	glEnable(GL_COLOR_MATERIAL);
 }
 
 
@@ -61,13 +64,11 @@ void Car::draw_brick() const {
 	glPushMatrix();
 	glTranslatef(position_x,-0.2,-1-position_y);
 
-	glEnable(GL_COLOR_MATERIAL);
 	glColor3f(0, 1, 0);
 
 	ut_draw_cuboid(width, depth-1, 0.2);
 	draw_cylinder();
 
-	glDisable(GL_COLOR_MATERIAL);
 	glPopMatrix();
 }
 

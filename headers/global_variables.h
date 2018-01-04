@@ -5,6 +5,7 @@
 #include "timer.h"
 #include "keyboard.h"
 #include "camera.h"
+#include <GL/glut.h>
 
 #define PI 3.141592
 
@@ -15,7 +16,7 @@ extern int near_clipping_distance;
 extern int fovy;
 
 /* out space */
-extern Space space;
+extern Space space; 
 
 /* timers */
 extern Timer t_camera, t_car, t_brick;

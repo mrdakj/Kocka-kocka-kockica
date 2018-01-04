@@ -40,51 +40,61 @@ ut_Point ut_world_to_screen_coordinates(const ut_Point& world_point) {
 }
 
 void ut_draw_cuboid(float width, float depth, float height) {
+
+	glEnable(GL_NORMALIZE);
+
+	glPushMatrix();
+	glTranslatef(width/2, height/2, -depth/2);
+	glScalef(width, height, depth);
+	glutSolidCube(1);
+	glPopMatrix();
+
+	glDisable(GL_NORMALIZE);
+}
+
+void ut_draw_rectangle_with_texture_XZ(float width, float depth) {
 	glBegin(GL_QUADS);
+	glNormal3f(0, 1, 0);
+        glTexCoord2f(0, 0);
+	glVertex3f(0, 0, 0);
+        glTexCoord2f(width, 0);
+	glVertex3f(width, 0, 0);
+        glTexCoord2f(width, depth);
+	glVertex3f(width, 0, -depth);
+        glTexCoord2f(0, depth);
+	glVertex3f(0, 0, -depth);
+	glEnd();
+}
 
-    //Front
-	glNormal3f(0,0,1);
-    glVertex3f(0, 0, 0);
-    glVertex3f(width, 0, 0);
-    glVertex3f(width, height, 0);
-    glVertex3f(0, height, 0);
+/* draw a rectangle with texture in plane z = 0, with left down corner at (0, 0) */
+void ut_draw_rectangle_with_texture_XY(float width, float height) {
+	glBegin(GL_QUADS);
+	glNormal3f(0, 0, 1);
+        glTexCoord2f(0, 0);
+	glVertex3f(0, 0, 0);
+        glTexCoord2f(width, 0);
+	glVertex3f(width, 0, 0);
+        glTexCoord2f(width, height);
+	glVertex3f(width, height, 0);
+        glTexCoord2f(0, height);
+	glVertex3f(0, height, 0);
+	glEnd();
+}
 
-    //Right
-	glNormal3f(1,0,0);
-    glVertex3f(width, 0, 0);
-    glVertex3f(width, 0, -depth);
-    glVertex3f(width, height, -depth);
-    glVertex3f(width, height, 0);
+/* draw a rectangle with texture in plane x = 0, with right down corner at (0, 0) */
+void ut_draw_rectangle_with_texture_YZ(float height, float depth) {
+	glBegin(GL_QUADS);
+	glNormal3f(-1, 0, 0);
+        glTexCoord2f(0, 0);
+	glVertex3f(0, 0, -depth);
+        glTexCoord2f(depth, 0);
+	glVertex3f(0, 0, 0);
+        glTexCoord2f(depth, height);
+	glVertex3f(0, height, 0);
+        glTexCoord2f(0, height);
+	glVertex3f(0, height, -depth);
+	glEnd();
 
-    //Back
-	glNormal3f(0,0,-1);
-    glVertex3f(width, 0, -depth);
-    glVertex3f(width, height, -depth);
-    glVertex3f(0, height, -depth);
-    glVertex3f(0, 0, -depth);
-
-    //Left
-	glNormal3f(-1,0,0);
-    glVertex3f(0, 0, -depth);
-    glVertex3f(0, height, -depth);
-    glVertex3f(0, height, 0);
-    glVertex3f(0, 0, 0);
-
-	//Top
-	glNormal3f(0,1,0);
-    glVertex3f(0, height, 0);
-    glVertex3f(width, height, 0);
-    glVertex3f(width, height, -depth);
-    glVertex3f(0, height, -depth);
-
-	//Bottom
-	glNormal3f(0,-1,0);
-    glVertex3f(0, 0, 0);
-    glVertex3f(width, 0, 0);
-    glVertex3f(width, 0, -depth);
-    glVertex3f(0, 0, -depth);
-
-    glEnd();
 }
 
 int ut_index_of_minimum(const float& a, const float& b, const float& c) {

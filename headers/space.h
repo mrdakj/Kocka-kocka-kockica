@@ -23,6 +23,10 @@ class Space {
 		/* help function for move function */
 		bool check_sides(bool x, bool y, bool z, int lowb1, int upb1, int lowb2, int upb2, int a, float cposz) const;
 
+		void draw_wall() const;
+
+		void draw_floor() const;
+
 		/* visit all bricks connected with brick c from above */
 		void dfs(Brick& c);
 

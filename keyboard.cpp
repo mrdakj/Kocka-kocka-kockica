@@ -1,7 +1,7 @@
 #include <GL/glut.h>
 #include "headers/global_variables.h"
 #include "headers/keyboard.h"
-#include <stdio.h>
+#include "headers/textures.h"
 
 #define unused_function_arg(x) ((void)x)
 
@@ -70,8 +70,10 @@ void keyboard_ascii_down(unsigned char key, int x, int y) {
 	}
 
 	/* exit program */
-	if (key == bt_exit.key)
+	if (key == bt_exit.key) {
+        glDeleteTextures(2, names);
 		exit(0);
+	}
 
 	/* camera */
 	action(key, camera_buttons, &t_camera);

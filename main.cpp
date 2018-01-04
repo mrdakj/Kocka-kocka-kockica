@@ -1,10 +1,10 @@
 #include <GL/glut.h>
 #include "headers/global_variables.h"
 
-#include <stdio.h>
 #include "headers/mouse.h"
 #include "headers/keyboard.h"
 #include "headers/utility.h"
+#include "headers/textures.h"
 
 int window_width;
 int window_height;
@@ -12,7 +12,6 @@ int near_clipping_distance = 1;
 int fovy = 40;
 Space space;
 Camera camera;
-
 
 static double projection_matrix_inverse[16]={0.0};
 
@@ -23,8 +22,9 @@ void set_light();
 void draw_cursor(const ut_Point& A, const ut_Point& B, const ut_Point& C);
 void get_projection_matrix_inverse();
 
-/* crate bricks and add them camera.view the space */
+/* crate bricks and add them to the space */
 void create_bricks();
+
 
 int main(int argc, char** argv) {
 
@@ -37,6 +37,13 @@ int main(int argc, char** argv) {
 
 	glEnable(GL_DEPTH_TEST);
 	glClearColor(0.16,0.16,0.16,1);
+
+	glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, 1);
+	glEnable(GL_COLOR_MATERIAL);
+
+	load_textures();
 
 	/* hide cursor */
 	glutSetCursor(GLUT_CURSOR_NONE);
@@ -139,7 +146,7 @@ void on_reshape(int new_width, int new_height) {
 
 
 void create_bricks() {
-	Brick brick_1(Vector3f(4,5,0), Size(2,1,2), Color(1,0,0));
+	Brick brick_1(Vector3f(4,5,0), Size(2,1,2), Color(1,0,0, 0.7));
 	Brick brick_2(Vector3f(0,0,0), Size(1,2,4), Color(0.5,0.5,0.5));
 	Brick brick_3(Vector3f(0,5,0), Size(2,1,1), Color(0,0,1));
 	Brick brick_4(Vector3f(5,0,0), Size(4,1,2), Color(0.5,0,0));
@@ -159,7 +166,6 @@ void create_bricks() {
 
 
 
-	space.add(brick_1);
 	space.add(brick_2);
 	space.add(brick_3);
 	space.add(brick_4);
@@ -176,6 +182,9 @@ void create_bricks() {
 	space.add(brick_14);
 	space.add(brick_15);
 	space.add(brick_16);
+
+	/* transparent bricks */
+	space.add(brick_1);
 
 }
 

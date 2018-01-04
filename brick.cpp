@@ -23,14 +23,13 @@ void Brick::draw_cuboid() const {
 	int h = size.height;
 	int d = size.depth;
 
-	/* set color */
-	glEnable(GL_COLOR_MATERIAL);
-	glColor3f(color.r, color.g, color.b);
-
+	glPushMatrix();
+	/* draw a cuboid smaller because of flickering when camera is inside it */
+	float eps = 0.001;
+	glTranslatef(eps/2, eps/2, -eps/2);
 	/* call from utility */
-	ut_draw_cuboid(w, d, h);
-
-	glDisable(GL_COLOR_MATERIAL);
+	ut_draw_cuboid(w-eps, d-eps, h-eps);
+	glPopMatrix();
 }
 
 void Brick::draw_cylinder() const {
@@ -44,12 +43,38 @@ void Brick::draw_cylinder() const {
 	}
 }
 
-void Brick::draw_brick() const {
+
+void Brick::draw_transparent_brick() const {
+	
+	glEnable(GL_CULL_FACE);
+
+	glCullFace(GL_FRONT);
+	draw_normal_brick();
+
+	glCullFace(GL_BACK);
+	draw_normal_brick();
+
+	glDisable(GL_CULL_FACE);
+}
+
+void Brick::draw_normal_brick() const {
+
 	glPushMatrix();
 	glTranslatef(pos.x, pos.z, -pos.y);
 	draw_cuboid();
 	draw_cylinder();
 	glPopMatrix();
+
+}
+
+void Brick::draw_brick() const {
+
+	glColor4f(color.r, color.g, color.b, color.a);
+
+	if (color.a != 1)
+		draw_transparent_brick();
+	else
+		draw_normal_brick();
 }
 
 void Brick::round() {
