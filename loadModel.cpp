@@ -57,8 +57,10 @@ void read_file2(char* file) {
 		}
     }
 
-    if (line)
-        free(line);
+    if (line) {
+		free(line);
+	}
+	
 
 	fclose(f);
 }
@@ -93,8 +95,9 @@ void read_file(char* file) {
 		}
     }
 
-    if (line)
-        free(line);
+    if (line) {
+		free(line);
+	}
 
 	fclose(f);
 }

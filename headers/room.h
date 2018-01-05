@@ -11,8 +11,9 @@
 #include <vector>
 
 
-class Space {
+class Room {
 	private:
+
 		/* returns false if some index is out of range, otherwise sets field (i,j,k) to value and returns true */
 		bool set_matrix_field(int i, int j, int k, unsigned char value);
 
@@ -28,7 +29,7 @@ class Space {
 		void draw_floor() const;
 
 		/* visit all bricks connected with brick c from above */
-		void dfs(Brick& c);
+		void dfs(Brick& c, std::vector<bool>& dfs_visited);
 
 		/* resize matrix and set fields to 0 */
 		void init_matrix();
@@ -56,8 +57,8 @@ class Space {
 		std::vector<std::vector<std::vector<unsigned char>>> matrix;
 
 		/* constructors */
-		Space();
-		Space(int size);
+		Room();
+		Room(int size);
 
 		/* returns -1 if some index is out of range, otherwise gets field (i,j,k) */
 		int get_matrix_field(int i, int j, int k) const;
@@ -65,11 +66,11 @@ class Space {
 		/* draw a grid */
 		void draw_grid(Color c) const;
 
-		/* add a brick to the space */
+		/* add a brick to the room */
 		void add(Brick& c);
 
 		/* render all bricks and a grid */
-		void render_space() const;
+		void render_room() const;
 
 		/* draw car base and all bricks in it */
 		void draw_car();

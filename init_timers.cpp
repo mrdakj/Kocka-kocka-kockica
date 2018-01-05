@@ -1,7 +1,8 @@
-/* animate car and brick on keyboard */
+/* init car, brick and camera timer */
 
 #include <GL/glut.h>
 #include "headers/collision.h"
+#include "headers/keyboard.h"
 
 void car_on_timer(int value);
 void brick_keyboard_on_timer(int value);
@@ -14,36 +15,36 @@ Timer t_camera(camera_on_timer);
 void car_on_timer(int value) {
 	if (!t_car.check(value)) return;
 
-	space.car.go();
+	room.car.go();
 
 	glutPostRedisplay();
 
 	if (!t_car.cont())
-		space.car.stop();
+		room.car.stop();
 }
 
 void brick_keyboard_on_timer(int value) {
 	if (!t_brick.check(value)) return;
 
-	if (space.selected_brick != NONE) {
-		Brick& current_brick = space.bricks[space.selected_brick];
+	if (room.selected_brick != NONE) {
+		Brick& current_brick = room.bricks[room.selected_brick];
 
 
 		if (brick_buttons[translation_up].pressed)
-			move_brick(Up, current_brick, space.brick_move_speed);
+			move_brick(Up, current_brick, room.brick_move_speed);
 
 		if (brick_buttons[translation_down].pressed)
-			move_brick(Down, current_brick, space.brick_move_speed);
+			move_brick(Down, current_brick, room.brick_move_speed);
 
-		float delta_x = brick_buttons[translation_left].pressed ? -space.brick_move_speed :
-						brick_buttons[translation_right].pressed ? space.brick_move_speed : 0;
+		float delta_x = brick_buttons[translation_left].pressed ? -room.brick_move_speed :
+						brick_buttons[translation_right].pressed ? room.brick_move_speed : 0;
 
 		if (brick_buttons[translation_left].pressed == brick_buttons[translation_right].pressed)
 			delta_x = 0;
 
 
-		float delta_y = brick_buttons[translation_forward].pressed ? space.brick_move_speed :
-						brick_buttons[translation_backward].pressed ? -space.brick_move_speed : 0;
+		float delta_y = brick_buttons[translation_forward].pressed ? room.brick_move_speed :
+						brick_buttons[translation_backward].pressed ? -room.brick_move_speed : 0;
 
 		if (brick_buttons[translation_forward].pressed == brick_buttons[translation_backward].pressed)
 			delta_y = 0;
@@ -63,7 +64,7 @@ void brick_keyboard_on_timer(int value) {
 void camera_on_timer(int value) {
 	if (!t_camera.check(value)) return;
 
-	if (space.selected_brick == NONE) {
+	if (room.selected_brick == NONE) {
 
 		/* get theta_delta and phi_delta from keyboard buttons */
 		float theta_delta = camera_buttons[rotation_left].pressed ? -0.02 :

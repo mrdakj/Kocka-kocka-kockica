@@ -1,5 +1,6 @@
 #include <GL/glut.h>
 #include "headers/camera.h"
+#include <cmath>
 
 #define PI 3.141592
 
@@ -67,6 +68,8 @@ void Camera::rotate(float theta_delta, float phi_delta) {
 	float cos_theta = std::cos(theta);
 
 	view = Vector3f(sin_phi*cos_theta, -cos_phi, sin_phi*sin_theta);
+	/* ? */
+	/* view.set(sin_phi*cos_theta, -cos_phi, sin_phi*sin_theta); */
 }
 
 

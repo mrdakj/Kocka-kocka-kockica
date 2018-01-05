@@ -1,18 +1,13 @@
 #ifndef _CAR_H_
 #define _CAR_H_
 
-
 class Car {
-
-friend class space;
 
 public:
 	int position_x;
 	int position_y;
 	int width;
 	int depth;
-	int wheel_rotation_angle;
-	float translation_x;
 	bool is_going;
 
 	Car();
@@ -21,8 +16,11 @@ public:
 	void draw_base() const;
 	void stop();
 	void go();
+	float get_position();
 
 private:
+	int wheel_rotation_angle;
+	float translation_x;
 	void draw_cylinder() const;
 	void draw_brick() const;
 };

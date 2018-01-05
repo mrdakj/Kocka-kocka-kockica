@@ -1,4 +1,4 @@
-#include "headers/space.h"
+#include "headers/room.h"
 #include <GL/glut.h>
 #include <cmath>
 #include "headers/utility.h"
@@ -7,9 +7,9 @@
 
 /* constuctors */
 
-Space::Space() : Space(20) {}
+Room::Room() : Room(20) {}
 
-Space::Space(int size) {
+Room::Room(int size) {
 	this->size = size;
 	selected_brick = NONE;
 	bricks.reserve(255);
@@ -19,12 +19,13 @@ Space::Space(int size) {
 	/* set matrix */
 	init_matrix();
 	matrix_set_car();
+
 }
 
 /* end constuctors */
 
 
-void Space::init_matrix() {
+void Room::init_matrix() {
 	matrix.resize(size);
 
 	for (int i = 0; i < size; i++) {
@@ -40,7 +41,7 @@ void Space::init_matrix() {
 	}
 }
 
-void Space::matrix_set_car() {
+void Room::matrix_set_car() {
 	set_matrix_field(car.position_x, car.position_y, 0, CAR);
 	set_matrix_field(car.position_x-1, car.position_y, 0, CAR);
 	set_matrix_field(car.position_x+car.width, car.position_y, 0, CAR);
@@ -52,30 +53,30 @@ void Space::matrix_set_car() {
 }
 
 
-void Space::add(Brick& c) {
+void Room::add(Brick& c) {
 	num++;
 	bricks.push_back(c);
 	update_matrix(bricks.size(), c);
 }
 
 
-bool Space::set_matrix_field(int i, int j, int k, unsigned char value) {
+bool Room::set_matrix_field(int i, int j, int k, unsigned char value) {
 	if (i<0 || i>=size || j<0 || j>=size || k<0 || k>=size) return false;
 
 	matrix[i][j][k] = value;
 	return true;
 }
 
-int Space::get_matrix_field(int i, int j, int k) const {
+int Room::get_matrix_field(int i, int j, int k) const {
 	if (i<0 || i>=size || j<0 || j>=size || k<0 || k>=size) return -1;
 
 	return matrix[i][j][k];
 }
 
-void Space::draw_wall() const {
+void Room::draw_wall() const {
 
 	glColor3f(0.7, 0, 0);
-    glBindTexture(GL_TEXTURE_2D, names[0]);
+    glBindTexture(GL_TEXTURE_2D, texture_names[0]);
 
 	glPushMatrix();
 	glTranslatef(size, -0.5, 0);
@@ -90,7 +91,7 @@ void Space::draw_wall() const {
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void Space::render_space() const {
+void Room::render_room() const {
 
 	draw_wall();
 	
@@ -105,7 +106,7 @@ void Space::render_space() const {
 	}
 }
 
-void Space::dfs(Brick& c) {
+void Room::dfs(Brick& c, std::vector<bool>& dfs_visited) {
 	int h = c.pos.z + c.size.height;
 	if (h>=size) return;
 
@@ -114,57 +115,58 @@ void Space::dfs(Brick& c) {
 			int id = get_matrix_field(i,j,h);
 
 			if (id != -1 && id != 0 && id != CAR) {
-				if (bricks[id-1].in_car == false) {
-					dfs(bricks[id-1]);
+				if (dfs_visited[id-1] == false) {
+					dfs(bricks[id-1], dfs_visited);
 				}
-				bricks[id-1].in_car = true;
+				dfs_visited[id-1] = true;
 			}
 		}
 	}
 }
 
-void Space::draw_car() {
+void Room::draw_car() {
 
-	car.draw_base();
+	/* FIX dont do this every time */
 
-	/* FIX do this only once */
+	std::vector<bool> dfs_visited(num);
+	std::fill(dfs_visited.begin(), dfs_visited.end(), false);
 
-	for (Brick& c : bricks) {
-		c.in_car=false;
-	}
 
 	for (int i = car.position_x; i < car.position_x+car.width; i++) {
 		for (int j = car.position_y+1; j < car.position_y+car.depth; j++) {
 			int id = get_matrix_field(i,j,0);
 			if (id != -1 && id != 0 && id != 255) {
-				if (bricks[id-1].in_car == false) {
-					dfs(bricks[id-1]);
+				if (dfs_visited[id-1] == false) {
+					dfs(bricks[id-1], dfs_visited);
 				}
-				bricks[id-1].in_car = true;
+				dfs_visited[id-1] = true;
 			}
 		}
 	}
 
-	for (const Brick& c : bricks) {
-		if (c.in_car)
-			c.draw_brick();
-	}
-}
+	
+	car.draw_base();
 
-void Space::render() {
 	glPushMatrix();
-	glTranslatef(-car.translation_x,0,0);
+	glTranslatef(car.get_position(), 0, 0);
+	for (int i = 0; i < num; i++) {
+		if (dfs_visited[i])
+			bricks[i].draw_brick();
+	}
 
-	if (car.is_going) 
-		draw_car();
-	else
-		render_space();
 	glPopMatrix();
 }
 
-void Space::draw_floor() const {
+void Room::render() {
+	if (car.is_going)
+		draw_car();
+	else
+		render_room();
+}
 
-    glBindTexture(GL_TEXTURE_2D, names[1]);
+void Room::draw_floor() const {
+
+    glBindTexture(GL_TEXTURE_2D, texture_names[1]);
 
 	ut_draw_rectangle_with_texture_XZ(car.position_x-1, size);
 
@@ -197,7 +199,7 @@ void Space::draw_floor() const {
 
 }
 
-void Space::draw_grid(Color c) const {
+void Room::draw_grid(Color c) const {
 	glDisable(GL_LIGHTING);
 
 	glColor3f(c.r, c.g, c.b);
@@ -219,7 +221,7 @@ void Space::draw_grid(Color c) const {
 
 }
 
-void Space::update_matrix(unsigned char number, Brick& c) {
+void Room::update_matrix(unsigned char number, Brick& c) {
 	for (int x = c.pos.x; x < c.pos.x+c.size.width; x++) {
 		for (int y = c.pos.y; y < c.pos.y+c.size.depth; y++) {
 			for (int z = c.pos.z; z < c.pos.z+c.size.height; z++) {
@@ -229,15 +231,15 @@ void Space::update_matrix(unsigned char number, Brick& c) {
 	}
 }
 
-void Space::select() {
+void Room::select() {
 	update_matrix(0 , bricks[selected_brick]);
 }
 
-void Space::deselect() {
+void Room::deselect() {
 	update_matrix(selected_brick+1 , bricks[selected_brick]);
 }
 
-bool Space::check_sides(bool x, bool y, bool z, int lowb1, int upb1, int lowb2, int upb2, int a, float cposz) const {
+bool Room::check_sides(bool x, bool y, bool z, int lowb1, int upb1, int lowb2, int upb2, int a, float cposz) const {
 	for (int i = lowb1; i < upb1; i++) {
 		for (int j = lowb2; j < upb2; j++) {
 				if (!x && get_matrix_field(a,i,j) != 0) return false;
@@ -254,7 +256,7 @@ bool Space::check_sides(bool x, bool y, bool z, int lowb1, int upb1, int lowb2, 
 	return true;
 }
 
-bool Space::move(int index, Direction d) const {
+bool Room::move(int index, Direction d) const {
 
 	const Brick& c = bricks[index];
 
@@ -298,7 +300,7 @@ bool Space::move(int index, Direction d) const {
 }
 
 
-void Space::put_down() {
+void Room::put_down() {
 	if (selected_brick == NONE)
 		return;
 
@@ -306,9 +308,10 @@ void Space::put_down() {
 	bricks[selected_brick].round();
 	deselect();
 	selected_brick = NONE;
+
 }
 
-void Space::pick(int id) {
+void Room::pick(int id) {
 	if (id < 1 || id > num) 
 		return;
 
@@ -332,6 +335,6 @@ void Space::pick(int id) {
 	c.pos.z += 0.2;
 }
 
-bool Space::nothing_selected() {
+bool Room::nothing_selected() {
 	return selected_brick == NONE;
 }

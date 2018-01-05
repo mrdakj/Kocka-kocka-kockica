@@ -31,7 +31,7 @@ bool move_brick(Direction d, Brick& c,float brick_move_speed) {
 		if (d != Down)
 			coordinate = line;
 
-		if (space.move(space.selected_brick, d)) {
+		if (room.move(room.selected_brick, d)) {
 			coordinate += z*brick_move_speed;
 			returnVal =true;
 		}

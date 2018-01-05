@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <limits>
 #include <array>
+#include <cmath>
 
 #define INF (std::numeric_limits<int>::max())
 
@@ -78,7 +79,7 @@ struct Plane {
 	Plane(int a, int b, int c, int d) : a(a), b(b), c(c), d(d) {};
 };
 
-/* intersect ray with plane in the space and set distance from camera postion to intersection point */
+/* intersect ray with plane in the room and set distance from camera postion to intersection point */
 static Vector3f	intersect_ray_and_plane(float x, float y, const Plane& plane, float& distance) {
 
 	Vector3f direction = get_ray_direction(x, y);
@@ -87,7 +88,7 @@ static Vector3f	intersect_ray_and_plane(float x, float y, const Plane& plane, fl
 
 	Vector3f A = camera.position + k*direction;
 
-	if (std::isnan(k) || k < near_clipping_distance || A.x < 0 || A.x > space.size || A.y < 0 || A.y > space.size || A.z > 0 || A.z < -space.size)
+	if (std::isnan(k) || k < near_clipping_distance || A.x < 0 || A.x > room.size || A.y < 0 || A.y > room.size || A.z > 0 || A.z < -room.size)
 		A.set_nan();
 
 	distance = k;
@@ -150,7 +151,7 @@ static int get_id(float mouse_x, float mouse_y) {
 	for (Plane_family plane_family : {X, Y, Z}) {
 		planesXYZ[plane_family].reset();
 
-		for (int d = 0; d <= space.size; d++) {
+		for (int d = 0; d <= room.size; d++) {
 			/* this is a vector OA, or just a point A */
 			float distance;
 			Vector3f A = intersect_ray_and_plane(mouse_x, mouse_y, get_plane(plane_family, d), distance);
@@ -163,7 +164,7 @@ static int get_id(float mouse_x, float mouse_y) {
 			int y = (plane_family == Y) ? d : A.y;
 			int z = (plane_family == Z) ? d : -A.z;
 
-			int id = space.get_matrix_field(
+			int id = room.get_matrix_field(
 					x - (plane_family == X),
 					z - (plane_family == Z), 
 					y - (plane_family == Y)
@@ -171,7 +172,7 @@ static int get_id(float mouse_x, float mouse_y) {
 
 			planesXYZ[plane_family].update(distance, id, A);
 
-			id = space.get_matrix_field(x,z,y);
+			id = room.get_matrix_field(x,z,y);
 
 			planesXYZ[plane_family].update(distance, id, A);
 
@@ -200,9 +201,9 @@ void on_mouse_click(int button, int state, int x, int y) {
 
 		int id = get_id(x, y);
 
-		space.pick(id);
+		room.pick(id);
 
-		if (!space.nothing_selected()) {
+		if (!room.nothing_selected()) {
 			camera.look_at_point(selection);
 			glutPostRedisplay();
 		}
@@ -215,7 +216,7 @@ void on_mouse_click(int button, int state, int x, int y) {
 
 		mouse.left_button_down = false;
 
-		space.put_down();
+		room.put_down();
 		camera.recover_angles();
 		glutPostRedisplay();
 	}
@@ -228,7 +229,11 @@ void on_mouse_click(int button, int state, int x, int y) {
 
 }
 
-static bool mouse_at_center(int x, int y) {
+void set_cursor_in_center() {
+	glutWarpPointer(window_width/2, window_height/2);
+}
+
+static bool mouse_in_center(int x, int y) {
 	return x == window_width/2 && y == window_height/2;
 }
 
@@ -243,22 +248,22 @@ void mouse_look(int x, int y) {
 	if (phi_step)
 		camera.rotate(theta_step, phi_step);
 
-	if (!mouse_at_center(x, y))
-		glutWarpPointer(window_width/2, window_height/2);
+	if (!mouse_in_center(x, y))
+		set_cursor_in_center();
 }
 
 
 void on_mouse_active_move(int x, int y) {
 
-	if (space.selected_brick == NONE) {
+	if (room.selected_brick == NONE) {
 		mouse_look(x,y);
 		glutPostRedisplay();
 		return;
 	}
 	
-	if (mouse_at_center(x, y)) return;
+	if (mouse_in_center(x, y)) return;
 
-	Brick& current_brick = space.bricks[space.selected_brick];
+	Brick& current_brick = room.bricks[room.selected_brick];
 
 	float delta_x = x-window_width/2;
 	delta_x *= mouse.sensitivity;
@@ -280,8 +285,8 @@ void on_mouse_active_move(int x, int y) {
 			move_brick(Down, current_brick, -delta_y);
 	}
 
-	if (!mouse_at_center(x, y))
-		glutWarpPointer(window_width/2, window_height/2);
+	if (!mouse_in_center(x, y))
+		set_cursor_in_center();
 
 	glutPostRedisplay();
 }

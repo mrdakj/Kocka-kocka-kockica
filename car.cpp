@@ -3,10 +3,21 @@
 #include "headers/utility.h"
 
 Car::Car() : Car(5, 10, 12, 7) {}
-Car::Car(int position_x, int position_y, int width, int depth) : position_x(position_x), position_y(position_y), width(width), depth(depth), wheel_rotation_angle(0), translation_x(0), is_going(false) {}
+Car::Car(int position_x, int position_y, int width, int depth) :
+	position_x(position_x), position_y(position_y),
+	width(width), depth(depth), is_going(false),
+	wheel_rotation_angle(0), translation_x(0) {}
 
+
+float Car::get_position() {
+	return -translation_x;
+}
 
 void Car::draw_base() const {
+
+	glPushMatrix();
+
+	glTranslatef(-translation_x,0,0);
 
 	draw_brick();
 
@@ -41,7 +52,10 @@ void Car::draw_base() const {
 	renderWheel();
 	glPopMatrix();
 
+	glPopMatrix();
+
 	glEnable(GL_COLOR_MATERIAL);
+
 }
 
 
