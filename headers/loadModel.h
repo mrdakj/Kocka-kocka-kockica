@@ -3,5 +3,6 @@
 
 void renderModel();
 void renderWheel();
+void free_display_lists();
 
 #endif

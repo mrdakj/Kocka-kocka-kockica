@@ -2,6 +2,7 @@
 #define _BRICK_H_
 
 #include "vector3f.h"
+#include <stdio.h>
 
 enum Direction {
 	Up, Down,
@@ -24,36 +25,42 @@ struct Size {
 
 class Brick {
 
-	public:
-		/* attributes */
-		Vector3f pos;
-		Size size;
-		Color color;
+friend class Room;
 
-		/* constructors */
-		Brick();
-		Brick(Vector3f pos, Size size);
-		Brick(Vector3f pos, Size size, Color color);
+public:
+	/* attributes */
+	Vector3f pos;
+	Size size;
+	Color color;
 
-		/* draw a brick of a given size and color at a given position */
-		void draw_brick() const;
+	/* constructors */
+	Brick();
+	Brick(Vector3f pos, Size size);
+	Brick(Vector3f pos, Size size, Color color);
 
-		/* place a brick at the nearest matrix field */
-		void round();
+	/* draw a brick of a given size and color at a given position */
+	void draw_brick() const;
 
-	private:
+	Vector3f get_world_coordinates() const;
 
-		/* draw a cuboid of a given size with left down corner at (0, 0, 0) */
-		void draw_cuboid() const;
+private:
+	/* FIX car id instead of this bool */
+	bool in_car;
 
-		/* draw depth times width cylinders */
-		void draw_cylinder() const;
+	/* draw a cuboid of a given size with left down corner at (0, 0, 0) */
+	void draw_cuboid() const;
 
-		/* draw a transparent brick of a given size at a given position */
-		void draw_transparent_brick() const;
+	/* draw depth times width cylinders */
+	void draw_cylinder() const;
 
-		/* draw a brick of a given size at a given position */
-		void draw_normal_brick() const;
+	/* draw a transparent brick of a given size at a given position */
+	void draw_transparent_brick() const;
+
+	/* draw a brick of a given size at a given position */
+	void draw_normal_brick() const;
+
+	/* place a brick at the nearest matrix field */
+	void round();
 
 };
 

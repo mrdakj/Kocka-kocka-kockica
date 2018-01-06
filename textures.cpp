@@ -44,3 +44,7 @@ static void create_texture(Image* image, GLuint* texture_names, const char* file
                  GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
 }
 
+
+void free_textures() {
+	glDeleteTextures(2, texture_names);
+}

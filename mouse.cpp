@@ -2,7 +2,6 @@
 #include "headers/utility.h"
 #include "headers/global_variables.h"
 #include "headers/camera.h"
-#include "headers/collision.h"
 #include <stdio.h>
 #include <limits>
 #include <array>
@@ -190,6 +189,9 @@ static int get_id(float mouse_x, float mouse_y) {
 
 void on_mouse_click(int button, int state, int x, int y) {
 
+	if (room.car.is_going)
+		return;
+
 	if (button == GLUT_LEFT_BUTTON &&  state == GLUT_DOWN) { 
 
 		/* left click is pressed, try to select a brick */
@@ -255,7 +257,7 @@ void mouse_look(int x, int y) {
 
 void on_mouse_active_move(int x, int y) {
 
-	if (room.selected_brick == NONE) {
+	if (room.nothing_selected()) {
 		mouse_look(x,y);
 		glutPostRedisplay();
 		return;
@@ -263,7 +265,6 @@ void on_mouse_active_move(int x, int y) {
 	
 	if (mouse_in_center(x, y)) return;
 
-	Brick& current_brick = room.bricks[room.selected_brick];
 
 	float delta_x = x-window_width/2;
 	delta_x *= mouse.sensitivity;
@@ -273,20 +274,28 @@ void on_mouse_active_move(int x, int y) {
 
 
 	if (mouse.left_button_down && !mouse.right_button_down) {
-		move_delta(delta_x, delta_y, current_brick);
+
+		float distance =Vector3f(selection.x-camera.position.x, 0, selection.z-camera.position.z).norm_squared();
+
+		if (distance<1*1 && delta_y<0)
+			delta_y = 0;
+
+		selection += room.move_selected_brick(camera.view, delta_x, delta_y);
 	}
 
 	if (mouse.left_button_down && mouse.right_button_down) {
 		if (delta_y > 0.9) delta_y = 0.9;
 		if (delta_y < -0.9) delta_y = -0.9;
 		if (delta_y > 0)
-			move_brick(Up, current_brick, delta_y);
+			selection += room.move_selected_brick(Up, delta_y);
 		else if (delta_y < 0)
-			move_brick(Down, current_brick, -delta_y);
+			selection += room.move_selected_brick(Down, -delta_y);
 	}
 
 	if (!mouse_in_center(x, y))
 		set_cursor_in_center();
+
+	camera.look_at_point(selection);
 
 	glutPostRedisplay();
 }

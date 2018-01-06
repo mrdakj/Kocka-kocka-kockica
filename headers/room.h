@@ -1,54 +1,77 @@
 #ifndef _SPACE_H_
 #define _SPACE_H_
 
-/* car ID */
-#define CAR 255
-/* nothing is selected */
-#define NONE -1
+#include <GL/glut.h>
+#include <vector>
 
 #include "brick.h"
 #include "car.h"
-#include <vector>
 
+/* max number of bricks in the room */
+/* 254 + 2 = 256 */
+#define MAX 254
+
+/* car ID */
+#define CAR 255
+/* ID of nothing */
+#define EMPTY 0
+
+#define NONE -1
+#define NOT_SET -1
+#define ERROR -1
+
+#define BRICK_SPEED 0.08
 
 class Room {
 	private:
 
+		bool refresh_car;
+
+		GLuint car_display_list;
+		
 		/* returns false if some index is out of range, otherwise sets field (i,j,k) to value and returns true */
 		bool set_matrix_field(int i, int j, int k, unsigned char value);
 
 
 		/* fill matrix with id=number (ranges from 1 to 255) at position determied by c */
-		void update_matrix(unsigned char number, Brick& c);
+		void update_matrix(unsigned char id, const Brick& c);
 
 		/* help function for move function */
 		bool check_sides(bool x, bool y, bool z, int lowb1, int upb1, int lowb2, int upb2, int a, float cposz) const;
+
+		/* returns true if a brick indexed with index can be moved in direction d */
+		bool can_move(Direction d) const;
 
 		void draw_wall() const;
 
 		void draw_floor() const;
 
 		/* visit all bricks connected with brick c from above */
-		void dfs(Brick& c, std::vector<bool>& dfs_visited);
+		void dfs(Brick& c);
+		void dfs();
 
-		/* resize matrix and set fields to 0 */
+		/* resize matrix and set fields to EMPTY */
 		void init_matrix();
 
+		/* set car wheels in matrix */
 		void matrix_set_car();
+
+		/* returns true if the brick can be added to the room */
+		bool can_add(const Brick& c) const;
+
+		/* returns true if id belongs to some brick */
+		bool is_brick(int id);
 
 	public:
 		Car car;
 
-		/* number of bricks */
-		int num;
+		int number_of_bricks;
 
 		/* size of matrix */
 		int size;
 
-		/* index of selected brick brick in vector bricks, -1 if nothing is selected */
-		int selected_brick;
-
-		float brick_move_speed;
+		/* id of selected brick brick, NONE if nothing is selected */
+		int selected_brick_id;
 
 		/* index of brick with id is id-1 */
 		std::vector<Brick> bricks;
@@ -59,17 +82,19 @@ class Room {
 		/* constructors */
 		Room();
 		Room(int size);
+		~Room();
 
-		/* returns -1 if some index is out of range, otherwise gets field (i,j,k) */
+
+		/* returns ERROR if some index is out of range, otherwise gets field (i,j,k) */
 		int get_matrix_field(int i, int j, int k) const;
 
 		/* draw a grid */
-		void draw_grid(Color c) const;
+		void draw_grid() const;
 
 		/* add a brick to the room */
-		void add(Brick& c);
+		void add(const Brick& c);
 
-		/* render all bricks and a grid */
+		/* render all bricks, car base, walls nad floor */
 		void render_room() const;
 
 		/* draw car base and all bricks in it */
@@ -77,8 +102,11 @@ class Room {
 
 		void render();
 
-		/* move a brick indexed with index in direction d */
-		bool move(int index, Direction d) const;
+		/* move selected brick and return difference */
+		Vector3f move_selected_brick(Direction d, float brick_move_speed);
+		
+		/* move selected brick in plane y=0 */
+		Vector3f move_selected_brick(Vector3f direction, float delta_x, float delta_z);
 
 		/* clear a part of the matrix where selected brick brick is */
 		void select();
@@ -94,6 +122,8 @@ class Room {
 
 		/* retruns true if nothing is selected */
 		bool nothing_selected();
+
+
 };
 
 #endif

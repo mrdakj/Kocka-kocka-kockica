@@ -1,8 +1,10 @@
 /* init car, brick and camera timer */
 
 #include <GL/glut.h>
-#include "headers/collision.h"
+#include "headers/global_variables.h"
 #include "headers/keyboard.h"
+#include "headers/room.h"
+#include "headers/camera.h"
 
 void car_on_timer(int value);
 void brick_keyboard_on_timer(int value);
@@ -11,6 +13,8 @@ void camera_on_timer(int value);
 Timer t_car(car_on_timer);
 Timer t_brick(brick_keyboard_on_timer);
 Timer t_camera(camera_on_timer);
+
+extern Vector3f selection;
 
 void car_on_timer(int value) {
 	if (!t_car.check(value)) return;
@@ -26,30 +30,36 @@ void car_on_timer(int value) {
 void brick_keyboard_on_timer(int value) {
 	if (!t_brick.check(value)) return;
 
-	if (room.selected_brick != NONE) {
-		Brick& current_brick = room.bricks[room.selected_brick];
-
+	if (!room.nothing_selected()) {
 
 		if (brick_buttons[translation_up].pressed)
-			move_brick(Up, current_brick, room.brick_move_speed);
+			selection += room.move_selected_brick(Up, BRICK_SPEED);
 
 		if (brick_buttons[translation_down].pressed)
-			move_brick(Down, current_brick, room.brick_move_speed);
+			selection += room.move_selected_brick(Down, BRICK_SPEED);
 
-		float delta_x = brick_buttons[translation_left].pressed ? -room.brick_move_speed :
-						brick_buttons[translation_right].pressed ? room.brick_move_speed : 0;
+		float delta_x = brick_buttons[translation_left].pressed ? -BRICK_SPEED :
+						brick_buttons[translation_right].pressed ? BRICK_SPEED : 0;
 
 		if (brick_buttons[translation_left].pressed == brick_buttons[translation_right].pressed)
 			delta_x = 0;
 
 
-		float delta_y = brick_buttons[translation_forward].pressed ? room.brick_move_speed :
-						brick_buttons[translation_backward].pressed ? -room.brick_move_speed : 0;
+		float delta_y = brick_buttons[translation_forward].pressed ? BRICK_SPEED :
+						brick_buttons[translation_backward].pressed ? -BRICK_SPEED : 0;
 
 		if (brick_buttons[translation_forward].pressed == brick_buttons[translation_backward].pressed)
 			delta_y = 0;
 
-		move_delta(delta_x, delta_y, current_brick);
+
+		float distance =Vector3f(selection.x-camera.position.x, 0, selection.z-camera.position.z).norm_squared();
+
+		if (distance<1*1 && delta_y<0)
+			delta_y = 0;
+
+		selection += room.move_selected_brick(camera.view, delta_x, delta_y);
+
+		camera.look_at_point(selection);
 
 		glutPostRedisplay();
 	}
@@ -64,7 +74,7 @@ void brick_keyboard_on_timer(int value) {
 void camera_on_timer(int value) {
 	if (!t_camera.check(value)) return;
 
-	if (room.selected_brick == NONE) {
+	if (room.nothing_selected()) {
 
 		/* get theta_delta and phi_delta from keyboard buttons */
 		float theta_delta = camera_buttons[rotation_left].pressed ? -0.02 :

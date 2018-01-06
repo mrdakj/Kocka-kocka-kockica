@@ -105,6 +105,11 @@ void read_file(char* file) {
 static GLuint legoList;
 static GLuint wheelList;
 
+void free_display_lists() {
+	glDeleteLists(legoList, 1);
+	glDeleteLists(wheelList, 1);
+}
+
 void render() {
 		glBegin(GL_TRIANGLES);
 			for (triangle i : triangles) {

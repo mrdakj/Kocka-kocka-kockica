@@ -12,5 +12,6 @@
 extern GLuint texture_names[NUMBER_OF_TEXTURES];
 
 void load_textures();
+void free_textures();
 
 #endif

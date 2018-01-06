@@ -3,7 +3,7 @@ CC = g++
 CFLAGS  = -std=c++11 -g -Wall -Wextra
 LDLIBS = -lGL -lGLU -lglut -lm
 
-main: main.o brick.o room.o keyboard.o init_timers.o mouse.o utility.o camera.o loadModel.o car.o collision.o timer.o image.o textures.o vector3f.o
+main: main.o brick.o room.o keyboard.o init_timers.o mouse.o utility.o camera.o loadModel.o car.o timer.o image.o textures.o vector3f.o
 	$(CC) $(CFLAGS)  -o main *.o $(LDLIBS)
 main.o: main.cpp  
 	$(CC) $(CFLAGS) -c main.cpp $(LDLIBS)
@@ -25,8 +25,6 @@ loadModel.o: loadModel.cpp headers/loadModel.h
 	$(CC) $(CFLAGS) -c loadModel.cpp $(LDLIBS)
 car.o: car.cpp headers/car.h
 	$(CC) $(CFLAGS) -c car.cpp $(LDLIBS)
-collision.o: collision.cpp headers/collision.h
-	$(CC) $(CFLAGS) -c collision.cpp $(LDLIBS)
 timer.o: timer.cpp headers/timer.h
 	$(CC) $(CFLAGS) -c timer.cpp $(LDLIBS)
 image.o: image.cpp headers/image.h

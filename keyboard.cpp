@@ -1,6 +1,6 @@
 #include "headers/global_variables.h"
 #include "headers/keyboard.h"
-#include "headers/textures.h"
+#include "headers/loadModel.h"
 
 #define unused_function_arg(x) ((void)x)
 
@@ -74,7 +74,7 @@ void keyboard_ascii_down(unsigned char key, int x, int y) {
 
 	/* exit program */
 	if (key == bt_exit.key) {
-        glDeleteTextures(2, texture_names);
+		free_display_lists();
 		exit(0);
 	}
 
@@ -85,7 +85,7 @@ void keyboard_ascii_down(unsigned char key, int x, int y) {
 	action(key, brick_buttons, &t_brick);
 
 	/* animation */
-	if (key == bt_animation_go.key)
+	if (key == bt_animation_go.key && room.nothing_selected())
 		t_car.activate();
 
 	if (key == bt_animation_stop.key) {

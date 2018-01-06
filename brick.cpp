@@ -16,6 +16,10 @@ Brick::Brick(Vector3f pos, Size size, Color color) : Brick(pos, size) {
 /* end of constuctors */
 
 
+Vector3f Brick::get_world_coordinates() const {
+	return Vector3f(pos.x, pos.z, -pos.y);
+}
+
 void Brick::draw_cuboid() const {
 	float eps = 0.001;
 
