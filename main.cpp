@@ -138,7 +138,7 @@ void on_reshape(int new_width, int new_height) {
 
 
 void create_bricks() {
-	Brick brick_1(Vector3f(1,6,0), Size(2,1,2), Color(1,0,0, 0.7));
+	Brick brick_1(Vector3f(1,16,0), Size(2,1,2), Color(0,1,0, 0.7));
 	Brick brick_2(Vector3f(0,0,0), Size(1,2,4), Color(0.5,0.5,0.5));
 	Brick brick_3(Vector3f(0,5,0), Size(2,1,1), Color(0,0,1));
 	Brick brick_4(Vector3f(5,0,0), Size(4,1,2), Color(0.5,0,0));
@@ -228,7 +228,8 @@ static void opengl_init() {
 	glEnable(GL_DEPTH_TEST);
 
 	/* background color */
-	glClearColor(0.16, 0.16, 0.16, 1);
+	glClearColor(0.188, 0.231, 0.245,1);
+	/* glClearColor(0.16, 0.16, 0.16, 1); */
 
 	/* for transparent objects */
 	glEnable(GL_BLEND);

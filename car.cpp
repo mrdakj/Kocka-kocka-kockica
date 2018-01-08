@@ -2,7 +2,7 @@
 #include "headers/car.h"
 #include "headers/utility.h"
 
-Car::Car() : Car(3, 9, 12, 6) {}
+Car::Car() : Car(4, 10, 12, 6) {}
 Car::Car(int position_x, int position_y, int width, int depth) :
 	position_x(position_x), position_y(position_y),
 	width(width), depth(depth), is_going(false),

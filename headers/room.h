@@ -11,7 +11,6 @@
 /* 254 + 2 = 256 */
 #define MAX 254
 
-/* car ID */
 #define CAR 255
 /* ID of nothing */
 #define EMPTY 0
@@ -20,7 +19,7 @@
 #define NOT_SET -1
 #define ERROR -1
 
-#define BRICK_SPEED 0.08
+#define BRICK_SPEED 0.8
 
 class Room {
 	private:
@@ -52,15 +51,15 @@ class Room {
 
 		/* resize matrix and set fields to EMPTY */
 		void init_matrix();
-
-		/* set car wheels in matrix */
 		void matrix_set_car();
 
 		/* returns true if the brick can be added to the room */
 		bool can_add(const Brick& c) const;
 
 		/* returns true if id belongs to some brick */
-		bool is_brick(int id);
+		bool is_brick(int id) const;
+
+		float collision_wheel(Direction d, float brick_move_speed, float car_corner_x, float car_corner_y);
 
 	public:
 		Car car;
