@@ -299,10 +299,10 @@ void Room::deselect()
 bool Room::check_sides(bool x, bool y, bool z, int lowb1, int upb1, int lowb2, int upb2, int a, float cposz) const {
 	for (int i = lowb1; i < upb1; i++) {
 
-		if (cposz+0.01<(int)cposz+0.2) {
-			if (!x && is_brick(get_matrix_field(a,i,(int)cposz-1))) return false;
-			if (!y && is_brick(get_matrix_field(i,a,(int)cposz-1))) return false;
-		}
+		/* if (cposz+0.01<(int)cposz+0.2) { */
+		/* 	if (!x && is_brick(get_matrix_field(a,i,(int)cposz-1))) return false; */
+		/* 	if (!y && is_brick(get_matrix_field(i,a,(int)cposz-1))) return false; */
+		/* } */
 
 		for (int j = lowb2; j < upb2; j++) {
 				if (!x && (is_brick(get_matrix_field(a,i,j)) || get_matrix_field(a,i,j) == ERROR)) return false;
@@ -360,11 +360,11 @@ float Room::collision_wheel(Direction d, float brick_move_speed, float car_corne
 
 	if (d == Down && c.pos.z <= 1+limit) {
 
-		bool cond_x = (c.pos.x < car_corner_x-1 && c.pos.x+c.size.width >= car_corner_x-1)
-					|| (c.pos.x >= car_corner_x-1 && c.pos.x <= car_corner_x+1);
+		bool cond_x = (c.pos.x < car_corner_x-1+eps && c.pos.x+c.size.width > car_corner_x-1+eps)
+					|| (c.pos.x > car_corner_x-1+eps && c.pos.x < car_corner_x+1-eps);
 
-		bool cond_y = (c.pos.y < car_corner_y-0.8 && c.pos.y+c.size.depth >= car_corner_y-0.8)
-					|| (c.pos.y >= car_corner_y-0.8 && c.pos.y <= car_corner_y-0.2);
+		bool cond_y = (c.pos.y < car_corner_y-0.8+eps && c.pos.y+c.size.depth > car_corner_y-0.8+eps)
+					|| (c.pos.y > car_corner_y-0.8+eps && c.pos.y < car_corner_y-0.2-eps);
 
 		if (cond_x && cond_y) {
 			float suggested_position = c.pos.z - brick_move_speed;
@@ -411,9 +411,9 @@ float Room::collision_wheel(Direction d, float brick_move_speed, float car_corne
 	}
 
 	if (d==Backward && c.pos.y+c.size.depth < car_corner_y-0.8+eps && c.pos.y+c.size.depth>=car_corner_y-0.8-limit) {
-		bool cond_1 = (car_corner_x-c.pos.x)*(car_corner_x-c.pos.x) + c.pos.z*c.pos.z <= 1;
-		bool cond_2 = (car_corner_x-(c.pos.x+c.size.width))*(car_corner_x-(c.pos.x+c.size.width)) + c.pos.z*c.pos.z <= 1;
-		bool cond_3 = c.pos.x <= car_corner_x && c.pos.x+c.size.width >= car_corner_x && c.pos.z <= 1;
+		bool cond_1 = (car_corner_x-c.pos.x)*(car_corner_x-c.pos.x) + c.pos.z*c.pos.z < 1;
+		bool cond_2 = (car_corner_x-(c.pos.x+c.size.width))*(car_corner_x-(c.pos.x+c.size.width)) + c.pos.z*c.pos.z < 1;
+		bool cond_3 = c.pos.x <= car_corner_x && c.pos.x+c.size.width >= car_corner_x && c.pos.z < 1;
 
 		if (cond_3 || cond_1 || cond_2) {
 			float suggested_position = c.pos.y + brick_move_speed;
@@ -426,9 +426,9 @@ float Room::collision_wheel(Direction d, float brick_move_speed, float car_corne
 	}
 
 	if (d==Forward && c.pos.y > car_corner_y-0.2-eps && c.pos.y<=car_corner_y-0.2+limit) {
-		bool cond_1 = (car_corner_x-c.pos.x)*(car_corner_x-c.pos.x) + c.pos.z*c.pos.z <= 1;
-		bool cond_2 = (car_corner_x-(c.pos.x+c.size.width))*(car_corner_x-(c.pos.x+c.size.width)) + c.pos.z*c.pos.z <= 1;
-		bool cond_3 = c.pos.x <= car_corner_x && c.pos.x+c.size.width >= car_corner_x && c.pos.z <= 1;
+		bool cond_1 = (car_corner_x-c.pos.x)*(car_corner_x-c.pos.x) + c.pos.z*c.pos.z < 1;
+		bool cond_2 = (car_corner_x-(c.pos.x+c.size.width))*(car_corner_x-(c.pos.x+c.size.width)) + c.pos.z*c.pos.z < 1;
+		bool cond_3 = c.pos.x <= car_corner_x && c.pos.x+c.size.width >= car_corner_x && c.pos.z < 1;
 
 		if (cond_3 || cond_1 || cond_2) {
 
@@ -444,10 +444,153 @@ float Room::collision_wheel(Direction d, float brick_move_speed, float car_corne
 
 }
 
+float Room::collision_cylinder(Direction d, float brick_move_speed) {
+	Brick& c = bricks[selected_brick_id - 1];
+	float eps = 0.001;
+
+	if (d==Left) {
+			int miny = std::floor(c.pos.y);
+			int maxy = std::ceil(c.pos.y);
+			int prev_id = NONE;
+			for (int i = miny; i < maxy+c.size.depth; i++) {
+				int current_id = get_matrix_field((int)c.pos.x, i, (int)c.pos.z-1);
+				if (is_brick(current_id) && current_id != prev_id) {
+					prev_id = current_id;
+					Brick& block_brick = bricks[current_id-1];
+					float m = block_brick.pos.y+0.2+eps;
+					float M = block_brick.pos.y+block_brick.size.depth-0.2-eps;
+					bool cond0 = c.pos.x+brick_move_speed >= block_brick.pos.x+block_brick.size.width-0.2-eps;
+					bool cond1 = c.pos.y < m && c.pos.y+c.size.depth > m;
+					bool cond2 = c.pos.y > m && c.pos.y < M;
+					if (cond0 && (cond1 || cond2)) {
+						float suggested_position = c.pos.x;
+						float new_pos =
+							(suggested_position > block_brick.pos.x+block_brick.size.width-0.2) ?
+							suggested_position :  block_brick.pos.x+block_brick.size.width-0.2;
+						return new_pos;
+					}
+				}
+			}
+	}
+
+	if (d==Right) {
+			int miny = std::floor(c.pos.y);
+			int maxy = std::ceil(c.pos.y);
+			int prev_id = NONE;
+			for (int i = miny; i < maxy+c.size.depth; i++) {
+				int current_id = get_matrix_field((int)c.pos.x+c.size.width, i, (int)c.pos.z-1);
+				if (is_brick(current_id) && current_id != prev_id) {
+					prev_id = current_id;
+					Brick& block_brick = bricks[current_id-1];
+					float m = block_brick.pos.y+0.2+eps;
+					float M = block_brick.pos.y+block_brick.size.depth-0.2-eps;
+					bool cond0 = c.pos.x-brick_move_speed+c.size.width <= block_brick.pos.x+0.2+eps;
+					bool cond1 = c.pos.y < m && c.pos.y+c.size.depth > m;
+					bool cond2 = c.pos.y > m && c.pos.y < M;
+					if (cond0 && (cond1 || cond2)) {
+						float suggested_position = c.pos.x;
+						float new_pos =
+							(suggested_position < block_brick.pos.x+0.2-c.size.width) ?
+							suggested_position :  block_brick.pos.x+0.2-c.size.width;
+						return new_pos;
+					}
+				}
+			}
+	}
+
+	if (d==Forward) {
+			int minx = std::floor(c.pos.x);
+			int maxx = std::ceil(c.pos.x);
+			int prev_id = NONE;
+			for (int i = minx; i < maxx+c.size.width; i++) {
+				int current_id = get_matrix_field(i, (int)c.pos.y, (int)c.pos.z-1);
+				if (is_brick(current_id) && current_id != prev_id) {
+					prev_id = current_id;
+					Brick& block_brick = bricks[current_id-1];
+					float m = block_brick.pos.x+0.2+eps;
+					float M = block_brick.pos.x+block_brick.size.width-0.2-eps;
+					bool cond0 = c.pos.y+ brick_move_speed>= block_brick.pos.y+block_brick.size.depth-0.2-eps;
+					bool cond1 = c.pos.x < m && c.pos.x+c.size.width > m;
+					bool cond2 = c.pos.x > m && c.pos.x < M;
+					if (cond0 && (cond1 || cond2)) {
+						float suggested_position = c.pos.y;
+						float new_pos =
+							(suggested_position > block_brick.pos.y+block_brick.size.depth-0.2) ?
+							suggested_position :  block_brick.pos.y+block_brick.size.depth-0.2;
+						return new_pos;
+					}
+				}
+			}
+	}
+
+	if (d==Backward) {
+
+			int minx = std::floor(c.pos.x);
+			int maxx = std::ceil(c.pos.x);
+			int prev_id = NONE;
+			for (int i = minx; i < maxx+c.size.width; i++) {
+				int current_id = get_matrix_field(i, (int)c.pos.y+c.size.depth, (int)c.pos.z-1);
+				if (is_brick(current_id) && current_id != prev_id) {
+					prev_id = current_id;
+					Brick& block_brick = bricks[current_id-1];
+					float m = block_brick.pos.x+0.2+eps;
+					float M = block_brick.pos.x+block_brick.size.width-0.2-eps;
+					bool cond0 = c.pos.y+c.size.depth-brick_move_speed <= block_brick.pos.y+0.2+eps;
+					bool cond1 = c.pos.x < m && c.pos.x+c.size.width > m;
+					bool cond2 = c.pos.x > m && c.pos.x < M;
+					if (cond0 && (cond1 || cond2)) {
+						float suggested_position = c.pos.y;
+						float new_pos =
+							(suggested_position < block_brick.pos.y+0.2-c.size.depth) ?
+							suggested_position :  block_brick.pos.y+0.2-c.size.depth;
+						return new_pos;
+					}
+				}
+			}
+	}
+
+	if (d==Down) {
+
+		
+			int minx = std::floor(c.pos.x);
+			int maxx = std::ceil(c.pos.x);
+			int miny = std::floor(c.pos.y);
+			int maxy = std::ceil(c.pos.y);
+			for (int i = minx; i < maxx+c.size.width; i++) {
+				int prev_id = NONE;
+				for (int j=miny; j<maxy+c.size.depth; j++) {
+					int current_id = get_matrix_field(i, j, (int)c.pos.z-1);
+					if (is_brick(current_id) && current_id != prev_id) {
+						prev_id = current_id;
+						Brick& block_brick = bricks[current_id-1];
+						float mx = block_brick.pos.x+0.2+eps;
+						float Mx = block_brick.pos.x+block_brick.size.width-0.2-eps;
+						bool cond1x = c.pos.x < mx && c.pos.x+c.size.width > mx;
+						bool cond2x = c.pos.x > mx && c.pos.x < Mx;
+
+						float my = block_brick.pos.y+0.2+eps;
+						float My = block_brick.pos.y+block_brick.size.depth-0.2-eps;
+						bool cond1y = c.pos.y < my && c.pos.y+c.size.depth > my;
+						bool cond2y = c.pos.y > my && c.pos.y < My;
+						if ((cond1y || cond2y) && (cond1x || cond2x)) {
+							return block_brick.pos.z+block_brick.size.height+0.2;
+						}
+					}
+				}
+			}
+	}
+
+	return -1;
+}
+
+
 Vector3f Room::move_selected_brick(Direction d, float brick_move_speed)
 {
-	if (std::fabs(brick_move_speed)>1)
+	if (brick_move_speed<0.003)
 		return Vector3f();
+
+	if (brick_move_speed>0.5)
+		brick_move_speed = 0.5;
 
 
 	/* car collision */
@@ -467,6 +610,10 @@ Vector3f Room::move_selected_brick(Direction d, float brick_move_speed)
 	Vector3f init_pos = bricks[selected_brick_id - 1].get_world_coordinates();
 	float limit = 1.2 * brick_move_speed; // 1.2>1 so we are sure the brick cannot go inside
 
+
+	float new_value2 = -1;
+
+
 	float& coordinate = (d == Left || d == Right) ?
 						c.pos.x : (d == Forward || d == Backward) ?
 						c.pos.y : c.pos.z;
@@ -477,29 +624,26 @@ Vector3f Room::move_selected_brick(Direction d, float brick_move_speed)
 	int line = (z == 1) ?
 			std::ceil(coordinate) : std::floor(coordinate);
 
-	if (d == Down)
-		limit += 0.2;
-
 	float distance = std::fabs(line - coordinate);
 
+	bool moved = false;
 	if (distance <= limit) {
-		if (d != Down)
-			coordinate = line;
+		coordinate = line;
 
 		if (can_move(d)) {
-			if (d == Down)
-				coordinate += z*brick_move_speed;
-			else
-				coordinate += z*(brick_move_speed-distance);
-		}
-		else {
-			if (d == Down)
-				coordinate = line+0.2;
+			coordinate += z*(brick_move_speed-distance);
+			moved = true;
 		}
 	}
-	else
+	else {
 		coordinate += z*brick_move_speed;
+		moved = true;
+	}
 
+	if (moved || d==Down) {
+		if (c.pos.z+0.001<(int)c.pos.z+0.2)
+			new_value2 = collision_cylinder(d, brick_move_speed);
+	}
 
 
 	if (new_value != -1) {
@@ -515,11 +659,22 @@ Vector3f Room::move_selected_brick(Direction d, float brick_move_speed)
 			coordinate = new_value;
 	}
 	
-	if (new_value>18)
-	{
-		printf("new_value = %f\n", new_value);
-		exit(0);
+	if (new_value2 != -1) {
+		if (d == Left && new_value2 > coordinate)
+			coordinate = new_value2;
+		if (d == Right && new_value2 < coordinate)
+			coordinate = new_value2;
+		if (d == Forward && new_value2 > coordinate)
+			coordinate = new_value2;
+		if (d == Backward && new_value2 < coordinate)
+			coordinate = new_value2;
+		if (d == Down && new_value2 > coordinate)
+			coordinate = new_value2;
 	}
+
+
+	if (c.pos.z < 0.2)
+		c.pos.z = 0.2;
 
 	return c.get_world_coordinates() - init_pos;
 }

@@ -19,7 +19,7 @@
 #define NOT_SET -1
 #define ERROR -1
 
-#define BRICK_SPEED 0.8
+#define BRICK_SPEED 0.9
 
 class Room {
 	private:
@@ -60,6 +60,7 @@ class Room {
 		bool is_brick(int id) const;
 
 		float collision_wheel(Direction d, float brick_move_speed, float car_corner_x, float car_corner_y);
+		float collision_cylinder(Direction d, float brick_move_speed);
 
 	public:
 		Car car;
