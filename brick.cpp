@@ -2,6 +2,7 @@
 #include "headers/brick.h"
 #include "headers/loadModel.h"
 #include "headers/utility.h"
+#include <cmath>
 
 /* constuctors */
 
@@ -16,8 +17,30 @@ Brick::Brick(Vector3f pos, Size size, Color color) : Brick(pos, size) {
 /* end of constuctors */
 
 
-Vector3f Brick::get_world_coordinates() const {
+Vector3f Brick::get_world_coordinates() const
+{
 	return Vector3f(pos.x, pos.z, -pos.y);
+}
+
+
+float Brick::cylinder_front() const
+{
+	return pos.y + 0.2;
+}
+
+float Brick::cylinder_back() const
+{
+	return pos.y + size.depth - 0.2;
+}
+
+float Brick::cylinder_left() const
+{
+	return pos.x + 0.2;
+}
+
+float Brick::cylinder_right() const
+{
+	return pos.x + size.width - 0.2;
 }
 
 void Brick::draw_cuboid() const {
@@ -78,4 +101,91 @@ void Brick::draw_brick() const {
 
 void Brick::round() {
 	pos = (pos + 0.5).coordinates_to_integer();
+}
+
+
+void Brick::move(Direction d, float delta)
+{
+	switch (d) {
+		case Left:
+			pos.x -= delta;
+			break;
+		case Right:
+			pos.x += delta;
+			break;
+		case Forward:
+			pos.y -= delta;
+			break;
+		case Backward:
+			pos.y += delta;
+			break;
+		case Up:
+			pos.z += delta;
+			break;
+		case Down:
+			pos.z -= delta;
+			break;
+	}
+}
+
+void Brick::move_to_position(Direction d, float position)
+{
+	switch (d) {
+		case Left:
+		case Right:
+			pos.x = position;
+			break;
+		case Forward:
+		case Backward:
+			pos.y = position;
+			break;
+		case Up:
+		case Down:
+			pos.z = position;
+			break;
+	}
+}
+
+
+void Brick::update_position(Direction d, float position)
+{
+	if (d == Left && position > pos.x)
+		pos.x = position;
+	if (d == Right && position < pos.x)
+		pos.x = position;
+	if (d == Forward && position > pos.y)
+		pos.y = position;
+	if (d == Backward && position < pos.y)
+		pos.y = position;
+	if (d == Down && position > pos.z)
+		pos.z = position;
+	if (d == Up && position < pos.z)
+		pos.z = position;
+}
+
+
+float Brick::get_distance(Direction d) const
+{
+	switch (d) {
+		case Left:
+			return std::fabs(std::floor(pos.x)-pos.x);
+			break;
+		case Right:
+			return std::fabs(std::ceil(pos.x)-pos.x);
+			break;
+		case Forward:
+			return std::fabs(std::floor(pos.y)-pos.y);
+			break;
+		case Backward:
+			return std::fabs(std::ceil(pos.y)-pos.y);
+			break;
+		case Up:
+			return std::fabs(std::ceil(pos.z)-pos.z);
+			break;
+		case Down:
+			return std::fabs(std::floor(pos.z)-pos.z);
+			break;
+	}
+
+	return -1;
 }

@@ -7,17 +7,6 @@
 #include "brick.h"
 #include "car.h"
 
-/* max number of bricks in the room */
-/* 254 + 2 = 256 */
-#define MAX 254
-
-#define CAR 255
-/* ID of nothing */
-#define EMPTY 0
-
-#define NONE -1
-#define NOT_SET -1
-#define ERROR -1
 
 #define BRICK_SPEED 0.8
 
@@ -60,7 +49,8 @@ class Room {
 		bool is_brick(int id) const;
 
 		float collision_wheel(Direction d, float brick_move_speed, float car_corner_x, float car_corner_y);
-		float collision_cylinder(Direction d, float brick_move_speed);
+		void collision_cylinder(Direction d, float brick_move_speed);
+		bool collision_cylinder(Brick& other, Direction d, float brick_move_speed);
 
 	public:
 		Car car;

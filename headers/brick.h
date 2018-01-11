@@ -43,9 +43,21 @@ public:
 
 	Vector3f get_world_coordinates() const;
 
+	void move(Direction d, float delta);
+	void move_to_position(Direction d, float position);
+	void update_position(Direction d, float position);
+
+
 private:
-	/* FIX car id instead of this bool */
 	bool in_car;
+
+	/* clipping planes of cylinder */
+	float cylinder_front() const;
+	float cylinder_back() const;
+	float cylinder_left() const;
+	float cylinder_right() const;
+
+	float get_distance(Direction d) const;
 
 	/* draw a cuboid of a given size with left down corner at (0, 0, 0) */
 	void draw_cuboid() const;
