@@ -19,7 +19,7 @@
 #define NOT_SET -1
 #define ERROR -1
 
-#define BRICK_SPEED 0.9
+#define BRICK_SPEED 0.8
 
 class Room {
 	private:
@@ -36,7 +36,7 @@ class Room {
 		void update_matrix(unsigned char id, const Brick& c);
 
 		/* help function for move function */
-		bool check_sides(bool x, bool y, bool z, int lowb1, int upb1, int lowb2, int upb2, int a, float cposz) const;
+		bool check_sides(Direction d, int lowb1, int upb1, int lowb2, int upb2, int a) const;
 
 		/* returns true if a brick indexed with index can be moved in direction d */
 		bool can_move(Direction d) const;
