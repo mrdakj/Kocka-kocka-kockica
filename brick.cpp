@@ -147,22 +147,6 @@ void Brick::move_to_position(Direction d, float position)
 }
 
 
-void Brick::update_position(Direction d, float position)
-{
-	if (d == Left && position > pos.x)
-		pos.x = position;
-	if (d == Right && position < pos.x)
-		pos.x = position;
-	if (d == Forward && position > pos.y)
-		pos.y = position;
-	if (d == Backward && position < pos.y)
-		pos.y = position;
-	if (d == Down && position > pos.z)
-		pos.z = position;
-	if (d == Up && position < pos.z)
-		pos.z = position;
-}
-
 
 float Brick::get_distance(Direction d) const
 {

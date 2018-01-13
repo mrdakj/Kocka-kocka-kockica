@@ -48,7 +48,8 @@ class Room {
 		/* returns true if id belongs to some brick */
 		bool is_brick(int id) const;
 
-		float collision_wheel(Direction d, float brick_move_speed, float car_corner_x, float car_corner_y);
+		float collision_wheel(Direction d, float brick_move_speed, Wheel wheel) const;
+		float collision_wheels(Direction d, float brick_move_speed) const;
 		void collision_cylinder(Direction d, float brick_move_speed);
 		bool collision_cylinder(Brick& other, Direction d, float brick_move_speed);
 

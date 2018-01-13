@@ -1,6 +1,10 @@
 #ifndef _CAR_H_
 #define _CAR_H_
 
+enum Wheel {
+	wheel_1, wheel_2, wheel_3, wheel_4
+};
+
 
 class Car {
 
@@ -18,6 +22,13 @@ public:
 	void stop();
 	void go();
 	float get_position();
+
+	float wheel_left(Wheel w) const;
+	float wheel_right(Wheel w) const;
+	float wheel_front(Wheel w) const;
+	float wheel_back(Wheel w) const;
+	float center_x(Wheel w) const;
+	int wheels_top() const;
 
 private:
 	int wheel_rotation_angle;

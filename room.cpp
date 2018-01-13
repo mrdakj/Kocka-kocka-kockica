@@ -43,9 +43,7 @@ Room::Room(int size) : size(size)
 
 Room::~Room()
 {
-	if (car_display_list != (GLuint)NOT_SET)
-		glDeleteLists(car_display_list, 1);
-
+	glDeleteLists(car_display_list, 1);
 	free_textures();
 }
 
@@ -142,9 +140,7 @@ void Room::draw_wall() const
 void Room::render_room() const
 {
 	draw_wall();
-	
 	draw_grid();
-
 	draw_floor();
 
 	car.draw_base();
@@ -206,8 +202,6 @@ void Room::draw_car()
 		
 		if (car_display_list == (GLuint)(NOT_SET))
 			car_display_list = glGenLists(1);
-		else
-			glDeleteLists(car_display_list, 1);
 
 		glNewList(car_display_list, GL_COMPILE);
 		for (const Brick& brick : bricks) {
@@ -315,6 +309,8 @@ void Room::deselect()
 
 bool Room::check_sides(Direction d, int lowb1, int upb1, int lowb2, int upb2, int a) const
 {
+	/* this function checks collisions with cuboid (not entire brick) and borders of the room */
+
 	for (int i = lowb1; i < upb1; i++) {
 		for (int j = lowb2; j < upb2; j++) {
 			int id;
@@ -326,21 +322,18 @@ bool Room::check_sides(Direction d, int lowb1, int upb1, int lowb2, int upb2, in
 			else if (d == Down || d == Up)
 				id = get_matrix_field(i, j, a);
 
-			/* cuboid or outside, return false because we cannot move */
+			/* cuboid or outside */
 			if (is_brick(id) || id == ERROR)
-				return false;
+				return COLLISION;
 		}
 	}
 
-	/* return true because it is safe to move */
-	return true;
+	return NO_COLLISION;
 }
 
 
 bool Room::can_move(Direction d) const
 {
-	/* this function checks collisions with cuboid (not entire brick) and borders of the room */
-
 	const Brick& c = bricks[selected_brick_id - 1];
 
 	int x = c.pos.x;
@@ -360,44 +353,37 @@ bool Room::can_move(Direction d) const
 
 	switch(d) {
 		case Left:
-			return check_sides(d, miny, maxy+depth, minz, maxz+height, x-1);
+			return check_sides(d, miny, maxy+depth, minz, maxz+height, x-1) == NO_COLLISION;
 		case Right:
-			return check_sides(d, miny, maxy+depth, minz, maxz+height, x+width);
+			return check_sides(d, miny, maxy+depth, minz, maxz+height, x+width)  == NO_COLLISION;
 		case Forward:
-			return check_sides(d, minx, maxx+width, minz, maxz+height, y-1);
+			return check_sides(d, minx, maxx+width, minz, maxz+height, y-1) == NO_COLLISION;
 		case Backward:
-			return check_sides(d, minx, maxx+width, minz, maxz+height, y+depth);
+			return check_sides(d, minx, maxx+width, minz, maxz+height, y+depth) == NO_COLLISION;
 		case Down:
-			return check_sides(d, minx, maxx+width, miny, maxy+depth, z-1);
+			return check_sides(d, minx, maxx+width, miny, maxy+depth, z-1) == NO_COLLISION;
 		case Up:
-			return check_sides(d, minx, maxx+width, miny, maxy+depth, z+height);
+			return check_sides(d, minx, maxx+width, miny, maxy+depth, z+height) == NO_COLLISION;
 	}
 
 	return true;
 }
 
 
-float Room::collision_wheel(Direction d, float brick_move_speed, float car_corner_x, float car_corner_y)
+float Room::collision_wheel(Direction d, float brick_move_speed, Wheel wheel) const
 {
-	Brick& c = bricks[selected_brick_id - 1];
+	const Brick& c = bricks[selected_brick_id - 1];
 	float limit = 1.2 * brick_move_speed; // 1.2>1 so we are sure the brick cannot go inside
 
-	/* clipping planes of the wheel */
-	float wheel_front = car_corner_y - 0.8;
-	float wheel_back = car_corner_y - 0.2;
-	float wheel_left = car_corner_x - 1;
-	float wheel_right = car_corner_x + 1;
-	float wheel_top = 1;
-
 	if (d == Down) {
-		if (!(c.pos.z < wheel_top + limit))
-			return -1;
+		if (!(c.pos.z < car.wheels_top() + limit))
+			return NOT_SET;
 
-		bool cond_x = (c.pos.x < wheel_left + eps && c.pos.x + c.size.width > wheel_left + eps)
-					|| (c.pos.x > wheel_left + eps && c.pos.x < wheel_right - eps);
+		bool cond_x = (c.pos.x < car.wheel_left(wheel) + eps && c.pos.x + c.size.width > car.wheel_left(wheel) + eps)
+					|| (c.pos.x > car.wheel_left(wheel) + eps && c.pos.x < car.wheel_right(wheel) - eps);
 
-		bool cond_y = (c.pos.y < wheel_front + eps && c.pos.y + c.size.depth > wheel_front + eps)
-					|| (c.pos.y > wheel_front + eps && c.pos.y < wheel_back - eps);
+		bool cond_y = (c.pos.y < car.wheel_front(wheel) + eps && c.pos.y + c.size.depth > car.wheel_front(wheel) + eps)
+					|| (c.pos.y > car.wheel_front(wheel) + eps && c.pos.y < car.wheel_back(wheel) - eps);
 
 		if (cond_x && cond_y) {
 			float suggested_position = c.pos.z - brick_move_speed;
@@ -405,98 +391,118 @@ float Room::collision_wheel(Direction d, float brick_move_speed, float car_corne
 			/* lower bound of z coordinate of brick bottom left corner */
 			float limit_position_squared;
 
-			if (c.pos.x >= car_corner_x)
-				limit_position_squared = 1-std::pow(c.pos.x-car_corner_x, 2);
-			else if (c.pos.x+c.size.width <= car_corner_x)
-					limit_position_squared = 1-std::pow(c.pos.x+c.size.width-car_corner_x, 2);
+			if (c.pos.x >= car.center_x(wheel))
+				limit_position_squared = 1-std::pow(c.pos.x-car.center_x(wheel), 2);
+			else if (c.pos.x+c.size.width <= car.center_x(wheel))
+					limit_position_squared = 1-std::pow(c.pos.x+c.size.width-car.center_x(wheel), 2);
 			else
 				limit_position_squared = 1;
 
-			return (suggested_position*suggested_position > limit_position_squared) ? 
-				suggested_position : std::sqrt(limit_position_squared);
+			if (suggested_position*suggested_position < limit_position_squared)
+				return std::sqrt(limit_position_squared);
 		}
 	}
 
 	/* if the brick is above the wheel and direction is not down no collision is possible */
-	if (c.pos.z >= wheel_top)
-		return -1;
+	if (c.pos.z >= car.wheels_top())
+		return NOT_SET;
 
 
 	if (d == Left) {
-		if (!(c.pos.x > car_corner_x && c.pos.x < wheel_right + limit))
-			return -1;
+		if (!(c.pos.x > car.center_x(wheel) && c.pos.x < car.wheel_right(wheel) + limit))
+			return NOT_SET;
 		
-		bool cond_y = (c.pos.y < wheel_front + eps && c.pos.y+c.size.depth > wheel_front + eps)
-					|| (c.pos.y > wheel_front + eps && c.pos.y < wheel_back - eps);
+		bool cond_y = (c.pos.y < car.wheel_front(wheel) + eps && c.pos.y+c.size.depth > car.wheel_front(wheel) + eps)
+					|| (c.pos.y > car.wheel_front(wheel) + eps && c.pos.y < car.wheel_back(wheel) - eps);
 
 		if (cond_y) {
 			float suggested_position = c.pos.x - brick_move_speed;
 
 			/* lower bound of x coordinate of bottom left brick corner */
-			float limit_position = car_corner_x + std::sqrt(1 - c.pos.z*c.pos.z);
+			float limit_position = car.center_x(wheel) + std::sqrt(1 - c.pos.z*c.pos.z);
 
-			return (suggested_position > limit_position) ? suggested_position : limit_position;
+			if (suggested_position < limit_position)
+				return limit_position;
 		}
 	}
 
 	if (d == Right) {
-		if (!(c.pos.x+c.size.width < car_corner_x && c.pos.x+c.size.width > wheel_left - limit))
-			return -1;
+		if (!(c.pos.x+c.size.width < car.center_x(wheel) && c.pos.x+c.size.width > car.wheel_left(wheel) - limit))
+			return NOT_SET;
 
-		bool cond_y = (c.pos.y < wheel_front + eps && c.pos.y+c.size.depth > wheel_front + eps)
-					|| (c.pos.y > wheel_front + eps && c.pos.y < wheel_back - eps);
+		bool cond_y = (c.pos.y < car.wheel_front(wheel) + eps && c.pos.y+c.size.depth > car.wheel_front(wheel) + eps)
+					|| (c.pos.y > car.wheel_front(wheel) + eps && c.pos.y < car.wheel_back(wheel) - eps);
 
 		if (cond_y) {
 			float suggested_position = c.pos.x + brick_move_speed;
 
 			/* upper bound of x coordinate of bottom left brick corner */
-			float limit_position = car_corner_x - std::sqrt(1 - c.pos.z*c.pos.z) - c.size.width;
+			float limit_position = car.center_x(wheel) - std::sqrt(1 - c.pos.z*c.pos.z) - c.size.width;
 
-			return (suggested_position < limit_position) ? suggested_position : limit_position;
+			if (suggested_position > limit_position)
+				return limit_position;
 		}
 	}
 
 	if (d == Backward) {
-		if (!(c.pos.y+c.size.depth < wheel_front + eps && c.pos.y+c.size.depth > wheel_front - limit))
-			return -1;
+		if (!(c.pos.y+c.size.depth < car.wheel_front(wheel) + eps && c.pos.y+c.size.depth > car.wheel_front(wheel) - limit))
+			return NOT_SET;
 
 		/* bottom left corner is inside wheel circle */
-		bool cond_1 = (car_corner_x-c.pos.x)*(car_corner_x-c.pos.x) + c.pos.z*c.pos.z < 1;
+		bool cond_1 = (car.center_x(wheel)-c.pos.x)*(car.center_x(wheel)-c.pos.x) + c.pos.z*c.pos.z < 1;
 		/* right down corner is inside wheel circle */
-		bool cond_2 = (car_corner_x-(c.pos.x+c.size.width))*(car_corner_x-(c.pos.x+c.size.width)) + c.pos.z*c.pos.z < 1;
-		bool cond_3 = c.pos.x < car_corner_x && c.pos.x + c.size.width > car_corner_x;
+		bool cond_2 = (car.center_x(wheel)-(c.pos.x+c.size.width))*(car.center_x(wheel)-(c.pos.x+c.size.width)) + c.pos.z*c.pos.z < 1;
+		bool cond_3 = c.pos.x < car.center_x(wheel) && c.pos.x + c.size.width > car.center_x(wheel);
 
 		if (cond_3 || cond_1 || cond_2) {
 			float suggested_position = c.pos.y + brick_move_speed;
 
 			/* upper bound of y coordinate of brick bottom left corner */
-			float limit_position = wheel_front - c.size.depth;
+			float limit_position = car.wheel_front(wheel) - c.size.depth;
 
-			return (suggested_position < limit_position) ? suggested_position : limit_position;
+			if (suggested_position > limit_position)
+				return limit_position;
 		}
 	}
 
 	if (d==Forward) {
-		if (!(c.pos.y > wheel_back - eps && c.pos.y < wheel_back + limit))
-			return -1;
+		if (!(c.pos.y > car.wheel_back(wheel) - eps && c.pos.y < car.wheel_back(wheel) + limit))
+			return NOT_SET;
 		
 		/* bottom left corner is inside wheel circle */
-		bool cond_1 = (car_corner_x-c.pos.x)*(car_corner_x-c.pos.x) + c.pos.z*c.pos.z < 1;
+		bool cond_1 = (car.center_x(wheel)-c.pos.x)*(car.center_x(wheel)-c.pos.x) + c.pos.z*c.pos.z < 1;
 		/* right down corner is inside wheel circle */
-		bool cond_2 = (car_corner_x-(c.pos.x+c.size.width))*(car_corner_x-(c.pos.x+c.size.width)) + c.pos.z*c.pos.z < 1;
-		bool cond_3 = c.pos.x < car_corner_x && c.pos.x + c.size.width > car_corner_x;
+		bool cond_2 = (car.center_x(wheel)-(c.pos.x+c.size.width))*(car.center_x(wheel)-(c.pos.x+c.size.width)) + c.pos.z*c.pos.z < 1;
+		bool cond_3 = c.pos.x < car.center_x(wheel) && c.pos.x + c.size.width > car.center_x(wheel);
 
 		if (cond_3 || cond_1 || cond_2) {
 			float suggested_position = c.pos.y - brick_move_speed;
 
 			/* lower bound of y coordinate of brick bottom left corner */
-			float limit_position = wheel_back;
+			float limit_position = car.wheel_back(wheel);
 
-			return (suggested_position > limit_position) ? suggested_position : limit_position;
+			if (suggested_position < limit_position)
+				return limit_position;
 		}
 	}
 
-	return -1;
+	return NOT_SET;
+}
+
+float Room::collision_wheels(Direction d, float brick_move_speed) const
+{
+	float wheel_limit = NOT_SET; 
+
+	if (wheel_limit ==  NOT_SET) 
+		wheel_limit = collision_wheel(d, brick_move_speed, wheel_1); 
+	if (wheel_limit == NOT_SET) 
+		wheel_limit = collision_wheel(d, brick_move_speed, wheel_2); 
+	if (wheel_limit == NOT_SET) 
+		wheel_limit = collision_wheel(d, brick_move_speed, wheel_3); 
+	if (wheel_limit == NOT_SET) 
+		wheel_limit = collision_wheel(d, brick_move_speed, wheel_4); 
+
+	return wheel_limit;
 }
 
 bool Room::collision_cylinder(Brick& other, Direction d, float brick_move_speed)
@@ -661,30 +667,20 @@ void Room::collision_cylinder(Direction d, float brick_move_speed)
 
 Vector3f Room::move_selected_brick(Direction d, float brick_move_speed)
 {
-	if (brick_move_speed>0.5)
+	Brick& c = bricks[selected_brick_id - 1];
+	Vector3f init_pos = bricks[selected_brick_id - 1].get_world_coordinates();
+
+	if (brick_move_speed > 0.5)
 		brick_move_speed = 0.5;
 
-
-	/* car collision */ 
-	float possible_position = -1; 
-	if (possible_position == -1) 
-		possible_position = collision_wheel(d, brick_move_speed, car.position_x, car.position_y); 
-	if (possible_position == -1) 
-		possible_position = collision_wheel(d, brick_move_speed, car.position_x+car.width, car.position_y); 
-	if (possible_position == -1) 
-		possible_position = collision_wheel(d, brick_move_speed, car.position_x+car.width, car.position_y+car.depth+1); 
-	if (possible_position == -1) 
-		possible_position = collision_wheel(d, brick_move_speed, car.position_x, car.position_y+car.depth+1); 
-	/* end of car collision */
-
-	Brick& c = bricks[selected_brick_id - 1];
-
-	Vector3f init_pos = bricks[selected_brick_id - 1].get_world_coordinates();
 	float limit = 1.2 * brick_move_speed; // 1.2>1 so we are sure the brick cannot go inside
+
+	float wheel_limit = collision_wheels(d, brick_move_speed);
 
 	float distance = c.get_distance(d);
 
 	bool moved = false;
+
 	if (distance < limit) {
 		c.move(d, distance);
 
@@ -703,9 +699,8 @@ Vector3f Room::move_selected_brick(Direction d, float brick_move_speed)
 			collision_cylinder(d, brick_move_speed);
 	}
 
-
-	if (possible_position != -1)
-		c.update_position(d, possible_position);
+	if (moved && wheel_limit != NOT_SET)
+		c.move_to_position(d, wheel_limit);
 
 	if (c.pos.z < 0.2)
 		c.pos.z = 0.2;
@@ -716,51 +711,36 @@ Vector3f Room::move_selected_brick(Direction d, float brick_move_speed)
 
 Vector3f Room::move_selected_brick(Vector3f direction, float delta_x, float delta_z)
 {
-	float d = std::sqrt(direction.x*direction.x+direction.z*direction.z);
+	float d = std::sqrt(direction.x*direction.x + direction.z*direction.z);
 
-
-	float ax=0,bx=0,ay=0,by=0;
+	float ax = 0, bx = 0, ay = 0, by = 0;
 
 	/* project normal vector of (projection of TO vector in XZ plane) of length delta_x camera.view x and z axes */
 	if (delta_x) {
-		bx=-direction.z*(delta_x/d);
-		ax=direction.x*(delta_x/d);
+		bx = -direction.z*(delta_x/d);
+		ax = direction.x*(delta_x/d);
 	}
 
 
 	/* project (projection of TO) vector of length delta_z camera.view x and z axes */
 	if (delta_z) {
-		by=direction.x*(delta_z/d);
-		ay=direction.z*(delta_z/d);
+		by = direction.x*(delta_z/d);
+		ay = direction.z*(delta_z/d);
 	}
 
-	float a = ax+ay;
-	float b = bx+by;
-
-	/* if this is > 1 collision will not work properly because we cannot skip a field */
-	if (a>0.9)
-		a = 0.9;
-	if (a<-0.9)
-		a = -0.9;
-	if (b>0.9)
-		b = 0.9;
-	if (b<-0.9)
-		b = -0.9;
+	float a = ax + ay;
+	float b = bx + by;
 
 	Vector3f delta;
 
-	if (b>0) {
+	if (b > 0)
 		delta += move_selected_brick(Right, b);
-	}
-	if (b<0) {
-		delta += move_selected_brick(Left,-b);
-	}
-	if (a>0) {
-		delta += move_selected_brick(Forward,a);
-	}
-	if (a<0) {
-		delta += move_selected_brick(Backward,-a);
-	}
+	if (b < 0)
+		delta += move_selected_brick(Left, -b);
+	if (a > 0)
+		delta += move_selected_brick(Forward, a);
+	if (a < 0)
+		delta += move_selected_brick(Backward, -a);
 
 	return delta;
 }
@@ -787,13 +767,12 @@ void Room::pick(int id)
 
 	Brick& c = bricks[selected_brick_id - 1];
 
-	if (c.pos.z+c.size.height<size) {
-		for (int i = 0; i < c.size.width; i++) {
-			for (int j = 0; j < c.size.depth; j++) {
-				if (get_matrix_field(c.pos.x+i, c.pos.y+j, c.pos.z+c.size.height) != 0) {
-					selected_brick_id = NONE;
-					return;
-				}
+	for (int i = 0; i < c.size.width; i++) {
+		for (int j = 0; j < c.size.depth; j++) {
+			int id = get_matrix_field(c.pos.x+i, c.pos.y+j, c.pos.z+c.size.height);
+			if (id != EMPTY && id != ERROR) {
+				selected_brick_id = NONE;
+				return;
 			}
 		}
 	}

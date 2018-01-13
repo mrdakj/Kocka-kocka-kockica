@@ -97,3 +97,93 @@ void Car::go() {
 	wheel_rotation_angle+=1;
 	translation_x += 0.02;
 }
+
+float Car::wheel_left(Wheel w) const
+{
+	switch (w) {
+		case wheel_1:
+		case wheel_4:
+			return position_x - 1;
+			break;
+		case wheel_2:
+		case wheel_3:
+			return position_x + width - 1;
+			break;
+	}
+
+	return -1;
+}
+
+float Car::wheel_right(Wheel w) const
+{
+	switch (w) {
+		case wheel_1:
+		case wheel_4:
+			return position_x + 1;
+			break;
+		case wheel_2:
+		case wheel_3:
+			return position_x + width + 1;
+			break;
+	}
+
+	return -1;
+
+}
+
+float Car::wheel_front(Wheel w) const
+{
+	switch (w) {
+		case wheel_1:
+		case wheel_2:
+			return position_y - 0.8;
+			break;
+			
+		case wheel_3:
+		case wheel_4:
+			return position_y + depth + 0.2;
+			break;
+	}
+
+	return -1;
+
+}
+
+float Car::wheel_back(Wheel w) const
+{
+	switch (w) {
+		case wheel_1:
+		case wheel_2:
+			return position_y - 0.2;
+			break;
+			
+		case wheel_3:
+		case wheel_4:
+			return position_y + depth + 0.8;
+			break;
+	}
+	return -1;
+
+}
+
+float Car::center_x(Wheel w) const
+{
+	switch (w) {
+		case wheel_1:
+		case wheel_4:
+			return position_x;
+			break;
+		case wheel_2:
+		case wheel_3:
+			return position_x + width;
+			break;
+	}
+
+	return -1;
+
+}
+
+int Car::wheels_top() const
+{
+	return 1;
+}

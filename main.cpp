@@ -166,14 +166,14 @@ void create_bricks() {
 	room.add(brick_7);
 	room.add(brick_8);
 
-	room.add(brick_9);
-	room.add(brick_10);
-	room.add(brick_11);
-	room.add(brick_12);
-	room.add(brick_13);
-	room.add(brick_14);
-	room.add(brick_15);
-	room.add(brick_16);
+	/* room.add(brick_9); */
+	/* room.add(brick_10); */
+	/* room.add(brick_11); */
+	/* room.add(brick_12); */
+	/* room.add(brick_13); */
+	/* room.add(brick_14); */
+	/* room.add(brick_15); */
+	/* room.add(brick_16); */
 
 	/* transparent bricks in the end (important because of depth test)*/
 	room.add(brick_1);

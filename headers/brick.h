@@ -45,7 +45,6 @@ public:
 
 	void move(Direction d, float delta);
 	void move_to_position(Direction d, float position);
-	void update_position(Direction d, float position);
 
 
 private:
