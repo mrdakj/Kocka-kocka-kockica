@@ -4,6 +4,7 @@
 #include "room.h"
 #include "timer.h"
 #include "camera.h"
+#include "model.h"
 
 #define PI 3.141592
 

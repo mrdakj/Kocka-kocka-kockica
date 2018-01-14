@@ -2,7 +2,6 @@
 #define _CAMERA_H_
 
 #include "vector3f.h"
-#include <tuple>
 
 class Camera {
 

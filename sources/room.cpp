@@ -1,8 +1,8 @@
 #include <cmath>
 
-#include "headers/room.h"
-#include "headers/utility.h"
-#include "headers/textures.h"
+#include "../headers/room.h"
+#include "../headers/utility.h"
+#include "../headers/textures.h"
 
 #define eps 0.001
 
@@ -10,6 +10,7 @@
 /* 254 + 2 = 256 */
 #define MAX 254
 
+/* ID of car */
 #define CAR 255
 /* ID of nothing */
 #define EMPTY 0
@@ -18,7 +19,7 @@
 #define NOT_SET -1
 #define ERROR -1
 
-#define NO_COLLISION 0 
+#define NO_COLLISION 0
 #define COLLISION 1
 
 /* constuctors */
@@ -53,9 +54,8 @@ void Room::init_matrix()
 
 	for (int i = 0; i < size; i++) {
 		matrix[i].resize(size);
-		for (int j = 0; j < size; j++) {
-		   matrix[i][j].resize(size, EMPTY);
-		}
+		for (int j = 0; j < size; j++)
+			matrix[i][j].resize(size, EMPTY);
 	}
 }
 
@@ -199,7 +199,7 @@ void Room::draw_car()
 		}
 
 		dfs();
-		
+
 		if (car_display_list == (GLuint)(NOT_SET))
 			car_display_list = glGenLists(1);
 
@@ -212,7 +212,7 @@ void Room::draw_car()
 
 		refresh_car = false;
 	}
-	
+
 	car.draw_base();
 
 	glPushMatrix();
@@ -259,7 +259,7 @@ void Room::draw_floor() const
 	glTranslatef(0, -0.5, 0);
 	ut_draw_rectangle_with_texture_YZ(0.5, size);
 	glPopMatrix();
-	
+
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
@@ -411,7 +411,7 @@ float Room::collision_wheel(Direction d, float brick_move_speed, Wheel wheel) co
 	if (d == Left) {
 		if (!(c.pos.x > car.center_x(wheel) && c.pos.x < car.wheel_right(wheel) + limit))
 			return NOT_SET;
-		
+
 		bool cond_y = (c.pos.y < car.wheel_front(wheel) + eps && c.pos.y+c.size.depth > car.wheel_front(wheel) + eps)
 					|| (c.pos.y > car.wheel_front(wheel) + eps && c.pos.y < car.wheel_back(wheel) - eps);
 
@@ -468,7 +468,7 @@ float Room::collision_wheel(Direction d, float brick_move_speed, Wheel wheel) co
 	if (d==Forward) {
 		if (!(c.pos.y > car.wheel_back(wheel) - eps && c.pos.y < car.wheel_back(wheel) + limit))
 			return NOT_SET;
-		
+
 		/* bottom left corner is inside wheel circle */
 		bool cond_1 = (car.center_x(wheel)-c.pos.x)*(car.center_x(wheel)-c.pos.x) + c.pos.z*c.pos.z < 1;
 		/* right down corner is inside wheel circle */
@@ -491,16 +491,16 @@ float Room::collision_wheel(Direction d, float brick_move_speed, Wheel wheel) co
 
 float Room::collision_wheels(Direction d, float brick_move_speed) const
 {
-	float wheel_limit = NOT_SET; 
+	float wheel_limit = NOT_SET;
 
-	if (wheel_limit ==  NOT_SET) 
-		wheel_limit = collision_wheel(d, brick_move_speed, wheel_1); 
-	if (wheel_limit == NOT_SET) 
-		wheel_limit = collision_wheel(d, brick_move_speed, wheel_2); 
-	if (wheel_limit == NOT_SET) 
-		wheel_limit = collision_wheel(d, brick_move_speed, wheel_3); 
-	if (wheel_limit == NOT_SET) 
-		wheel_limit = collision_wheel(d, brick_move_speed, wheel_4); 
+	if (wheel_limit ==  NOT_SET)
+		wheel_limit = collision_wheel(d, brick_move_speed, wheel_1);
+	if (wheel_limit == NOT_SET)
+		wheel_limit = collision_wheel(d, brick_move_speed, wheel_2);
+	if (wheel_limit == NOT_SET)
+		wheel_limit = collision_wheel(d, brick_move_speed, wheel_3);
+	if (wheel_limit == NOT_SET)
+		wheel_limit = collision_wheel(d, brick_move_speed, wheel_4);
 
 	return wheel_limit;
 }
@@ -715,14 +715,11 @@ Vector3f Room::move_selected_brick(Vector3f direction, float delta_x, float delt
 
 	float ax = 0, bx = 0, ay = 0, by = 0;
 
-	/* project normal vector of (projection of TO vector in XZ plane) of length delta_x camera.view x and z axes */
 	if (delta_x) {
 		bx = -direction.z*(delta_x/d);
 		ax = direction.x*(delta_x/d);
 	}
 
-
-	/* project (projection of TO) vector of length delta_z camera.view x and z axes */
 	if (delta_z) {
 		by = direction.x*(delta_z/d);
 		ay = direction.z*(delta_z/d);
@@ -760,7 +757,7 @@ void Room::put_down()
 
 void Room::pick(int id)
 {
-	if (id < 1 || id > number_of_bricks) 
+	if (id < 1 || id > number_of_bricks)
 		return;
 
 	selected_brick_id = id;

@@ -1,13 +1,15 @@
-#include "headers/utility.h"
+#include "../headers/utility.h"
 
-void ut_draw_line(const ut_Point& A,const ut_Point& B) {
+void ut_draw_line(const ut_Point& A,const ut_Point& B)
+{
 	glBegin(GL_LINES);
 	glVertex3f(A.x, A.y, A.z);
 	glVertex3f(B.x, B.y, B.z);
 	glEnd();
 }
 
-void ut_draw_triangle(const ut_Point& A, const ut_Point& B, const ut_Point& C) {
+void ut_draw_triangle(const ut_Point& A, const ut_Point& B, const ut_Point& C)
+{
 	glBegin(GL_TRIANGLES);
 	glVertex3f(A.x, A.y, A.z);
 	glVertex3f(B.x, B.y, B.z);
@@ -15,7 +17,8 @@ void ut_draw_triangle(const ut_Point& A, const ut_Point& B, const ut_Point& C) {
 	glEnd();
 }
 
-ut_Point ut_world_to_screen_coordinates(const ut_Point& world_point) {
+ut_Point ut_world_to_screen_coordinates(const ut_Point& world_point)
+{
 	GLdouble modelview_matrix[16];
 	GLdouble projection_matrix[16];
 	GLint viewport[4];
@@ -39,8 +42,8 @@ ut_Point ut_world_to_screen_coordinates(const ut_Point& world_point) {
 	return screen_point;
 }
 
-void ut_draw_cuboid(float width, float depth, float height) {
-
+void ut_draw_cuboid(float width, float depth, float height)
+{
 	glEnable(GL_NORMALIZE);
 
 	glPushMatrix();
@@ -52,7 +55,8 @@ void ut_draw_cuboid(float width, float depth, float height) {
 	glDisable(GL_NORMALIZE);
 }
 
-void ut_draw_rectangle_with_texture_XZ(float width, float depth) {
+void ut_draw_rectangle_with_texture_XZ(float width, float depth)
+{
 	glBegin(GL_QUADS);
 	glNormal3f(0, 1, 0);
         glTexCoord2f(0, 0);
@@ -67,7 +71,8 @@ void ut_draw_rectangle_with_texture_XZ(float width, float depth) {
 }
 
 /* draw a rectangle with texture in plane z = 0, with left down corner at (0, 0) */
-void ut_draw_rectangle_with_texture_XY(float width, float height) {
+void ut_draw_rectangle_with_texture_XY(float width, float height)
+{
 	glBegin(GL_QUADS);
 	glNormal3f(0, 0, 1);
         glTexCoord2f(0, 0);
@@ -82,7 +87,8 @@ void ut_draw_rectangle_with_texture_XY(float width, float height) {
 }
 
 /* draw a rectangle with texture in plane x = 0, with right down corner at (0, 0) */
-void ut_draw_rectangle_with_texture_YZ(float height, float depth) {
+void ut_draw_rectangle_with_texture_YZ(float height, float depth)
+{
 	glBegin(GL_QUADS);
 	glNormal3f(-1, 0, 0);
         glTexCoord2f(0, 0);
@@ -97,7 +103,8 @@ void ut_draw_rectangle_with_texture_YZ(float height, float depth) {
 
 }
 
-int ut_index_of_minimum(const float& a, const float& b, const float& c) {
+int ut_index_of_minimum(const float& a, const float& b, const float& c)
+{
 	if (a <= b) {
 		if (a <= c) return 0;
 		return 2;

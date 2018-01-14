@@ -12,7 +12,6 @@ class Vector3f {
 		Vector3f(float x, float y, float z);
 		Vector3f(const Vector3f& v);
 
-		/* override operators */
 		Vector3f operator+(const Vector3f& v) const;
 		Vector3f operator+(const float scalar) const;
 

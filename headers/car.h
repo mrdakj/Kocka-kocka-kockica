@@ -13,6 +13,7 @@ public:
 	int position_y;
 	int width;
 	int depth;
+
 	bool is_going;
 
 	Car();
@@ -21,14 +22,17 @@ public:
 	void draw_base() const;
 	void stop();
 	void go();
-	float get_position();
+	float get_position() const;
 
+	/* wheel clipping planes */
 	float wheel_left(Wheel w) const;
 	float wheel_right(Wheel w) const;
 	float wheel_front(Wheel w) const;
 	float wheel_back(Wheel w) const;
-	float center_x(Wheel w) const;
 	int wheels_top() const;
+
+	/* get x coordinate of the center */
+	float center_x(Wheel w) const;
 
 private:
 	int wheel_rotation_angle;

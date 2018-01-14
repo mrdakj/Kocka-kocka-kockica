@@ -1,10 +1,7 @@
-#include "headers/global_variables.h"
-#include "headers/keyboard.h"
-#include "headers/loadModel.h"
+#include "../headers/global_variables.h"
+#include "../headers/keyboard.h"
 
 #define unused_function_arg(x) ((void)x)
-
-/* define extern variables */
 
 /* exit button */
 Button bt_exit(27);
@@ -37,18 +34,13 @@ std::vector<Button> camera_buttons = {
 	Button('i'), // rotation up
 	Button('k')  // rotation down
 };
-/* end of extern variables */
 
-/* private functions */
 
 /* change button state with key key and activate timer if needed (if it is not NULL) */
 static void action(unsigned char key, std::vector<Button>& buttons, Timer* timer);
 
-/* end private functions */
-
-/* function definitions */
-
-static void action(unsigned char key, std::vector<Button>& buttons, Timer* timer) {
+static void action(unsigned char key, std::vector<Button>& buttons, Timer* timer)
+{
 	for (Button& bt : buttons) {
 		if (key == bt.key) {
 			bt.change_state();
@@ -58,25 +50,25 @@ static void action(unsigned char key, std::vector<Button>& buttons, Timer* timer
 	}
 }
 
-bool all_released(const std::vector<Button>& buttons) {
+bool all_released(const std::vector<Button>& buttons)
+{
 	for (const Button& bt : buttons) {
-		if (bt.pressed) return false;
+		if (bt.pressed)
+			return false;
 	}
 
 	return true;
 }
 
 
-void keyboard_ascii_down(unsigned char key, int x, int y) {
-
+void keyboard_ascii_down(unsigned char key, int x, int y)
+{
 	unused_function_arg(x);
 	unused_function_arg(y);
 
 	/* exit program */
-	if (key == bt_exit.key) {
-		free_display_lists();
+	if (key == bt_exit.key)
 		exit(0);
-	}
 
 	/* camera */
 	action(key, camera_buttons, &t_camera);
@@ -94,7 +86,8 @@ void keyboard_ascii_down(unsigned char key, int x, int y) {
 	}
 }
 
-void keyboard_ascii_up(unsigned char key, int x, int y) {
+void keyboard_ascii_up(unsigned char key, int x, int y)
+{
 	unused_function_arg(x);
 	unused_function_arg(y);
 
@@ -104,6 +97,3 @@ void keyboard_ascii_up(unsigned char key, int x, int y) {
 	/* brick */
 	action(key, brick_buttons, NULL);
 }
-
-/* end of function definitions */
-

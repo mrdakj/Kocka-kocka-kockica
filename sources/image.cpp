@@ -1,9 +1,7 @@
-/* downloaded from _____________*/
-
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "headers/image.h"
+#include "../headers/image.h"
 
 Image *image_init(int width, int height) {
 

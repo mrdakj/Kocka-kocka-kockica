@@ -1,19 +1,17 @@
-/* copied from _________________ */
-
-#include "headers/textures.h"
+#include "../headers/textures.h"
 
 GLuint texture_names[NUMBER_OF_TEXTURES];
 
 static void create_texture(Image* image, GLuint* texture_names, const char* file_name, int texture_index);
 
-void load_textures() {
-
+void load_textures()
+{
     glEnable(GL_TEXTURE_2D);
 
 	/* enable light with textures */
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
-    Image* image = image_init(0, 0);
+	Image* image = image_init(0, 0);
 
 	/* generate texture names */
     glGenTextures(NUMBER_OF_TEXTURES, texture_names);
@@ -28,8 +26,8 @@ void load_textures() {
     image_done(image);
 }
 
-static void create_texture(Image* image, GLuint* texture_names, const char* file_name, int texture_index) {
-
+static void create_texture(Image* image, GLuint* texture_names, const char* file_name, int texture_index)
+{
     image_read(image, file_name);
 
     glBindTexture(GL_TEXTURE_2D, texture_names[texture_index]);
@@ -44,7 +42,7 @@ static void create_texture(Image* image, GLuint* texture_names, const char* file
                  GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
 }
 
-
-void free_textures() {
+void free_textures()
+{
 	glDeleteTextures(2, texture_names);
 }

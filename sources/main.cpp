@@ -1,25 +1,22 @@
 #include <GL/glut.h>
-#include "headers/global_variables.h"
+#include "../headers/global_variables.h"
+#include "../headers/mouse.h"
+#include "../headers/keyboard.h"
+#include "../headers/utility.h"
+#include "../headers/textures.h"
+#include "../headers/models.h"
 
-#include "headers/mouse.h"
-#include "headers/keyboard.h"
-#include "headers/utility.h"
-#include "headers/textures.h"
-
-/* global variables */
 int window_width = 1100;
 int window_height = 600;
 int near_clipping_distance = 1;
 int fovy = 40;
 Room room;
 Camera camera;
-/* end of global variables */
+Model cylinder("models/legoCylinder.obj");
+Model wheel("models/wheel.obj", "models/wheel.mtl");
 
-/* private variables */
 static double projection_matrix_inverse[16] = {0.0};
-/* end of private variables */
 
-/* private functions */
 static void set_window();
 static void on_display(void);
 static void on_reshape(int new_width, int new_height);
@@ -29,20 +26,17 @@ static void get_projection_matrix_inverse();
 
 /* register callbacks */
 static void glut_callback_functions();
-
 /* crate bricks and add them to the room */
 static void create_bricks();
-
 static void opengl_init();
-/* end of private functions */
 
-int main(int argc, char** argv) {
-
+int main(int argc, char** argv)
+{
 	/* init glut */
 	glutInit(&argc, argv);
 	glutInitDisplayMode(
-			GLUT_RGBA | 
-			GLUT_DOUBLE | 
+			GLUT_RGBA |
+			GLUT_DOUBLE |
 			GLUT_DEPTH
 	);
 
@@ -59,19 +53,24 @@ int main(int argc, char** argv) {
 	create_bricks();
 	load_textures();
 
+	/* load models */
+	cylinder.load();
+	wheel.load();
+
 	glutMainLoop();
 
 	return 0;
 }
 
-void set_window() {
+void set_window()
+{
 	glutInitWindowPosition(0, 0);
 	glutInitWindowSize(window_width, window_height);
 	glutCreateWindow("Kocka kocka kockica");
 }
 
-void set_light() {
-
+void set_light()
+{
 	GLfloat light_ambient[] = {0.1, 0.1, 0.1 ,1};
 	GLfloat light_diffuse[] = {1, 1, 1, 1};
 	GLfloat light_specular[] = {0.3, 0.3, 0.3, 1};
@@ -114,8 +113,8 @@ void on_display(void)
 	glutSwapBuffers();
 }
 
-void on_reshape(int new_width, int new_height) {
-
+void on_reshape(int new_width, int new_height)
+{
 	if (new_height == 0)
 		new_height = 1;
 
@@ -137,7 +136,8 @@ void on_reshape(int new_width, int new_height) {
 }
 
 
-void create_bricks() {
+void create_bricks()
+{
 	Brick brick_1(Vector3f(1,16,0), Size(2,1,2), Color(0,1,0, 0.7));
 	Brick brick_2(Vector3f(0,0,0), Size(1,2,4), Color(0.5,0.5,0.5));
 	Brick brick_3(Vector3f(0,5,0), Size(2,1,1), Color(0,0,1));
@@ -180,14 +180,15 @@ void create_bricks() {
 
 }
 
-void draw_cursor(const ut_Point& A, const ut_Point& B, const ut_Point& C) {
+void draw_cursor(const ut_Point& A, const ut_Point& B, const ut_Point& C)
+{
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_LIGHTING);
 
 	glPushMatrix();
 	glLoadIdentity();
 	glMultMatrixd(projection_matrix_inverse);
-	glColor3f(0.6,0.4,0.8);
+	glColor3f(0.6, 0.4, 0.8);
 	ut_draw_triangle(A, B, C);
 	glPopMatrix();
 
@@ -195,7 +196,8 @@ void draw_cursor(const ut_Point& A, const ut_Point& B, const ut_Point& C) {
 	glEnable(GL_LIGHTING);
 }
 
-void get_projection_matrix_inverse() {
+void get_projection_matrix_inverse()
+{
 	/* copied from https://gist.github.com/gyng/8921328 */
 
 	GLdouble projection_matrix[16];
@@ -214,7 +216,8 @@ void get_projection_matrix_inverse() {
 	projection_matrix_inverse[15] = -c / (d * e);
 }
 
-static void glut_callback_functions() {
+static void glut_callback_functions()
+{
 	glutDisplayFunc(on_display);
 	glutReshapeFunc(on_reshape);
 	glutKeyboardFunc(keyboard_ascii_down);
@@ -224,12 +227,12 @@ static void glut_callback_functions() {
 	glutPassiveMotionFunc(on_mouse_passive_move);
 }
 
-static void opengl_init() {
+static void opengl_init()
+{
 	glEnable(GL_DEPTH_TEST);
 
 	/* background color */
 	glClearColor(0.188, 0.231, 0.245,1);
-	/* glClearColor(0.16, 0.16, 0.16, 1); */
 
 	/* for transparent objects */
 	glEnable(GL_BLEND);
