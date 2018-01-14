@@ -139,44 +139,34 @@ void on_reshape(int new_width, int new_height)
 void create_bricks()
 {
 	Brick brick_1(Vector3f(1,16,0), Size(2,1,2), Color(0,1,0, 0.7));
-	Brick brick_2(Vector3f(0,0,0), Size(1,2,4), Color(0.5,0.5,0.5));
-	Brick brick_3(Vector3f(0,5,0), Size(2,1,1), Color(0,0,1));
+	Brick brick_2(Vector3f(0,0,0), Size(1,1,1), Color(1,0,0, 0.7));
+	Brick brick_3(Vector3f(0,5,0), Size(2,1,1), Color(0,0,1, 0.7));
 	Brick brick_4(Vector3f(5,0,0), Size(4,1,2), Color(0.5,0,0));
-	Brick brick_5(Vector3f(5,7,0), Size(1,1,1), Color(1,1,0));
+	Brick brick_5(Vector3f(5,7,0), Size(1,1,1), Color(0.5,1,0.5));
 	Brick brick_6(Vector3f(5,8,0), Size(1,1,2), Color(1,1,1));
 	Brick brick_7(Vector3f(0,8,0), Size(1,2,1), Color(0,1,1));
-	Brick brick_8(Vector3f(0,15,0), Size(1,1,1), Color(0.3,0.3,0.3));
+	Brick brick_8(Vector3f(0,15,0), Size(1,1,1), Color(0.7,0.8,0.4));
 
-	Brick brick_9(Vector3f(4,5,3), Size(2,1,2), Color(1,0,0));
-	Brick brick_10(Vector3f(0,0,3), Size(1,2,4), Color(0.5,0.5,0.5));
-	Brick brick_11(Vector3f(0,5,3), Size(2,1,1), Color(0,0,1));
-	Brick brick_12(Vector3f(5,0,3), Size(4,1,2), Color(0.5,0,0));
-	Brick brick_13(Vector3f(5,7,3), Size(1,1,1), Color(1,1,0));
-	Brick brick_14(Vector3f(5,8,3), Size(1,1,2), Color(1,1,1));
-	Brick brick_15(Vector3f(0,8,3), Size(1,2,1), Color(0,1,1));
-	Brick brick_16(Vector3f(0,15,3), Size(1,1,1), Color(0.3,0.3,0.3));
+	Brick brick_9(Vector3f(10,5,3), Size(2,1,1), Color(0,0,1));
+	Brick brick_10(Vector3f(12,1,3), Size(2,1,2), Color(0,0.8,0));
+	Brick brick_11(Vector3f(9,10,3), Size(1,1,1), Color(1,1,0));
+	Brick brick_12(Vector3f(15,15,3), Size(3,1,1), Color(1,1,0,0.7));
 
 
-
-	room.add(brick_2);
-	room.add(brick_3);
 	room.add(brick_4);
 	room.add(brick_5);
 	room.add(brick_6);
 	room.add(brick_7);
 	room.add(brick_8);
-
-	/* room.add(brick_9); */
-	/* room.add(brick_10); */
-	/* room.add(brick_11); */
-	/* room.add(brick_12); */
-	/* room.add(brick_13); */
-	/* room.add(brick_14); */
-	/* room.add(brick_15); */
-	/* room.add(brick_16); */
+	room.add(brick_9);
+	room.add(brick_10);
+	room.add(brick_11);
 
 	/* transparent bricks in the end (important because of depth test)*/
 	room.add(brick_1);
+	room.add(brick_2);
+	room.add(brick_3);
+	room.add(brick_12);
 
 }
 

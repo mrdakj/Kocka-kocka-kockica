@@ -1,6 +1,6 @@
 # RG001-kocka-kocka-kockica
 
-![Could not be displayed](screenshots/img_6_date_06.01.2018.png?raw=true "kocka kocka kockica")
+![Could not be displayed](screenshots/kockice.png?raw=true "kocka kocka kockica")
 
 ***
 ## :package: Installation

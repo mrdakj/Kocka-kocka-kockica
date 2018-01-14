@@ -670,6 +670,9 @@ Vector3f Room::move_selected_brick(Direction d, float brick_move_speed)
 	Brick& c = bricks[selected_brick_id - 1];
 	Vector3f init_pos = bricks[selected_brick_id - 1].get_world_coordinates();
 
+	if (brick_move_speed < 0.003)
+		return Vector3f();
+
 	if (brick_move_speed > 0.5)
 		brick_move_speed = 0.5;
 

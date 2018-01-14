@@ -8,7 +8,7 @@
 #include "car.h"
 
 
-#define BRICK_SPEED 0.8
+#define BRICK_SPEED 0.08
 
 class Room {
 	private:
