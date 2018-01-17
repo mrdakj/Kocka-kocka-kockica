@@ -16,16 +16,16 @@ extern std::vector<Button> camera_buttons;
 extern std::vector<Button> brick_buttons;
 
 enum {
-	translation_up,
-	translation_down,
-	translation_left,
-	translation_right,
-	translation_forward,
-	translation_backward,
-	rotation_left, 
-	rotation_right,
-	rotation_up,
-	rotation_down
+	Translation_up,
+	Translation_down,
+	Translation_left,
+	Translation_right,
+	Translation_forward,
+	Translation_backward,
+	Rotation_left, 
+	Rotation_right,
+	Rotation_up,
+	Rotation_down
 };
 
 void keyboard_ascii_down(unsigned char key, int x, int y);

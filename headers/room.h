@@ -54,12 +54,12 @@ class Room {
 		bool collision_cylinder(Brick& other, Direction d, float brick_move_speed);
 
 	public:
+		/* size of matrix */
+		int size;
+
 		Car car;
 
 		int number_of_bricks;
-
-		/* size of matrix */
-		int size;
 
 		/* id of selected brick brick, NONE if nothing is selected */
 		int selected_brick_id;
@@ -71,8 +71,7 @@ class Room {
 		std::vector<std::vector<std::vector<unsigned char>>> matrix;
 
 		/* constructors */
-		Room();
-		Room(int size);
+		Room(int size = 20);
 		~Room();
 
 
@@ -94,10 +93,10 @@ class Room {
 		void render();
 
 		/* move selected brick and return difference */
-		Vector3f move_selected_brick(Direction d, float brick_move_speed);
+		ut::Vector3f move_selected_brick(Direction d, float brick_move_speed);
 		
 		/* move selected brick in plane y=0 */
-		Vector3f move_selected_brick(Vector3f direction, float delta_x, float delta_z);
+		ut::Vector3f move_selected_brick(ut::Vector3f direction, float delta_x, float delta_z);
 
 		/* clear a part of the matrix where selected brick brick is */
 		void select();

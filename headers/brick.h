@@ -5,22 +5,20 @@
 #include <stdio.h>
 
 enum Direction {
-	Up, Down,
-	Left, Right,
-	Forward, Backward
+	Up_direction, Down_direction,
+	Left_direction, Right_direction,
+	Forward_direction, Backward_direction
 };
 
 struct Color {
 	float r, g, b, a;
-	Color() : r(1), g(0), b(0), a(1) {}
-	Color(float r, float g, float b) : r(r), g(g), b(b), a(1) {}
-	Color(float r, float g, float b, float a) : r(r), g(g), b(b), a(a) {}
+	/* red is a default color */
+	Color(float r = 1, float g = 0, float b = 0, float a = 1) : r(r), g(g), b(b), a(a) {}
 };
 
 struct Size {
 	int width, height, depth;
-	Size() : width(1), height(1), depth(1) {}
-	Size(int width, int height, int depth) :  width(width), height(height), depth(depth) {}
+	Size(int width = 1, int height = 1, int depth = 1) :  width(width), height(height), depth(depth) {}
 };
 
 class Brick {
@@ -29,19 +27,19 @@ friend class Room;
 
 public:
 	/* attributes */
-	Vector3f pos;
+	ut::Vector3f pos;
 	Size size;
 	Color color;
 
 	/* constructors */
-	Brick();
-	Brick(Vector3f pos, Size size);
-	Brick(Vector3f pos, Size size, Color color);
+	Brick(Color color);
+	Brick(Size size, Color color = Color());
+	Brick(ut::Vector3f pos = ut::Vector3f(), Size size = Size(), Color color = Color());
 
 	/* draw a brick of a given size and color at a given position */
 	void draw_brick() const;
 
-	Vector3f get_world_coordinates() const;
+	ut::Vector3f get_world_coordinates() const;
 
 	void move(Direction d, float delta);
 	void move_to_position(Direction d, float position);

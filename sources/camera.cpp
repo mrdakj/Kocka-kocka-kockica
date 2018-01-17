@@ -6,8 +6,8 @@
 
 Camera::Camera()
 {
-	view = Vector3f(0, 0 , -1);
-	position = Vector3f(0 ,3, 4);
+	view = ut::Vector3f(0, 0 , -1);
+	position = ut::Vector3f(0 ,3, 4);
 
 	theta = -PI/2;
 	phi = PI/2;
@@ -23,7 +23,7 @@ void Camera::look_at() const
 }
 
 
-void Camera::look_at_point(const Vector3f& A)
+void Camera::look_at_point(const ut::Vector3f& A)
 {
 	view = A - position;
 	view.normalize();
@@ -44,13 +44,13 @@ void Camera::recover_angles()
 void Camera::move_forward(float forward_delta)
 {
 	float d = std::sqrt(view.x*view.x+view.z*view.z);
-	position += (forward_delta/d*0.2)*Vector3f(view.x, 0, view.z);
+	position += (forward_delta/d*0.2)*ut::Vector3f(view.x, 0, view.z);
 }
 
 void Camera::move_left(float left_delta)
 {
 	float d = std::sqrt(view.x*view.x+view.z*view.z);
-	position += (left_delta/d*0.2)*Vector3f(view.z, 0, -view.x);
+	position += (left_delta/d*0.2)*ut::Vector3f(view.z, 0, -view.x);
 }
 
 void Camera::move_up(float up_delta)
@@ -71,7 +71,7 @@ void Camera::rotate(float theta_delta, float phi_delta)
 	float sin_theta = std::sin(theta);
 	float cos_theta = std::cos(theta);
 
-	view = Vector3f(sin_phi*cos_theta, -cos_phi, sin_phi*sin_theta);
+	view = ut::Vector3f(sin_phi*cos_theta, -cos_phi, sin_phi*sin_theta);
 }
 
 

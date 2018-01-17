@@ -15,14 +15,14 @@ private:
 	void move_up(float up_delta);
 
 public:
-	Vector3f view;
-	Vector3f position;
+	ut::Vector3f view;
+	ut::Vector3f position;
 
 	Camera();
 	void look_at() const;
 
 	/* set camera to look directly to the point A */
-	void look_at_point(const Vector3f& A);
+	void look_at_point(const ut::Vector3f& A);
 
 	/* get theta and phi from view vector */
 	void recover_angles();

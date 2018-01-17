@@ -31,7 +31,7 @@ void Model::read_materials()
 	int counter = 0;
 	std::string line;
 
-    while (std::getline(f, line)) {
+	while (std::getline(f, line)) {
 
 		if (line.length() == 0)
 			continue;
@@ -71,7 +71,7 @@ void Model::read_materials()
 			counter = 0;
 		}
 
-    }
+	}
 
 	f.close();
 
@@ -93,9 +93,10 @@ void Model::read_file()
 
 	std::string line;
 
-    while (std::getline(f, line)) {
+	while (std::getline(f, line)) {
 		if (line.length() == 0)
 			continue;
+
 		std::istringstream line_stream(line);
 		std::string type;
 		line_stream >> type;
@@ -113,9 +114,8 @@ void Model::read_file()
 		else if (type == "f") {
 			Triangle t;
 			char slash;
-			for (int i = 0; i < 3; i++) {
+			for (int i = 0; i < 3; i++)
 				line_stream >> t.vertex_index[i] >> slash >> slash >> t.normal_index[i];
-			}
 			triangles.push_back(t);
 		}
 		else if (use_materials && type == "usemtl") {

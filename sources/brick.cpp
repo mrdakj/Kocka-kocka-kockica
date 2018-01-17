@@ -6,18 +6,13 @@
 
 #define eps 0.001
 
-Brick::Brick() : Brick(Vector3f(), Size()) {}
+Brick::Brick(Color color) : color(color) {}
+Brick::Brick(Size size, Color color) : size(size), color(color)  {}
+Brick::Brick(ut::Vector3f pos, Size size, Color color) : pos(pos), size(size), color(color) {}
 
-Brick::Brick(Vector3f pos, Size size) : pos(pos), size(size) {}
-
-Brick::Brick(Vector3f pos, Size size, Color color) : Brick(pos, size)
+ut::Vector3f Brick::get_world_coordinates() const
 {
-	this->color = color;
-}
-
-Vector3f Brick::get_world_coordinates() const
-{
-	return Vector3f(pos.x, pos.z, -pos.y);
+	return ut::Vector3f(pos.x, pos.z, -pos.y);
 }
 
 float Brick::cylinder_front() const
@@ -45,7 +40,7 @@ void Brick::draw_cuboid() const
 	glPushMatrix();
 	/* draw a cuboid smaller because of flickering when camera is inside it */
 	glTranslatef(eps/2, eps/2, -eps/2);
-	ut_draw_cuboid(size.width - eps, size.depth - eps, size.height - eps);
+	ut::draw_cuboid(size.width - eps, size.depth - eps, size.height - eps);
 	glPopMatrix();
 }
 
@@ -105,22 +100,22 @@ void Brick::round()
 void Brick::move(Direction d, float delta)
 {
 	switch (d) {
-		case Left:
+		case Left_direction:
 			pos.x -= delta;
 			break;
-		case Right:
+		case Right_direction:
 			pos.x += delta;
 			break;
-		case Forward:
+		case Forward_direction:
 			pos.y -= delta;
 			break;
-		case Backward:
+		case Backward_direction:
 			pos.y += delta;
 			break;
-		case Up:
+		case Up_direction:
 			pos.z += delta;
 			break;
-		case Down:
+		case Down_direction:
 			pos.z -= delta;
 			break;
 	}
@@ -129,16 +124,16 @@ void Brick::move(Direction d, float delta)
 void Brick::move_to_position(Direction d, float position)
 {
 	switch (d) {
-		case Left:
-		case Right:
+		case Left_direction:
+		case Right_direction:
 			pos.x = position;
 			break;
-		case Forward:
-		case Backward:
+		case Forward_direction:
+		case Backward_direction:
 			pos.y = position;
 			break;
-		case Up:
-		case Down:
+		case Up_direction:
+		case Down_direction:
 			pos.z = position;
 			break;
 	}
@@ -149,22 +144,22 @@ void Brick::move_to_position(Direction d, float position)
 float Brick::get_distance(Direction d) const
 {
 	switch (d) {
-		case Left:
+		case Left_direction:
 			return std::fabs(std::floor(pos.x)-pos.x);
 			break;
-		case Right:
+		case Right_direction:
 			return std::fabs(std::ceil(pos.x)-pos.x);
 			break;
-		case Forward:
+		case Forward_direction:
 			return std::fabs(std::floor(pos.y)-pos.y);
 			break;
-		case Backward:
+		case Backward_direction:
 			return std::fabs(std::ceil(pos.y)-pos.y);
 			break;
-		case Up:
+		case Up_direction:
 			return std::fabs(std::ceil(pos.z)-pos.z);
 			break;
-		case Down:
+		case Down_direction:
 			return std::fabs(std::floor(pos.z)-pos.z);
 			break;
 	}

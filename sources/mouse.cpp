@@ -24,11 +24,11 @@ struct Mouse {
 static Mouse mouse(0.01);
 
 /* world coordinates of selection */
-Vector3f selection;
+ut::Vector3f selection;
 
-static void get_axes_of_near_clipping_plane(Vector3f& x_axis, Vector3f& y_axis)
+static void get_axes_of_near_clipping_plane(ut::Vector3f& x_axis, ut::Vector3f& y_axis)
 {
-	x_axis = camera.view * Vector3f(0,1,0);
+	x_axis = camera.view * ut::Vector3f(0,1,0);
 	x_axis.normalize();
 
 	y_axis = x_axis * camera.view;
@@ -53,9 +53,9 @@ static void transform_coordinates(float& x, float& y)
 	x /= window_width/2.0;
 }
 
-static Vector3f get_point_at_near_clipping_plane(float x, float y)
+static ut::Vector3f get_point_at_near_clipping_plane(float x, float y)
 {
-	Vector3f x_axis, y_axis;
+	ut::Vector3f x_axis, y_axis;
 	get_axes_of_near_clipping_plane(x_axis, y_axis);
 
 	transform_coordinates(x, y);
@@ -64,11 +64,11 @@ static Vector3f get_point_at_near_clipping_plane(float x, float y)
 }
 
 /* get a direction of mouse picking ray */
-static Vector3f get_ray_direction(float x, float y)
+static ut::Vector3f get_ray_direction(float x, float y)
 {
-	Vector3f point_at_clipping_plane = get_point_at_near_clipping_plane(x, y);
+	ut::Vector3f point_at_clipping_plane = get_point_at_near_clipping_plane(x, y);
 
-	Vector3f direction = point_at_clipping_plane - camera.position;
+	ut::Vector3f direction = point_at_clipping_plane - camera.position;
 
 	return direction;
 }
@@ -80,13 +80,13 @@ struct Plane {
 };
 
 /* intersect ray with plane in the room and set distance from camera postion to intersection point */
-static Vector3f	intersect_ray_and_plane(float x, float y, const Plane& plane, float& distance)
+static ut::Vector3f	intersect_ray_and_plane(float x, float y, const Plane& plane, float& distance)
 {
-	Vector3f direction = get_ray_direction(x, y);
-	Vector3f plane_up = Vector3f(plane.a, plane.b, plane.c);
+	ut::Vector3f direction = get_ray_direction(x, y);
+	ut::Vector3f plane_up = ut::Vector3f(plane.a, plane.b, plane.c);
 	float k = (-plane.d-camera.position.dot(plane_up)) / direction.dot(plane_up);
 
-	Vector3f A = camera.position + k*direction;
+	ut::Vector3f A = camera.position + k*direction;
 
 	if (std::isnan(k) || k < near_clipping_distance || A.x < 0 || A.x > room.size || A.y < 0 || A.y > room.size || A.z > 0 || A.z < -room.size)
 		A.set_nan();
@@ -106,17 +106,17 @@ enum Plane_family {
 struct PlanesXYZ {
 	float min_distance;
 	int id;
-	Vector3f selection;
-	PlanesXYZ() : min_distance(INF), id(-1), selection(Vector3f(0 ,0 ,0)) {}
+	ut::Vector3f selection;
+	PlanesXYZ() : min_distance(INF), id(-1), selection(ut::Vector3f(0 ,0 ,0)) {}
 
 	void reset() {
-		selection = Vector3f(0, 0, 0);
+		selection = ut::Vector3f(0, 0, 0);
 		min_distance = INF;
 		id = -1;
 	}
 
 	/* try to update distance, id and selection */
-	bool update(float distance, int id, const Vector3f& A) {
+	bool update(float distance, int id, const ut::Vector3f& A) {
 		if (id==0 || id==255 || id == -1) return false;
 
 		if (distance < min_distance) {
@@ -155,7 +155,7 @@ static int get_id(float mouse_x, float mouse_y)
 		for (int d = 0; d <= room.size; d++) {
 			/* this is a vector OA, or just a point A */
 			float distance;
-			Vector3f A = intersect_ray_and_plane(mouse_x, mouse_y, get_plane(plane_family, d), distance);
+			ut::Vector3f A = intersect_ray_and_plane(mouse_x, mouse_y, get_plane(plane_family, d), distance);
 
 			if (A.is_nan()) continue;
 
@@ -180,9 +180,9 @@ static int get_id(float mouse_x, float mouse_y)
 		}
 	}
 
-	int plane_family_with_min_distance = ut_index_of_minimum(planesXYZ[X].min_distance, planesXYZ[Y].min_distance, planesXYZ[Z].min_distance);
+	int plane_family_with_min_distance = ut::index_of_minimum(planesXYZ[X].min_distance, planesXYZ[Y].min_distance, planesXYZ[Z].min_distance);
 
-	selection = planesXYZ[plane_family_with_min_distance].selection + Vector3f(0, 0.2, 0);
+	selection = planesXYZ[plane_family_with_min_distance].selection + ut::Vector3f(0, 0.2, 0);
 
 	return planesXYZ[plane_family_with_min_distance].id;
 }
@@ -280,7 +280,7 @@ void on_mouse_active_move(int x, int y)
 
 	if (mouse.left_button_down && !mouse.right_button_down) {
 
-		float distance =Vector3f(selection.x-camera.position.x, 0, selection.z-camera.position.z).norm_squared();
+		float distance =ut::Vector3f(selection.x-camera.position.x, 0, selection.z-camera.position.z).norm_squared();
 
 		if (distance<1*1 && delta_y<0)
 			delta_y = 0;
@@ -292,9 +292,9 @@ void on_mouse_active_move(int x, int y)
 		if (delta_y > 0.9) delta_y = 0.9;
 		if (delta_y < -0.9) delta_y = -0.9;
 		if (delta_y > 0)
-			selection += room.move_selected_brick(Up, delta_y);
+			selection += room.move_selected_brick(Up_direction, delta_y);
 		else if (delta_y < 0)
-			selection += room.move_selected_brick(Down, -delta_y);
+			selection += room.move_selected_brick(Down_direction, -delta_y);
 	}
 
 	if (!mouse_in_center(x, y))

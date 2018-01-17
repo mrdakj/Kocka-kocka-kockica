@@ -23,7 +23,7 @@ static void set_window();
 static void on_display(void);
 static void on_reshape(int new_width, int new_height);
 static void set_light();
-static void draw_cursor(const ut_Point& A, const ut_Point& B, const ut_Point& C);
+static void draw_cursor(const ut::Point& A, const ut::Point& B, const ut::Point& C);
 static void get_projection_matrix_inverse();
 
 /* register callbacks */
@@ -106,9 +106,9 @@ void on_display(void)
 
 	/* draw cursor */
 	draw_cursor(
-		ut_Point(-0.02, -0.02, 0),
-		ut_Point(0.02, -0.02, 0),
-		ut_Point()
+		ut::Point(-0.02, -0.02, 0),
+		ut::Point(0.02, -0.02, 0),
+		ut::Point()
 	);
 
 	/* send new picture to the screen */
@@ -140,19 +140,19 @@ void on_reshape(int new_width, int new_height)
 
 void create_bricks()
 {
-	Brick brick_1(Vector3f(1,16,0), Size(2,1,2), Color(0,1,0, 0.7));
-	Brick brick_2(Vector3f(0,0,0), Size(1,1,1), Color(1,0,0, 0.7));
-	Brick brick_3(Vector3f(0,5,0), Size(2,1,1), Color(0,0,1, 0.7));
-	Brick brick_4(Vector3f(5,0,0), Size(4,1,2), Color(0.5,0,0));
-	Brick brick_5(Vector3f(5,7,0), Size(1,1,1), Color(0.5,1,0.5));
-	Brick brick_6(Vector3f(5,8,0), Size(1,1,2), Color(1,1,1));
-	Brick brick_7(Vector3f(0,8,0), Size(1,2,1), Color(0,1,1));
-	Brick brick_8(Vector3f(0,15,0), Size(1,1,1), Color(0.7,0.8,0.4));
+	Brick brick_1(ut::Vector3f(1,16,0), Size(2,1,2), Color(0,1,0, 0.7));
+	Brick brick_2(ut::Vector3f(0,0,0), Size(1,1,1), Color(1,0,0, 0.7));
+	Brick brick_3(ut::Vector3f(0,5,0), Size(2,1,1), Color(0,0,1, 0.7));
+	Brick brick_4(ut::Vector3f(5,0,0), Size(4,1,2), Color(0.5,0,0));
+	Brick brick_5(ut::Vector3f(5,7,0), Size(1,1,1), Color(0.5,1,0.5));
+	Brick brick_6(ut::Vector3f(5,8,0), Size(1,1,2), Color(1,1,1));
+	Brick brick_7(ut::Vector3f(0,8,0), Size(1,2,1), Color(0,1,1));
+	Brick brick_8(ut::Vector3f(0,15,0), Size(1,1,1), Color(0.7,0.8,0.4));
 
-	Brick brick_9(Vector3f(10,5,3), Size(2,1,1), Color(0,0,1));
-	Brick brick_10(Vector3f(12,1,3), Size(2,1,2), Color(0,0.8,0));
-	Brick brick_11(Vector3f(9,10,3), Size(1,1,1), Color(1,1,0));
-	Brick brick_12(Vector3f(15,15,3), Size(3,1,1), Color(1,1,0,0.7));
+	Brick brick_9(ut::Vector3f(10,5,3), Size(2,1,1), Color(0,0,1));
+	Brick brick_10(ut::Vector3f(12,1,3), Size(2,1,2), Color(0,0.8,0));
+	Brick brick_11(ut::Vector3f(9,10,3), Size(1,1,1), Color(1,1,0));
+	Brick brick_12(ut::Vector3f(15,15,3), Size(3,1,1), Color(1,1,0,0.7));
 
 
 	room.add(brick_4);
@@ -172,7 +172,7 @@ void create_bricks()
 
 }
 
-void draw_cursor(const ut_Point& A, const ut_Point& B, const ut_Point& C)
+void draw_cursor(const ut::Point& A, const ut::Point& B, const ut::Point& C)
 {
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_LIGHTING);
@@ -181,7 +181,7 @@ void draw_cursor(const ut_Point& A, const ut_Point& B, const ut_Point& C)
 	glLoadIdentity();
 	glMultMatrixd(projection_matrix_inverse);
 	glColor3f(0.6, 0.4, 0.8);
-	ut_draw_triangle(A, B, C);
+	ut::draw_triangle(A, B, C);
 	glPopMatrix();
 
 	glEnable(GL_DEPTH_TEST);
