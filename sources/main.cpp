@@ -1,4 +1,5 @@
 #include <GL/glut.h>
+#include <string>
 #include "../headers/global_variables.h"
 #include "../headers/mouse.h"
 #include "../headers/keyboard.h"
@@ -12,8 +13,9 @@ int near_clipping_distance = 1;
 int fovy = 40;
 Room room;
 Camera camera;
-Model cylinder("models/legoCylinder.obj");
-Model wheel("models/wheel.obj", "models/wheel.mtl");
+
+Model cylinder(std::string("models/legoCylinder.obj"));
+Model wheel(std::string("models/wheel.obj"),std::string("models/wheel.mtl"));
 
 static double projection_matrix_inverse[16] = {0.0};
 

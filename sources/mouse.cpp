@@ -8,7 +8,7 @@
 
 #define INF (std::numeric_limits<int>::max())
 
-#define unused_function_arg(x) ((void)x)
+#define unused(x) ((void)x)
 
 struct Mouse {
 	float sensitivity;
@@ -190,8 +190,8 @@ static int get_id(float mouse_x, float mouse_y)
 
 void on_mouse_click(int button, int state, int x, int y)
 {
-	unused_function_arg(x);
-	unused_function_arg(y);
+	unused(x);
+	unused(y);
 
 	if (room.car.is_going)
 		return;
@@ -202,7 +202,8 @@ void on_mouse_click(int button, int state, int x, int y)
 
 		mouse.left_button_down = true;
 
-
+		/* mouse is in the center of the screen */
+		/* get the id under the mouse */
 		int id = get_id(window_width/2.0, window_height/2.0);
 
 		room.pick(id);

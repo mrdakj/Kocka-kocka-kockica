@@ -1,41 +1,19 @@
 #include "../headers/model.h"
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
+#include <fstream>
+#include <sstream>
 
-Model::Model(const char* file_name)
-{
-	this->file_name = strdup(file_name);
-	this->materials_name = NULL;
-	use_materials = false;
-	material_file_read = false;
-	file_read = false;
-	loaded = false;
-}
+Model::Model(std::string file_name) :
+	file_name(file_name), materials_name(""),
+	file_read(false), material_file_read(false),
+	use_materials(false), loaded(false) {}
 
-Model::Model(const char* file_name, const char* material_file_name)
-{
-	this->materials_name = strdup(material_file_name);
-	this->file_name = strdup(file_name);
-	use_materials = true;
-	material_file_read = false;
-	file_read = false;
-	loaded = false;
-}
+Model::Model(std::string file_name, std::string material_file_name) :
+	file_name(file_name), materials_name(material_file_name),
+	file_read(false), material_file_read(false),
+	use_materials(true), loaded(false) {}
 
 Model::~Model()
 {
-	if (file_name)
-		free(file_name);
-
-	if (materials_name)
-		free(materials_name);
-
-	for (Material m : materials) {
-		if (m.name)
-			free(m.name);
-	}
-
 	glDeleteLists(display_list, 1);
 }
 
@@ -43,56 +21,48 @@ void Model::read_materials()
 {
 	if (!use_materials || material_file_read) return;
 
-	FILE* f = fopen(materials_name, "r");
-	if (f == NULL)
+	std::ifstream f(materials_name);
+
+	if(!f)
 		return;
 
-    char * line = NULL;
-    size_t len = 0;
-    ssize_t read;
 	Material m;
 
 	int counter = 0;
+	std::string line;
 
-    while ((read = getline(&line, &len, f)) != -1) {
+    while (std::getline(f, line)) {
 
-		char* word_1 = (char*)malloc(len); 
-		char* word_2 = (char*)malloc(len); 
+		if (line.length() == 0)
+			continue;
 
-		sscanf(line, "%s %s", word_1, word_2);
-		if (strcmp(word_1, "newmtl")==0) {
-			m.name = strdup(word_2);
+		std::istringstream line_stream(line);
+
+		std::string type;
+		line_stream >> type;
+
+		if (type == "newmtl") {
+			line_stream >> m.name;
 			counter++;
 		}
-
-		if (word_1)
-			free(word_1);
-		if (word_2)
-			free(word_2);
-
-
-		if (len > 1 && line[0] == 'N' && line[1] == 's') {
-			sscanf(line, "Ns %f", &m.shininess);
+		else if (type == "Ns") {
+			line_stream >> m.shininess;
 			counter++;
 		}
-
-		if (len > 1 && line[0] == 'K' && line[1] == 'a') {
-			sscanf(line, "Ka %f %f %f", &m.ambient.x, &m.ambient.y, &m.ambient.z);
+		else if (type == "Ka") {
+			line_stream >> m.ambient.x >> m.ambient.y >> m.ambient.z;
 			counter++;
 		}
-
-		if (len > 1 && line[0] == 'K' && line[1] == 'd') {
-			sscanf(line, "Kd %f %f %f", &m.diffuse.x, &m.diffuse.y, &m.diffuse.z);
+		else if (type == "Kd") {
+			line_stream >> m.diffuse.x >> m.diffuse.y >> m.diffuse.z;
 			counter++;
 		}
-
-		if (len > 1 && line[0] == 'K' && line[1] == 's') {
-			sscanf(line, "Ks %f %f %f", &m.specular.x, &m.specular.y, &m.specular.z);
+		else if (type == "Ks") {
+			line_stream >> m.specular.x >> m.specular.y >> m.specular.z;
 			counter++;
 		}
-
-		if (len > 1 && line[0] == 'K' && line[1] == 'e') {
-			sscanf(line, "Ke %f %f %f", &m.emission.x, &m.emission.y, &m.emission.z);
+		else if (type == "Ke") {
+			line_stream >> m.emission.x >> m.emission.y >> m.emission.z;
 			counter++;
 		}
 
@@ -103,11 +73,7 @@ void Model::read_materials()
 
     }
 
-    if (line) {
-		free(line);
-	}
-	
-	fclose(f);
+	f.close();
 
 	material_file_read = true;
 }
@@ -120,56 +86,50 @@ void Model::read_file()
 	if (use_materials && !material_file_read)
 		read_materials();
 
-	FILE* f = fopen(file_name, "r");
-	if (f == NULL)
+	std::ifstream f(file_name);
+
+	if (!f)
 		return;
 
-    char * line = NULL;
-    size_t len = 0;
-    ssize_t read;
+	std::string line;
 
-    while ((read = getline(&line, &len, f)) != -1) {
-		if (line[0] == 'v') {
-			if (line[1] == 'n') {
-				Normal normal;
-				sscanf(line, "vn %f %f %f",&normal.x,&normal.y,&normal.z);
-				normals.push_back(normal);
-			} else {
-				Vertex ver;
-				sscanf(line, "v %f %f %f",&ver.x,&ver.y,&ver.z);
-				vertices.push_back(ver);
-			}
+    while (std::getline(f, line)) {
+		if (line.length() == 0)
+			continue;
+		std::istringstream line_stream(line);
+		std::string type;
+		line_stream >> type;
+
+		if (type == "vn") {
+			Normal normal;
+			line_stream >> normal.x >> normal.y >> normal.z;
+			normals.push_back(normal);
 		}
-		else if (line[0]=='f') {
+		else if (type == "v") {
+			Vertex ver;
+			line_stream >> ver.x >> ver.y >> ver.z;
+			vertices.push_back(ver);
+		}
+		else if (type == "f") {
 			Triangle t;
-			sscanf(line, "f %d//%d %d//%d %d//%d", &t.vertex_index[0], &t.normal_index[0], &t.vertex_index[1], &t.normal_index[1], &t.vertex_index[2], &t.normal_index[2]);
+			char slash;
+			for (int i = 0; i < 3; i++) {
+				line_stream >> t.vertex_index[i] >> slash >> slash >> t.normal_index[i];
+			}
 			triangles.push_back(t);
 		}
-		else if (use_materials) {
-			char* word_1 = (char*)malloc(len); 
-			char* word_2 = (char*)malloc(len); 
-
-			sscanf(line, "%s %s", word_1, word_2);
-			if (strcmp(word_1, "usemtl")==0) {
-				for (int i = 0; i < (int)materials.size(); i++) {
-					if (strcmp(word_2, materials[i].name) == 0)
-						materials_index.push_back(std::make_pair(triangles.size(), i));
-				}
+		else if (use_materials && type == "usemtl") {
+			std::string mat_name;
+			line_stream >> mat_name;
+			for (int i = 0; i < (int)materials.size(); i++) {
+				if (mat_name == materials[i].name)
+					materials_index.push_back(std::make_pair(triangles.size(), i));
 			}
-
-			if (word_1)
-				free(word_1);
-			if (word_2)
-				free(word_2);
 		}
-    }
-
-    if (line) {
-		free(line);
 	}
-	
-	fclose(f);
 
+	f.close();
+	
 	file_read = true;
 }
 
@@ -231,4 +191,3 @@ void Model::render() const
 	if (loaded)
 		glCallList(display_list);
 }
-

@@ -3,6 +3,7 @@
 
 #include <GL/glut.h>
 #include <vector>
+#include <string>
 
 struct Float_3 {
 	float x, y, z;
@@ -22,27 +23,27 @@ struct Material {
 	Float_3 diffuse;
 	Float_3 specular;
 	Float_3 emission;
-	char* name;
+	std::string name;
 };
 
 class Model {
 
 public:
-	Model(const char* file_name, const char* material_file_name);
-	Model(const char* file_name);
+	Model(std::string file_name, std::string material_file_name);
+	Model(std::string file_name);
 	~Model();
 
 	void render() const;
 	void load();
 	
 private:
-	char* file_name;
-	char* materials_name;
+	std::string file_name;
+	std::string materials_name;
 
-	bool loaded;
 	bool file_read;
 	bool material_file_read;
 	bool use_materials;
+	bool loaded;
 
 	std::vector<Vertex> vertices;
 	std::vector<Normal> normals;

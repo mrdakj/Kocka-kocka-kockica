@@ -1,7 +1,7 @@
 #include "../headers/global_variables.h"
 #include "../headers/keyboard.h"
 
-#define unused_function_arg(x) ((void)x)
+#define unused(x) ((void)x)
 
 /* exit button */
 Button bt_exit(27);
@@ -36,7 +36,7 @@ std::vector<Button> camera_buttons = {
 };
 
 
-/* change button state with key key and activate timer if needed (if it is not NULL) */
+/* change button state with key key and activate timer if needed (if it is not nullptr) */
 static void action(unsigned char key, std::vector<Button>& buttons, Timer* timer);
 
 static void action(unsigned char key, std::vector<Button>& buttons, Timer* timer)
@@ -44,7 +44,7 @@ static void action(unsigned char key, std::vector<Button>& buttons, Timer* timer
 	for (Button& bt : buttons) {
 		if (key == bt.key) {
 			bt.change_state();
-			if (timer != NULL)
+			if (timer != nullptr)
 				timer->activate();
 		}
 	}
@@ -63,8 +63,8 @@ bool all_released(const std::vector<Button>& buttons)
 
 void keyboard_ascii_down(unsigned char key, int x, int y)
 {
-	unused_function_arg(x);
-	unused_function_arg(y);
+	unused(x);
+	unused(y);
 
 	/* exit program */
 	if (key == bt_exit.key)
@@ -88,12 +88,12 @@ void keyboard_ascii_down(unsigned char key, int x, int y)
 
 void keyboard_ascii_up(unsigned char key, int x, int y)
 {
-	unused_function_arg(x);
-	unused_function_arg(y);
+	unused(x);
+	unused(y);
 
 	/* camera */
-	action(key, camera_buttons, NULL);
+	action(key, camera_buttons, nullptr);
 
 	/* brick */
-	action(key, brick_buttons, NULL);
+	action(key, brick_buttons, nullptr);
 }
