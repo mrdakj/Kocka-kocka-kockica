@@ -98,7 +98,7 @@ void Car::go()
 	translation_x += 0.02;
 }
 
-float Car::Wheel_left(Wheel w) const
+float Car::wheel_left(Wheel w) const
 {
 	switch (w) {
 		case Wheel_1:
@@ -114,7 +114,7 @@ float Car::Wheel_left(Wheel w) const
 	return -1;
 }
 
-float Car::Wheel_right(Wheel w) const
+float Car::wheel_right(Wheel w) const
 {
 	switch (w) {
 		case Wheel_1:
@@ -131,7 +131,7 @@ float Car::Wheel_right(Wheel w) const
 
 }
 
-float Car::Wheel_front(Wheel w) const
+float Car::wheel_front(Wheel w) const
 {
 	switch (w) {
 		case Wheel_1:
@@ -148,7 +148,7 @@ float Car::Wheel_front(Wheel w) const
 
 }
 
-float Car::Wheel_back(Wheel w) const
+float Car::wheel_back(Wheel w) const
 {
 	switch (w) {
 		case Wheel_1:

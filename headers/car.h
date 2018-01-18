@@ -24,10 +24,10 @@ public:
 	float get_position() const;
 
 	/* wheel clipping planes */
-	float Wheel_left(Wheel w) const;
-	float Wheel_right(Wheel w) const;
-	float Wheel_front(Wheel w) const;
-	float Wheel_back(Wheel w) const;
+	float wheel_left(Wheel w) const;
+	float wheel_right(Wheel w) const;
+	float wheel_front(Wheel w) const;
+	float wheel_back(Wheel w) const;
 	int wheels_top() const;
 
 	/* get x coordinate of the center */

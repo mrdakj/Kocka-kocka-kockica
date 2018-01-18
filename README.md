@@ -1,10 +1,11 @@
 # RG001-kocka-kocka-kockica
 
-![Could not be displayed](screenshots/kockice.png?raw=true "kocka kocka kockica")
+[![Watch the video](screenshots/kockice.png)](https://www.youtube.com/watch?v=UA_t3k20eEs)
 
 ***
 ## :package: Installation
 :exclamation: Requirements: Freeglut 
+
 
 ### Manual
 

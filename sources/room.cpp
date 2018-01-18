@@ -372,11 +372,11 @@ float Room::collision_wheel(Direction d, float brick_move_speed, Wheel wheel) co
 		if (!(c.pos.z < car.wheels_top() + limit))
 			return NOT_SET;
 
-		bool cond_x = (c.pos.x < car.Wheel_left(wheel) + eps && c.pos.x + c.size.width > car.Wheel_left(wheel) + eps)
-					|| (c.pos.x > car.Wheel_left(wheel) + eps && c.pos.x < car.Wheel_right(wheel) - eps);
+		bool cond_x = (c.pos.x < car.wheel_left(wheel) + eps && c.pos.x + c.size.width > car.wheel_left(wheel) + eps)
+					|| (c.pos.x > car.wheel_left(wheel) + eps && c.pos.x < car.wheel_right(wheel) - eps);
 
-		bool cond_y = (c.pos.y < car.Wheel_front(wheel) + eps && c.pos.y + c.size.depth > car.Wheel_front(wheel) + eps)
-					|| (c.pos.y > car.Wheel_front(wheel) + eps && c.pos.y < car.Wheel_back(wheel) - eps);
+		bool cond_y = (c.pos.y < car.wheel_front(wheel) + eps && c.pos.y + c.size.depth > car.wheel_front(wheel) + eps)
+					|| (c.pos.y > car.wheel_front(wheel) + eps && c.pos.y < car.wheel_back(wheel) - eps);
 
 		if (cond_x && cond_y) {
 			float suggested_position = c.pos.z - brick_move_speed;
@@ -402,11 +402,11 @@ float Room::collision_wheel(Direction d, float brick_move_speed, Wheel wheel) co
 
 
 	if (d == Left_direction) {
-		if (!(c.pos.x > car.center_x(wheel) && c.pos.x < car.Wheel_right(wheel) + limit))
+		if (!(c.pos.x > car.center_x(wheel) && c.pos.x < car.wheel_right(wheel) + limit))
 			return NOT_SET;
 
-		bool cond_y = (c.pos.y < car.Wheel_front(wheel) + eps && c.pos.y+c.size.depth > car.Wheel_front(wheel) + eps)
-					|| (c.pos.y > car.Wheel_front(wheel) + eps && c.pos.y < car.Wheel_back(wheel) - eps);
+		bool cond_y = (c.pos.y < car.wheel_front(wheel) + eps && c.pos.y+c.size.depth > car.wheel_front(wheel) + eps)
+					|| (c.pos.y > car.wheel_front(wheel) + eps && c.pos.y < car.wheel_back(wheel) - eps);
 
 		if (cond_y) {
 			float suggested_position = c.pos.x - brick_move_speed;
@@ -420,11 +420,11 @@ float Room::collision_wheel(Direction d, float brick_move_speed, Wheel wheel) co
 	}
 
 	if (d == Right_direction) {
-		if (!(c.pos.x+c.size.width < car.center_x(wheel) && c.pos.x+c.size.width > car.Wheel_left(wheel) - limit))
+		if (!(c.pos.x+c.size.width < car.center_x(wheel) && c.pos.x+c.size.width > car.wheel_left(wheel) - limit))
 			return NOT_SET;
 
-		bool cond_y = (c.pos.y < car.Wheel_front(wheel) + eps && c.pos.y+c.size.depth > car.Wheel_front(wheel) + eps)
-					|| (c.pos.y > car.Wheel_front(wheel) + eps && c.pos.y < car.Wheel_back(wheel) - eps);
+		bool cond_y = (c.pos.y < car.wheel_front(wheel) + eps && c.pos.y+c.size.depth > car.wheel_front(wheel) + eps)
+					|| (c.pos.y > car.wheel_front(wheel) + eps && c.pos.y < car.wheel_back(wheel) - eps);
 
 		if (cond_y) {
 			float suggested_position = c.pos.x + brick_move_speed;
@@ -438,7 +438,7 @@ float Room::collision_wheel(Direction d, float brick_move_speed, Wheel wheel) co
 	}
 
 	if (d == Backward_direction) {
-		if (!(c.pos.y+c.size.depth < car.Wheel_front(wheel) + eps && c.pos.y+c.size.depth > car.Wheel_front(wheel) - limit))
+		if (!(c.pos.y+c.size.depth < car.wheel_front(wheel) + eps && c.pos.y+c.size.depth > car.wheel_front(wheel) - limit))
 			return NOT_SET;
 
 		/* bottom left corner is inside wheel circle */
@@ -451,7 +451,7 @@ float Room::collision_wheel(Direction d, float brick_move_speed, Wheel wheel) co
 			float suggested_position = c.pos.y + brick_move_speed;
 
 			/* upper bound of y coordinate of brick bottom left corner */
-			float limit_position = car.Wheel_front(wheel) - c.size.depth;
+			float limit_position = car.wheel_front(wheel) - c.size.depth;
 
 			if (suggested_position > limit_position)
 				return limit_position;
@@ -459,7 +459,7 @@ float Room::collision_wheel(Direction d, float brick_move_speed, Wheel wheel) co
 	}
 
 	if (d==Forward_direction) {
-		if (!(c.pos.y > car.Wheel_back(wheel) - eps && c.pos.y < car.Wheel_back(wheel) + limit))
+		if (!(c.pos.y > car.wheel_back(wheel) - eps && c.pos.y < car.wheel_back(wheel) + limit))
 			return NOT_SET;
 
 		/* bottom left corner is inside wheel circle */
@@ -472,7 +472,7 @@ float Room::collision_wheel(Direction d, float brick_move_speed, Wheel wheel) co
 			float suggested_position = c.pos.y - brick_move_speed;
 
 			/* lower bound of y coordinate of brick bottom left corner */
-			float limit_position = car.Wheel_back(wheel);
+			float limit_position = car.wheel_back(wheel);
 
 			if (suggested_position < limit_position)
 				return limit_position;
