@@ -198,7 +198,7 @@ void on_mouse_click(int button, int state, int x, int y)
 
 	if (button == GLUT_LEFT_BUTTON &&  state == GLUT_DOWN) {
 
-		/* left click is pressed, try to select a brick */
+		/* left button is pressed, try to select a brick */
 
 		mouse.left_button_down = true;
 

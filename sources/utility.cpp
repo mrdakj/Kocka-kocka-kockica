@@ -56,6 +56,7 @@ namespace ut {
 		glDisable(GL_NORMALIZE);
 	}
 
+	/* draw a rectangle with texture in plane y = 0, with bottom left corner at (0, 0) */
 	void draw_rectangle_with_texture_XZ(float width, float depth)
 	{
 		glBegin(GL_QUADS);
@@ -71,7 +72,7 @@ namespace ut {
 		glEnd();
 	}
 
-	/* draw a rectangle with texture in plane z = 0, with left down corner at (0, 0) */
+	/* draw a rectangle with texture in plane z = 0, with bottom left corner at (0, 0) */
 	void draw_rectangle_with_texture_XY(float width, float height)
 	{
 		glBegin(GL_QUADS);
@@ -87,7 +88,7 @@ namespace ut {
 		glEnd();
 	}
 
-	/* draw a rectangle with texture in plane x = 0, with right down corner at (0, 0) */
+	/* draw a rectangle with texture in plane x = 0, with bottom right corner at (0, 0) */
 	void draw_rectangle_with_texture_YZ(float height, float depth)
 	{
 		glBegin(GL_QUADS);

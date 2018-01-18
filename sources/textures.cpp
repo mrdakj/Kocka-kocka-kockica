@@ -6,7 +6,7 @@ static void create_texture(Image* image, GLuint* texture_names, const char* file
 
 void load_textures()
 {
-    glEnable(GL_TEXTURE_2D);
+	glEnable(GL_TEXTURE_2D);
 
 	/* enable light with textures */
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
@@ -14,16 +14,16 @@ void load_textures()
 	Image* image = image_init(0, 0);
 
 	/* generate texture names */
-    glGenTextures(NUMBER_OF_TEXTURES, texture_names);
+	glGenTextures(NUMBER_OF_TEXTURES, texture_names);
 
 	create_texture(image, texture_names, FILENAME0, 0);
 	create_texture(image, texture_names, FILENAME1, 1);
 
 	/* default texture */
-    glBindTexture(GL_TEXTURE_2D, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
 
 	/* destroy object for drawing textures from the file */
-    image_done(image);
+	image_done(image);
 }
 
 static void create_texture(Image* image, GLuint* texture_names, const char* file_name, int texture_index)

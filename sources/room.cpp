@@ -33,8 +33,6 @@ Room::Room(int size) : refresh_car(true), car_display_list(NOT_SET), size(size),
 	matrix_set_car();
 }
 
-/* end of constuctors */
-
 Room::~Room()
 {
 	glDeleteLists(car_display_list, 1);
@@ -115,7 +113,7 @@ int Room::get_matrix_field(int i, int j, int k) const
 void Room::draw_wall() const
 {
 	glColor3f(0.7, 0, 0);
-    glBindTexture(GL_TEXTURE_2D, texture_names[0]);
+	glBindTexture(GL_TEXTURE_2D, texture_names[0]);
 
 	glPushMatrix();
 	glTranslatef(size, -0.5, 0);
@@ -127,7 +125,7 @@ void Room::draw_wall() const
 	ut::draw_rectangle_with_texture_XY(size, size/2);
 	glPopMatrix();
 
-    glBindTexture(GL_TEXTURE_2D, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void Room::render_room() const
@@ -224,7 +222,7 @@ void Room::render()
 
 void Room::draw_floor() const
 {
-    glBindTexture(GL_TEXTURE_2D, texture_names[1]);
+	glBindTexture(GL_TEXTURE_2D, texture_names[1]);
 
 	ut::draw_rectangle_with_texture_XZ(car.position_x-1, size);
 
@@ -253,7 +251,7 @@ void Room::draw_floor() const
 	ut::draw_rectangle_with_texture_YZ(0.5, size);
 	glPopMatrix();
 
-    glBindTexture(GL_TEXTURE_2D, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void Room::draw_grid() const
